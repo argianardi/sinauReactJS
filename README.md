@@ -37,6 +37,44 @@ jika conditional hanya memiliki satu cabang kita dapat menggunakan syntax `logic
 </div>
 ```
 
+## Rendering Lists
+
+Kita dapat menggunakan fitur JavaScript seperti for loop dan fungsi array map() untuk merender list komponen. Misalnya, kita memiliki serangkaian produk:
+
+```
+const products = [
+  { title: 'Cabbage', id: 1 },
+  { title: 'Garlic', id: 2 },
+  { title: 'Apple', id: 3 },
+];
+```
+
+Kita bisa gunakan fungsi map() untuk mengubah array produk menjadi array item.
+
+```
+     <ul>
+        {products.map((product) => (
+          <li key={product.id}>
+            {product.title}
+          </li>
+        ))}
+    </ul>
+```
+
+Atau kita juga bisa meringkasnya menjadi seperti ini [[1]](https://beta.reactjs.org/learn):
+
+```
+const listItems = products.map(product =>
+  <li key={product.id}>
+    {product.title}
+  </li>
+);
+
+return (
+  <ul>{listItems}</ul>
+);
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
