@@ -17,6 +17,26 @@ return (
 );
 ```
 
+Agar code kita lebih ringkas kita bisa menggunakan ternari operator seperti ini [[1]](https://beta.reactjs.org/learn):
+
+```
+<div>
+  {isLoggedIn ? (
+    <AdminPanel />
+  ) : (
+    <LoginForm />
+  )}
+</div>
+```
+
+jika conditional hanya memiliki satu cabang kita dapat menggunakan syntax `logical &&` [[1]](https://beta.reactjs.org/learn):
+
+```
+<div>
+  {isLoggedIn && <AdminPanel />}
+</div>
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
