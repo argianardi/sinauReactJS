@@ -50,6 +50,86 @@
   - untuk nama folder dibuat dengan lower case, contonya pages
   - untuk variable yang nilainya absolut dibuat dengan uppercase, contohnya JUMLAHHARI
 
+## Props
+
+### Props
+
+Props adalah suatu cara untuk mengirim dan mengakses data dari suatu component (parent component) ke component lain (child component) secara langsung. Berikut contoh penggunaannya di coding:
+
+```
+function App() {
+  return (
+    <div className="Parentbox">
+      <FotoProduct />
+      <ProductInfo title="Sarung gajah berdiri" price="74000" category="pakaian" />
+    </div>
+  );
+}
+```
+
+App merupakan component parent yang memiliki component child `FotoProduct` dan `ProductInfo`. Component `App` akan melempar data title, price dan category ke component `ProductInfo` menggunakan props. Berikut codingan pada component `ProductInfo`:
+
+```
+function ProductInfo({ category, title, price }) {
+
+  return (
+    <div>
+      <div className="Deskripsi">
+        <p className="Cate">{category}</p>
+        <h1 className="Title">{title}</h1>
+        <p className="Price">IDR {price}</p>
+        <p className="Info">
+          one of the most recognizable shoes in the AJ colection, the Air Jordan
+          3 Retro features lightweight, visible cushioning just like the
+          original from '88, Signature details and materials celebrate the
+          game-changing icon.
+        </p>
+      </div>
+    </div>
+  );
+}
+```
+
+### Default Props
+
+Defualt props merupakan nilai props yang secara otomatis akan digunakan ketika suatu component tidak diberi props. Berikut contoh penggunaanya di coding:
+
+```
+const YouTubeComp = ({ time }) => {
+  return (
+    <div className="youtube-wrapper">
+      <div className="img-thumb">
+        <img src={"https://source.unsplash.com/200x400?youtube"} />
+        <p className="time">{time}</p>
+      </div>
+      <p className="title">Title Here</p>
+      <p className="desc">desc here</p>
+    </div>
+  );
+};
+
+YouTubeComp.defaultProps = {
+  time: "00.00",
+};
+
+export default YouTubeComp;
+```
+
+Codingan diatas merupakan codingan component child yang akan menerima props time pada tag `<p>` dan kemudian akan diberi defaultProps time dengan value “00.00”
+
+```
+const Home = () => {
+  return (
+    <>
+      <YouTubeComp time="5.04" />
+      <YouTubeComp />
+    </>
+  );
+};
+```
+
+Codingan diatas merupakan component parent yang berisi 2 component Youtube diatas tadi dimana component YouTube pertama diberi props time dengan value “5.04” sedangan pada component YouTube kedua tidak diberi props sehingga secara otomatis akan ditampilkan props defaultnya tadi yaitu “00.00”. berikut hasilnya:
+
 ## Conditional Rendering
 
 Di React, tidak ada sintaks khusus untuk penulisan conditional. Sebagai gantinya, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional
