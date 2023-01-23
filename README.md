@@ -130,6 +130,22 @@ const Home = () => {
 
 Codingan diatas merupakan component parent yang berisi 2 component Youtube diatas tadi dimana component YouTube pertama diberi props time dengan value “5.04” sedangan pada component YouTube kedua tidak diberi props sehingga secara otomatis akan ditampilkan props defaultnya tadi yaitu “00.00”. berikut hasilnya:
 
+## Image
+
+Berdasarkan sumber sourcenya terdapat dua cara untuk menampilkan image.
+
+### Dari local
+
+```
+<img sr­c={image1} alt="gambar laptop" width={150}className="float-left mr-3" />
+```
+
+## Dari url
+
+```
+<img src={"https://source.unsplash.com/600x400"} alt="img" />
+```
+
 ## Conditional Rendering
 
 Di React, tidak ada sintaks khusus untuk penulisan conditional. Sebagai gantinya, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional
@@ -169,7 +185,7 @@ jika conditional hanya memiliki satu cabang kita dapat menggunakan syntax `logic
 </div>
 ```
 
-## Rendering Lists
+## Lists Rendering
 
 Kita dapat menggunakan fitur JavaScript seperti for loop dan fungsi array map() untuk merender list komponen. Misalnya, kita memiliki serangkaian produk:
 
