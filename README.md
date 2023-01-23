@@ -146,6 +146,18 @@ Berdasarkan sumber sourcenya terdapat dua cara untuk menampilkan image.
 <img src={"https://source.unsplash.com/600x400"} alt="img" />
 ```
 
+## Inline Style
+
+Untuk menambahkan inline style css dapat dilakukan dengan cara berikut:
+
+```
+<div className="rounded-xl overflow-hidden card-shadow relative" style={{
+width: 287, height: 386 }} >
+</div>
+```
+
+Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
+
 ## Conditional Rendering
 
 Di React, tidak ada sintaks khusus untuk penulisan conditional. Sebagai gantinya, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional
