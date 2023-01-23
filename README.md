@@ -1,3 +1,12 @@
+## Persiapan Project
+
+- Install React
+  Untuk install react js buat folder baru dengan nama aplikasi yang akan kita buat, kemudian buka folder tersebut dengan cli atau vs code langsung dan command:
+
+  ```
+      npx create-react-app .
+  ```
+
 ## Conditional Rendering
 
 Di React, tidak ada sintaks khusus untuk penulisan conditional. Sebagai gantinya, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional
