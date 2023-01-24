@@ -140,7 +140,7 @@ Berdasarkan sumber sourcenya terdapat dua cara untuk menampilkan image.
 <img sr­c={image1} alt="gambar laptop" width={150}className="float-left mr-3" />
 ```
 
-## Dari url
+### Dari url
 
 ```
 <img src={"https://source.unsplash.com/600x400"} alt="img" />
@@ -234,6 +234,41 @@ return (
   <ul>{listItems}</ul>
 );
 ```
+
+## React Router
+
+React Router merupakan library yang digunakan untuk membuat sebuah route atau navigasi yang memungkinkan user bisa berpindah dari satu halaman ke halaman lainnya. Untuk bisa menggunakan react router kita harus mengistallnya terlebih dahulu dengan command:
+
+```
+npm i react-router-dom
+```
+
+Selanjutnya kita lakukan konfigurasi di file yang kita khususkan untuk router (biasanya file App.js), seperti ini:
+
+```
+    import { BrowserRouter, Route, Routes } from "react-router-dom";
+    import "./App.css";
+    import Detail from "./pages/Detail";
+    import Home from "./pages/Home";
+    import Login from "./pages/Login";
+
+    function App() {
+        return (
+           <BrowserRouter>
+             <Routes>
+               <Route path="/" element={<Home />} />
+               <Route path="/:id" element={<Detail />} />
+               <Route path="/login" element={<Login />} />
+               <Route path="*" element={<NotFound />} />
+             </Routes>
+           </BrowserRouter>
+         );
+    }
+```
+
+Path digunakan untuk mendefinisikan alamat page website kita. Element digunakan untuk mendefinisikan component/page yang akan dituju menggunkan alamat pada path yang kita buat. Code ":id" maksudnya adalah path untuk parameter, yang membuat value id akan menjadi dinamis. Sehingga jika di bar search browser diberi alamat base-url/1 maka user akan dibawa ke page Detail dengan data dari elemen yang id-nya 1.
+
+Sedangkan "\*" untuk menangkap semuat alamat selain alamat yang ada di path Route yang sudah kita buat sebelumnya, ini bertujuan agar user saat memasukkan alamat yang salah akan langsung diarahkan ke page `<NotFound />`. Khusus untuk Route ini harus diletakkan di urutan yang paling bawah. karena jika diletakkan diatas, alamat apapun yang diketikkan user akan ditangkap oleh Route ini meskipun alamat yang dimasukkan untuk menuju ke salah satu page dalam website itu benar.
 
 ## Referensi
 
