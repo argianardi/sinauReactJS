@@ -237,11 +237,15 @@ return (
 
 ## React Router
 
+### Install React-Router
+
 React Router merupakan library yang digunakan untuk membuat sebuah route atau navigasi yang memungkinkan user bisa berpindah dari satu halaman ke halaman lainnya. Untuk bisa menggunakan react router kita harus mengistallnya terlebih dahulu dengan command:
 
 ```
 npm i react-router-dom
 ```
+
+### Konfigurasi Router
 
 Selanjutnya kita lakukan konfigurasi di file yang kita khususkan untuk router (biasanya file App.js), seperti ini:
 
@@ -269,6 +273,32 @@ Selanjutnya kita lakukan konfigurasi di file yang kita khususkan untuk router (b
 Path digunakan untuk mendefinisikan alamat page website kita. Element digunakan untuk mendefinisikan component/page yang akan dituju menggunkan alamat pada path yang kita buat. Code ":id" maksudnya adalah path untuk parameter, yang membuat value id akan menjadi dinamis. Sehingga jika di bar search browser diberi alamat base-url/1 maka user akan dibawa ke page Detail dengan data dari elemen yang id-nya 1.
 
 Sedangkan "\*" untuk menangkap semuat alamat selain alamat yang ada di path Route yang sudah kita buat sebelumnya, ini bertujuan agar user saat memasukkan alamat yang salah akan langsung diarahkan ke page `<NotFound />`. Khusus untuk Route ini harus diletakkan di urutan yang paling bawah. karena jika diletakkan diatas, alamat apapun yang diketikkan user akan ditangkap oleh Route ini meskipun alamat yang dimasukkan untuk menuju ke salah satu page dalam website itu benar.
+
+### Link
+
+Link ini akan menggantikan tag `<a>` pada react, bedanya hanya atribute href diganti dengan to selebihnya sama. Sebulum membuat Link kita harus import Link terlebih dahulu. Berikut contoh penggunaanya di coding:
+
+```
+import { Link } from "react-router-dom";
+
+<ul  className="fixed bg-white inset-0 flex flex-col md:flex md:items-center"  id="menu">
+  <li className="mx-3 py-6 md:py-0">
+    <Link to="showcase" className="text-black  hover:underline">
+      Showcase
+    </Link>
+  </li>
+  <li className="mx-3 py-6 md:py-0">
+    <Link to="catalog" className="text-black md:text-white">
+      Catalog
+    </Link>
+  </li>
+  <li className="mx-3 py-6 md:py-0">
+    <Link to="delivery" className="text-black md:text-white ">
+      Delivery
+    </Link>
+  </li>
+</ul>;
+```
 
 ## Referensi
 
