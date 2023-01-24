@@ -130,7 +130,9 @@ const Home = () => {
 
 Codingan diatas merupakan component parent yang berisi 2 component Youtube diatas tadi dimana component YouTube pertama diberi props time dengan value “5.04” sedangan pada component YouTube kedua tidak diberi props sehingga secara otomatis akan ditampilkan props defaultnya tadi yaitu “00.00”. berikut hasilnya:
 
-## State
+## State dan UseState
+
+### State
 
 State adalah sebuah object untuk menyimpan data pada React dan akan di render atau muat ulang ketika data mengalami perubahan. Berikut contoh penggunaannya di coding:
 
@@ -158,6 +160,111 @@ const Home = () => {
       <h5>Like: {like}</h5>
       //--------------------------------------------------------
       <button onClick={handleLike}>Like</button>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+### UseState
+
+useState digunakan untuk membuat dan mengupdate state. Berikut beberapa contoh penggunaan useState:
+
+#### useState Untuk Object
+
+```
+//----------------Import useState----------
+import React, { useState } from "react";
+
+const Home = () => {
+  //---------- Assign state menggunakan useStae berbentuk object
+  const [person, setPerson] = useState({
+    firstName: "Ronoa",
+    lastname: "Zoro",
+    age: 20,
+  });
+ //--------------------------------------------------------------------
+
+  const handleUpadateAge = () => {
+    //---------- update state menggunakan setState dan rest parameter
+    setPerson({
+      ...person,
+      age: person.age + 1,
+    });
+    //--------------------------------------------------------------------
+  };
+
+  return (
+    <div className="home">
+      <h3>Contact List</h3>
+      //-------- Tampilkan state
+      <h5>First Name: {person.firstName}</h5>
+      <h5>Last Name: {person.lastname}</h5>
+      <h5>Age: {person.age}</h5>
+      //--------------------------------------------------------------------
+      <button onClick={handleUpadateAge}>Update Age</button>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+#### useState Untuk Nesting Object
+
+```
+ //-----------------Import useState ----------------
+import React, { useState } from "react";
+
+const Home = () => {
+
+  const [person, setPerson] = useState({
+    //---------- Assign state menggunakan useStae untuk nesting object
+    firstName: "Ronoa",
+    lastname: "Zoro",
+    age: 20,
+    track: {
+      fight: 30,
+      bounty: 30000,
+    },
+    //--------------------------------------------------------------------
+  });
+
+  const handleUpdateAge = () => {
+    setPerson({
+      ...person,
+      age: person.age + 1,
+    });
+  };
+
+  const handleUpdateFight = () => {
+    //---------- update state menggunakan setState dan rest parameter
+    setPerson({
+      ...person,
+      track: {
+        ...person.track,
+        fight: person.track.fight + 1,
+      },
+    });
+    //--------------------------------------------------------------------
+  };
+
+  return (
+    <div className="home">
+      <h3>Contact List</h3>
+      //-----------------Tampilkan state ---------------
+      <h5>First Name: {person.firstName}</h5>
+      <h5>Last Name: {person.lastname}</h5>
+      <h5>Age: {person.age}</h5>
+      <h5>Track:</h5>
+      <ul>
+        <li>fight: {person.track.fight}</li>
+        <li>bounty: {person.track.bounty}</li>
+      </ul>
+      //--------------------------------------------------------------------
+      <button onClick={handleUpdateAge}>Update Age</button>
+      <button onClick={handleUpdateFight}>Update Fight</button>
     </div>
   );
 };
