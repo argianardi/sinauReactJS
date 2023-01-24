@@ -436,6 +436,116 @@ Saat button Go to Detail pada item 1 ditekan, kita akan langsung pindah ke halam
 <image src="./src/images/detailPage-useNavigate.png" alt='detailPage userNavigate'>
 </p>
 
+### useParams()
+
+Digunakan untuk membaca url paramater. Dicontoh ini kita akan menggunakan page Detail yang telah dibuat di materi `useNavigate()` sebelumnya, dimana kita telah memilik url parameter id. Untuk bisa menggunakannya kita import `useParams()`, kemudian kita deklarasikan `useParams()` dalam satu variabel (dicontoh kita buat params). Params ini akan mengembalikan object yang isinya paramater yang ada di page yang sedang kita kerjakan (di contoh page detail) [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Detail.jsx);
+
+```
+import React from "react";
+import { useParams } from "react-router-dom";
+
+const Detail = () => {
+  const params = useParams();
+  console.log(params);
+  return (
+    <div>
+      <p>Detail</p>
+    </div>
+  );
+};
+
+export default Detail;
+```
+
+Jika dilihat di browser saat kita masih di page home dan kita klik button `Go to Detail` di salah satu itemnya kita akan masuk di page detail item 1 dan jika kita coba console variable `params` hasilnya seperti ini:
+
+```
+Object { id: "1" }
+```
+
+Terlihat jika diconsole ternyata variabel params berisi object id. Sehingga kita dapat langsung destruct untuk mengambil id dan kita coba return id-nya seperti ini [[2]](https://github.com/argianardi/ReactRouterV6/blob/params/src/pages/Detail.jsx):
+
+```
+import React from "react";
+import { useParams } from "react-router-dom";
+
+const Detail = () => {
+  const { id } = useParams();
+  return (
+    <div>
+      <p>Detail Page</p>
+      <p>Params id: {id}</p>
+    </div>
+  );
+};
+
+export default Detail;
+```
+
+Disini saat di home page kita tekan button `Go to Detail` di item 1, 2 dan 3 hasilnya seperti ini, sudah menunjukkan page yang dinamis tampilan page detailnya menyesuaikan masing-masing id nya, seperti ini:
+
+<p align="center">
+    <image src="./src/images/resultOfUseParams1.png"/>
+    <image src="./src/images/resultOfUseParams2.png"/>
+    <image src="./src/images/resultOfUseParams3.png"/>
+</p>
+
+Selanjutnya kita melakukan fetching API untuk menampilkan data detail dari masing-masing item yang diidentifikasi berdasarkan id-nya masing – masing, berikut langkah - langkahnya [[2]](https://github.com/argianardi/ReactRouterV6/blob/params/src/pages/Detail.jsx):
+
+```
+// Import useState dan useEffect
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+
+const Detail = () => {
+  const { id } = useParams();
+  //declarasikan variabel untuk menampung data user (di contoh user) menggunakan hooks useState
+  const [user, setUser] = useState(null);
+
+  //lakukan fetching api dan isikan data user dari API dalam variabel yang kita deklarasikan tadi
+  useEffect(() => {
+    fetch(`https://jsonplaceholder.typicode.com/users/${id}`)
+      .then((resp) => resp.json())
+      .then((data) => {
+        setUser(data);
+      })
+      .catch((err) => console.log(err));
+  }, [id]);
+  return (
+    <div>
+      <p>Detail Page</p>
+      <p>Params id: {id}</p>
+
+      {/* return data user dari API tadi menggunakan tag <pre>  */}
+      <pre> {JSON.stringify(user, null, 2)} </pre>
+    </div>
+  );
+};
+
+
+export default Detail;
+```
+
+Sehingga hasilnya sepert ini:
+
+<p align="center">
+    <image src="./src/images/resultOfUseParams4.png" alt='result of user params 4'/>
+</p>
+
+Dari halaman home diatas saat button `Go to Detail` pada item 1 ditekan hasilnya seperti gambar di bawah ini (kita dibawa ke detail page) dan url di search bar di browser berubah menjadi `locallhost 3000/1`
+
+<p align="center">
+    <image src="./src/images/resultOfUseParams5.png" alt='result of user params 5'/>
+</p>
+
+Begitu juga saat button `Go to Detail` pada item 2 ditekan hasilnya seperti gambar di bawah ini dan url di bar searching berubah menjadi locallhost 3000/2
+
+<p align="center">
+    <image src="./src/images/resultOfUseParams6.png" alt='result of user params 6'/>
+</p>
+
+Hal yang sama juga akan terjadi jika kita menekan button `Go to Detail` untuk elemen item lainnya.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
