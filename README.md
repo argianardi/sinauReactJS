@@ -211,6 +211,67 @@ const Home = () => {
 export default Home;
 ```
 
+#### useState Untuk Nesting Object
+
+```
+ //-----------------Import useState ----------------
+import React, { useState } from "react";
+
+const Home = () => {
+
+  const [person, setPerson] = useState({
+    //---------- Assign state menggunakan useStae untuk nesting object
+    firstName: "Ronoa",
+    lastname: "Zoro",
+    age: 20,
+    track: {
+      fight: 30,
+      bounty: 30000,
+    },
+    //--------------------------------------------------------------------
+  });
+
+  const handleUpdateAge = () => {
+    setPerson({
+      ...person,
+      age: person.age + 1,
+    });
+  };
+
+  const handleUpdateFight = () => {
+    //---------- update state menggunakan setState dan rest parameter
+    setPerson({
+      ...person,
+      track: {
+        ...person.track,
+        fight: person.track.fight + 1,
+      },
+    });
+    //--------------------------------------------------------------------
+  };
+
+  return (
+    <div className="home">
+      <h3>Contact List</h3>
+      //-----------------Tampilkan state ---------------
+      <h5>First Name: {person.firstName}</h5>
+      <h5>Last Name: {person.lastname}</h5>
+      <h5>Age: {person.age}</h5>
+      <h5>Track:</h5>
+      <ul>
+        <li>fight: {person.track.fight}</li>
+        <li>bounty: {person.track.bounty}</li>
+      </ul>
+      //--------------------------------------------------------------------
+      <button onClick={handleUpdateAge}>Update Age</button>
+      <button onClick={handleUpdateFight}>Update Fight</button>
+    </div>
+  );
+};
+
+export default Home;
+```
+
 ## Image
 
 Berdasarkan sumber sourcenya terdapat dua cara untuk menampilkan image.
