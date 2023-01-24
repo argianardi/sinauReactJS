@@ -130,6 +130,41 @@ const Home = () => {
 
 Codingan diatas merupakan component parent yang berisi 2 component Youtube diatas tadi dimana component YouTube pertama diberi props time dengan value “5.04” sedangan pada component YouTube kedua tidak diberi props sehingga secara otomatis akan ditampilkan props defaultnya tadi yaitu “00.00”. berikut hasilnya:
 
+## State
+
+State adalah sebuah object untuk menyimpan data pada React dan akan di render atau muat ulang ketika data mengalami perubahan. Berikut contoh penggunaannya di coding:
+
+```
+//-------------import useState.---------------------------
+import React, { useState } from "react";
+//--------------------------------------------------------
+
+const Home = () => {
+  //-------------Assign state menggunakan useState------
+  const [like, setLike] = useState(0);
+  //--------------------------------------------------------
+
+
+  const handleLike = () => {
+    //-------------Upedate perubahan pada state menggunakan setState
+    setLike(like + 1);
+    //--------------------------------------------------------
+  };
+
+  return (
+    <div className="home">
+      <h3>Contact List</h3>
+      //-------------Terakhir tampilkan state ------
+      <h5>Like: {like}</h5>
+      //--------------------------------------------------------
+      <button onClick={handleLike}>Like</button>
+    </div>
+  );
+};
+
+export default Home;
+```
+
 ## Image
 
 Berdasarkan sumber sourcenya terdapat dua cara untuk menampilkan image.
