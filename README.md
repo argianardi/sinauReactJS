@@ -235,6 +235,37 @@ return (
 );
 ```
 
+## Event Handler
+
+Berikut contoh penggunaan dari event handler:
+
+```
+import React from "react";
+
+//-------------------------------------------------------------------------------
+const Home = () => {
+  const handleClick = (message) => {
+    console.log(`${message}`);
+  };
+//-------------------------------------------------------------------------------
+
+  return (
+    <div className="home">
+      <h3>Contact List</h3>
+//-------------------------------------------------------------------------------
+      <button onClick={() => handleClick("Clicked")}>Click</button>
+//-------------------------------------------------------------------------------
+    </div>
+  );
+};
+
+export default Home;
+```
+
+Untuk membuat event handler pertama kita harus menyiapkan function yang nantinya akan dijalankan saat kita men-trigger event yang kita buat (di contoh function handleClick). Kemudian buat event handler-nya (di contoh event onClick) di salah satu elemen yang kita buat di contoh (di button). Terakhir di event handler yang kita buat tadi kita panggil function yang telah kita buat tadi (function handleClick) dengan memanfaatkan anonymous function.
+
+Dari code di atas akan menghasilkan button dengan nama `Click`, saat kita menekan tombol tersebut maka di console akan tercetak sebuah message yang kita set (Clicked).
+
 ## React Router
 
 ### Install React-Router
