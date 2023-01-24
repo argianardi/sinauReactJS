@@ -247,7 +247,7 @@ npm i react-router-dom
 
 ### Konfigurasi Router
 
-Selanjutnya kita lakukan konfigurasi di file yang kita khususkan untuk router (biasanya file App.js), seperti ini:
+Selanjutnya kita lakukan konfigurasi di file yang kita khususkan untuk router (biasanya file App.js), seperti ini [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/App.js):
 
 ```
     import { BrowserRouter, Route, Routes } from "react-router-dom";
@@ -300,6 +300,143 @@ import { Link } from "react-router-dom";
 </ul>;
 ```
 
+### useNavigate()
+
+Disebut juga parametericly bisasanya digunakan untuk membuat halaman berpindah ketika user berhasil login atau register. Untuk mengimplementasikan useNavigate(), di contoh ini kita melakukan fetching API. Berikut contoh penggunaannya di coding [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
+
+```
+import React from "react";
+import { useState, useEffect } from "react";
+
+const Home = () => {
+    const [user, setUsers] = useState([]);
+
+    useEffect(() => {
+        fetch("https://jsonplaceholder.typicode.com/users")
+             .then((resp) => resp.json())
+             .then((data) => {
+               setUsers(data)
+             })
+             .catch((err) => console.log(err));
+         []);
+
+        return (
+           <div>
+             <p>Home</p>
+           </div>
+         );
+       };
+
+export default Home;
+```
+
+Lakukan looping map untuk data API yang telah di-fetching sebelumnya dan buat tombol button yang di dalamnya ada function handle untuk mengambil id saat button element ditekan, yang nantinya akan di jadikan path di useNavigate() [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
+
+```
+import React from "react";
+import { useState, useEffect } from "react";
+
+const Home = () => {
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((resp) => resp.json())
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const handleGotoDetail = (id) => {};
+
+  return (
+    <div>
+      <h1>Home Page</h1>
+    //------------------------------------------------------------------------------------------
+      <ul>
+        {users.map((user) => {
+          return (
+            <li key={user.id}>
+              {user.name}
+              <button onClick={() => handleGotoDetail(user.id)}>
+                Go to Detail
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    //------------------------------------------------------------------------------------------
+    </div>
+  );
+};
+
+export default Home;
+```
+
+Selanjutnya import useNavigate, deklarasikan useNavigate() dalam variabel (di contoh navigate) dan gunakan variabel useNavigate yang di declarasikan tadi untuk membuat path menggunakan id di dalam function handle id tadi [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
+
+```
+import React from "react";
+import { useState, useEffect } from "react";
+//-----------------------------------------------------------------------------------
+import { useNavigate } from "react-router-dom";
+//-----------------------------------------------------------------------------------
+
+const Home = () => {
+  const [users, setUsers] = useState([]);
+  //-----------------------------------------------------------------------------------
+  const navigate = useNavigate();
+  //-----------------------------------------------------------------------------------
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((resp) => resp.json())
+      .then((data) => {
+        setUsers(data);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
+  const handleGotoDetail = (id) => {
+    //-----------------------------------------------------------------------------------
+    navigate(`/${id}`);
+    //-----------------------------------------------------------------------------------
+  };
+
+  return (
+    <div>
+      <h1>Home Page</h1>
+      <ul>
+        {users.map((user) => {
+          return (
+            <li key={user.id}>
+              {user.name}
+              <button onClick={() => handleGotoDetail(user.id)}>
+                Go to Detail
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+sehingga hasilnya akan seperti ini:
+
+<p align="center">
+<image src="./src/images/useNavigate-result.png" alt='result of useNavigate'>
+</p>
+
+Saat button Go to Detail pada item 1 ditekan, kita akan langsung pindah ke halaman detail dan alamat url di search bar browser akan berubah dari `locallhost:3000` menjadi `locallhost:3000/1`. Begitu juga jika button pada item 2 ditekan kita akan pindah ke halaman detail dan url di bar searchnya berubah menjadi `locallhost:3000/2` begitu juga seterunya dinamis path dari useNavigate mengambil id item-item kita, Detail page tadi seperti ini hasilnya:
+
+<p align="center">
+<image src="./src/images/detailPage-useNavigate.png" alt='detailPage userNavigate'>
+</p>
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
+- [[2] github.com/argianardi/ReactRouterV6](https://github.com/argianardi/ReactRouterV6)
