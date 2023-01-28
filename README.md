@@ -719,6 +719,93 @@ Begitu juga saat button `Go to Detail` pada item 2 ditekan hasilnya seperti gamb
 
 Hal yang sama juga akan terjadi jika kita menekan button `Go to Detail` untuk elemen item lainnya.
 
+## useEffect
+
+UseEffect digunakan untuk menambahkan side effect di functional component. Side effect adalah function yang dieksekusi setelah komponen dirender. UseEffect hooks akan menerima dua parameter, yaitu sebuah callback dan sebuah array.
+
+```
+useEffect(() => {
+    fn();
+}, []);
+```
+
+Array di parameter kedua ini, bisa di isi atau bisa juga dikosongkan. Kalau arraynya kosong, maka useEffect akan dijalankan sekali saja, yaitu saat komponen pertama kali di render. Jika arraynya diisi item maka useEffect ini akan dijalankan setiap kali item di dalam array tersebut berubah. Salah satu kondisi dimana kita bisa menggunakan useEffect() adalah disaat kita harus fetch data dari server:
+
+```
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+const baseUrl = "https://api.themoviedb.org/";
+const page = 1;
+
+const NowPlayingMovies = () => {
+  const [movies, setMovies] = useState([]);
+  const { toggle } = useMoveContext();
+
+  //----------------------------------------------------------------------------------
+  useEffect(() => {
+    getMovies();
+  }, []);
+  //----------------------------------------------------------------------------------
+
+  const getMovies = async () => {
+    await axios
+      .get(
+        `${baseUrl}3/movie/now_playing?api_key=${process.env.REACT_APP_API_KEY}&language=en-US&page=${page}`
+      )
+      .then((response) => {
+        setMovies(response.data.results);
+      })
+      .catch((error) => {
+        console.log(error);
+        alert("error");
+      });
+  };
+
+  return (
+    <>
+      <NavigationBar />
+      <div
+        className="d-flex flex-wrap justify-content-around "
+        style={{ background: toggle ? "#E9DCC9" : "#28282B" }}
+      >
+        {movies.map((movie) => {
+          return (
+            <CardMovies
+              src={"https://image.tmdb.org/t/p/original/" + movie.poster_path}
+              title={movie.title}
+              key={movie.id}
+              onClick={() => handleDetailPage(movie)}
+              onClick2={() => handleFav(movie)}
+            />
+          );
+        })}
+      </div>
+    </>
+  );
+};
+
+export default NowPlayingMovies;
+```
+
+Kita sebenarnya bisa membuat useEffect tanpa adanya parrameter array tersebut, akibatnya useEffect akan selalu di panggil pada saat terjadinya re-render. Jadi apapun yang sifatnya re-render, maka fungsi di atas akan terus muncul.
+
+```
+import React, { useEffect, useState } from 'react';
+
+const Home = () => {
+    const [name, setName] = useState('');
+    //---------------------------------------------------------------
+    useEffect(() => console.log('Always rendered.'));
+    //---------------------------------------------------------------
+
+    return <input type='text' value={name} onChange={(e) => setName(e.target.value)} />;
+}
+
+export default Home;
+```
+
+Hasilnya, setiap kita ketikkan text di dalam component input itu, maka `console.log('Always rendered.')` akan selalu dijalankan. Hal ini bisa menyebabkan crash atau memory leak.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
