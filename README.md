@@ -806,6 +806,73 @@ export default Home;
 
 Hasilnya, setiap kita ketikkan text di dalam component input itu, maka `console.log('Always rendered.')` akan selalu dijalankan. Hal ini bisa menyebabkan crash atau memory leak.
 
+## CRUD (post/get/put/delete request)
+
+### Get request
+
+Sebelum melakukan request data melalui api kita harus menyiapkan base url dan axion di file lain (`src/api/<namaFile.js>`) agar lebih rapi yang nanti selanjutnya bisa kita import di file tempat melaukan request api (get,post, put atau delete).
+
+```
+import axios from "axios";
+
+export default axios.create({
+  baseURL: "http://localhost:4444",
+});
+```
+
+Untuk melakukan get request, selain harus menggunakan axios atau fetching dari javascript kita juga harus menggunakan useEffect:
+
+```
+import React, { useEffect, useState } from "react";
+import ContactList from "./ContactList";
+import Api from "../api/contactApi";
+
+const Home = () => {
+  const [contacts, setContacts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+//-----------------------------------------------------------------------------
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const getContacts = async () => {
+    await Api.get("/contacts")
+      .then((res) => {
+        setContacts(res.data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+//-----------------------------------------------------------------------------
+
+  return (
+    <div>
+      <div className="home">
+        {loading && <div>loading..........</div>}
+        <h3>Contact List</h3>
+        {error && <div>{error}</div>}
+
+        {contacts.map((contact) => (
+          <ContactList
+            key={contact.id}
+            name={contact.name}
+            number={contact.number}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
