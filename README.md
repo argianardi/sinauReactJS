@@ -873,6 +873,70 @@ const Home = () => {
 export default Home;
 ```
 
+### Post Request
+
+Untuk melakukan post request kita membuatuhkan parameter berupa id dari item yang akan kita hapus. Di dalam function delete request kita harus menambahkan functin get request agar kita mendapatkan data terbaru setelah kita menghapus item. Dan terakhir kita harus menambahkan function delete request ke even handler onClick di button.
+
+```
+import React, { useEffect, useState } from "react";
+import ContactList from "./ContactList";
+import Api from "../api/contactApi";
+
+const Home = () => {
+  const [contacts, setContacts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const getContacts = async () => {
+    await Api.get("/contacts")
+      .then((res) => {
+        setContacts(res.data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+//-------------------------------------------------------------------------
+  const handleDelete = async (id) => {
+    await Api.delete(`/contacts/${id}`).then((res) => {
+      getContacts();
+    });
+  };
+//-------------------------------------------------------------------------
+
+  return (
+    <div>
+      <div className="home">
+        {loading && <div>loading..........</div>}
+        <h3>Contact List</h3>
+        {error && <div>{error}</div>}
+
+        {contacts.map((contact) => (
+          <ContactList
+            key={contact.id}
+            name={contact.name}
+            number={contact.number}
+      //-------------------------------------------------------------------------
+            onDelete={() => handleDelete(contact.id)}
+      //-------------------------------------------------------------------------
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
