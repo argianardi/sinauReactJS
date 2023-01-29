@@ -873,7 +873,7 @@ const Home = () => {
 export default Home;
 ```
 
-### Post Request
+### Delete Request
 
 Untuk melakukan post request kita membuatuhkan parameter berupa id dari item yang akan kita hapus. Di dalam function delete request kita harus menambahkan functin get request agar kita mendapatkan data terbaru setelah kita menghapus item. Dan terakhir kita harus menambahkan function delete request ke even handler onClick di button.
 
@@ -935,6 +935,85 @@ const Home = () => {
 };
 
 export default Home;
+```
+
+### Post Request
+
+Untuk membuat post kita harus menyiapkan function yang berfungsi untuk melakukan post request yang nantinya dijadikan value untuk event onSubmit di tag form, di dalamnya terdapat:
+
+- post request
+- state loading
+- navigasi ke halaman sebelumnya (biasanya menggunakan useNavigate)
+
+```
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Api from "../api/contactApi";
+
+const Create = () => {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const contact = { name, number };
+    setLoading(true);
+    Api.post("/contacts", contact).then((res) => {
+      console.log(res);
+      setName("");
+      setNumber("");
+      setLoading(false);
+      navigate("/");
+    });
+  };
+
+  return (
+    <div className="contact-form">
+      <h3>Contact Form</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact name
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact number
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+          />
+        </div>
+        <div className="btn-group">
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => navigate("/")}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            {loading ? "Submiting....." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default Create;
 ```
 
 ## Referensi
