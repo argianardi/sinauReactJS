@@ -475,7 +475,7 @@ import { Link } from "react-router-dom";
 
 ### useNavigate()
 
-Disebut juga parametericly bisasanya digunakan untuk membuat halaman berpindah ketika user berhasil login atau register. Untuk mengimplementasikan useNavigate(), di contoh ini kita melakukan fetching API. Berikut contoh penggunaannya di coding [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
+Disebut juga parametericly bisasanya digunakan untuk pindah dari suatu halaman ke halaman lainnya untuk mengaplikasikannya kita harus memasukkan useNavigate() ini kedalam suatu function dan nantinya function tersebut akan dijadikan value untuk suatu event (biasanya onClick atau onSubmit). Berikut contoh penggunaannya di coding [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
 
 ```
 import React from "react";
@@ -611,7 +611,7 @@ Saat button Go to Detail pada item 1 ditekan, kita akan langsung pindah ke halam
 
 ### useParams()
 
-Digunakan untuk membaca url paramater. Dicontoh ini kita akan menggunakan page Detail yang telah dibuat di materi `useNavigate()` sebelumnya, dimana kita telah memilik url parameter id. Untuk bisa menggunakannya kita import `useParams()`, kemudian kita deklarasikan `useParams()` dalam satu variabel (dicontoh kita buat params). Params ini akan mengembalikan object yang isinya paramater yang ada di page yang sedang kita kerjakan (di contoh page detail) [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Detail.jsx);
+Digunakan untuk membaca url paramater. Dicontoh ini kita akan menggunakan page Detail yang telah dibuat di materi `useNavigate()` sebelumnya, dimana kita telah memilik url parameter id. Untuk bisa menggunakannya kita import `useParams()`, kemudian kita deklarasikan `useParams()` dalam satu variabel (dicontoh kita buat params). Params ini akan mengembalikan object yang isinya paramater yang ada di url page yang sedang kita kerjakan (di contoh page detail) [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Detail.jsx);
 
 ```
 import React from "react";
@@ -805,6 +805,344 @@ export default Home;
 ```
 
 Hasilnya, setiap kita ketikkan text di dalam component input itu, maka `console.log('Always rendered.')` akan selalu dijalankan. Hal ini bisa menyebabkan crash atau memory leak.
+
+## CRUD (post/get/put/delete request)
+
+### Get request
+
+Sebelum melakukan request data melalui api kita harus menyiapkan base url dan axion di file lain (`src/api/<namaFile.js>`) agar lebih rapi yang nanti selanjutnya bisa kita import di file tempat melaukan request api (get,post, put atau delete).
+
+```
+import axios from "axios";
+
+export default axios.create({
+  baseURL: "http://localhost:4444",
+});
+```
+
+Untuk melakukan get request, selain harus menggunakan axios atau fetching dari javascript kita juga harus menggunakan useEffect:
+
+```
+import React, { useEffect, useState } from "react";
+import ContactList from "./ContactList";
+import Api from "../api/contactApi";
+
+const Home = () => {
+  const [contacts, setContacts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+//-----------------------------------------------------------------------------
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const getContacts = async () => {
+    await Api.get("/contacts")
+      .then((res) => {
+        setContacts(res.data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+//-----------------------------------------------------------------------------
+
+  return (
+    <div>
+      <div className="home">
+        {loading && <div>loading..........</div>}
+        <h3>Contact List</h3>
+        {error && <div>{error}</div>}
+
+        {contacts.map((contact) => (
+          <ContactList
+            key={contact.id}
+            name={contact.name}
+            number={contact.number}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+### Delete Request
+
+Untuk melakukan post request kita membuatuhkan parameter berupa id dari item yang akan kita hapus. Di dalam function delete request kita harus menambahkan functin get request agar kita mendapatkan data terbaru setelah kita menghapus item. Dan terakhir kita harus menambahkan function delete request ke even handler onClick di button.
+
+```
+import React, { useEffect, useState } from "react";
+import ContactList from "./ContactList";
+import Api from "../api/contactApi";
+
+const Home = () => {
+  const [contacts, setContacts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const getContacts = async () => {
+    await Api.get("/contacts")
+      .then((res) => {
+        setContacts(res.data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+//-------------------------------------------------------------------------
+  const handleDelete = async (id) => {
+    await Api.delete(`/contacts/${id}`).then((res) => {
+      getContacts();
+    });
+  };
+//-------------------------------------------------------------------------
+
+  return (
+    <div>
+      <div className="home">
+        {loading && <div>loading..........</div>}
+        <h3>Contact List</h3>
+        {error && <div>{error}</div>}
+
+        {contacts.map((contact) => (
+          <ContactList
+            key={contact.id}
+            name={contact.name}
+            number={contact.number}
+      //-------------------------------------------------------------------------
+            onDelete={() => handleDelete(contact.id)}
+      //-------------------------------------------------------------------------
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;
+```
+
+### Post Request
+
+Untuk membuat post kita harus menyiapkan function yang berfungsi untuk melakukan post request yang nantinya dijadikan value untuk event onSubmit di tag form, di dalamnya terdapat:
+
+- post request
+- state loading
+- navigasi ke halaman sebelumnya (biasanya menggunakan useNavigate)
+
+```
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Api from "../api/contactApi";
+
+const Create = () => {
+  const navigate = useNavigate();
+
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const contact = { name, number };
+    setLoading(true);
+    Api.post("/contacts", contact).then((res) => {
+      console.log(res);
+      setLoading(false);
+      navigate("/");
+    });
+  };
+
+  return (
+    <div className="contact-form">
+      <h3>Contact Form</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact name
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact number
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+          />
+        </div>
+        <div className="btn-group">
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => navigate("/")}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            {loading ? "Submiting....." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default Create;
+```
+
+### Put Request
+
+Di contoh ini Put request dijadikan satu file dengan post request, jadi di dalam function handle submit kita harus beri logic jika terdapat data id di param maka jalankan function put requst tetapi jika tidak ada maka jalankan post request.
+
+```
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Api from "../api/contactApi";
+
+const Create = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+
+//------------------------------------------------------------------------
+  useEffect(() => {
+    if (id) {
+      Api.get(`/contacts/${id}`).then((res) => {
+        const { data } = res;
+        setName(data.name);
+        setNumber(data.number);
+      });
+    }
+  }, [id]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const contact = { name, number };
+    setLoading(true);
+
+    if (id) {
+      updateContact(contact);
+    } else {
+      createContact(contact);
+    }
+  };
+
+  const createContact = (contact) => {
+    Api.post("/contacts", contact).then((res) => {
+      setLoading(false);
+      navigate("/");
+    });
+  };
+
+  const updateContact = (contact) => {
+    Api.put(`/contacts/${id}`, contact).then(() => {
+      setLoading(false);
+      navigate("/");
+    });
+  };
+//------------------------------------------------------------------------
+
+  return (
+    <div className="contact-form">
+      <h3>{id ? "Upadate" : "Add"} Contact</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact name
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact number
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+          />
+        </div>
+        <div className="btn-group">
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => navigate("/")}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            {loading ? "Submiting....." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default Create;
+```
+
+## Active Link
+
+Active Link ini digunakan di dalam component navbar untuk membuat salah satu menu navigasinya memiliki style yang berbeda (bisanya warnanya lebih gelap atau lebih terang atu bisa juga di beri underline) yang menandakan bahwa menu tersebut sedang active, yang berarti bahwa kita sedang berada di page tempat path menu navigasi tersebut. Untuk bisa menggunakannya kita harus import NavLink dari react-router-dom.
+
+```
+import React from "react";
+import { NavLink } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <nav>
+      <h1>Phone Contact</h1>
+      <div className="nav-menu">
+        <NavLink to="/" activeclassname="active">
+          Home
+        </NavLink>
+        <NavLink to="create" activeclassname="active">
+          New Contact
+        </NavLink>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+```
+
+Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassname"active"` artinya saat kita berada di page dengan path `/`, class `active` tersebut akan dijalankan. Di mana class `active` inilah yang akan membuat style pada menu navbar dengan path `/` ini akan berbeda. class `active` tersebut bisa kita set sendiri.
 
 ## Referensi
 
