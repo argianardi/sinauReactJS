@@ -475,7 +475,7 @@ import { Link } from "react-router-dom";
 
 ### useNavigate()
 
-Disebut juga parametericly bisasanya digunakan untuk membuat halaman berpindah ketika user berhasil login atau register. Untuk mengimplementasikan useNavigate(), di contoh ini kita melakukan fetching API. Berikut contoh penggunaannya di coding [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
+Disebut juga parametericly bisasanya digunakan untuk pindah dari suatu halaman ke halaman lainnya untuk mengaplikasikannya kita harus memasukkan useNavigate() ini kedalam suatu function dan nantinya function tersebut akan dijadikan value untuk suatu event (biasanya onClick atau onSubmit). Berikut contoh penggunaannya di coding [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Home.jsx):
 
 ```
 import React from "react";
@@ -611,7 +611,7 @@ Saat button Go to Detail pada item 1 ditekan, kita akan langsung pindah ke halam
 
 ### useParams()
 
-Digunakan untuk membaca url paramater. Dicontoh ini kita akan menggunakan page Detail yang telah dibuat di materi `useNavigate()` sebelumnya, dimana kita telah memilik url parameter id. Untuk bisa menggunakannya kita import `useParams()`, kemudian kita deklarasikan `useParams()` dalam satu variabel (dicontoh kita buat params). Params ini akan mengembalikan object yang isinya paramater yang ada di page yang sedang kita kerjakan (di contoh page detail) [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Detail.jsx);
+Digunakan untuk membaca url paramater. Dicontoh ini kita akan menggunakan page Detail yang telah dibuat di materi `useNavigate()` sebelumnya, dimana kita telah memilik url parameter id. Untuk bisa menggunakannya kita import `useParams()`, kemudian kita deklarasikan `useParams()` dalam satu variabel (dicontoh kita buat params). Params ini akan mengembalikan object yang isinya paramater yang ada di url page yang sedang kita kerjakan (di contoh page detail) [[2]](https://github.com/argianardi/ReactRouterV6/blob/navigate/src/pages/Detail.jsx);
 
 ```
 import React from "react";
@@ -963,8 +963,6 @@ const Create = () => {
     setLoading(true);
     Api.post("/contacts", contact).then((res) => {
       console.log(res);
-      setName("");
-      setNumber("");
       setLoading(false);
       navigate("/");
     });
@@ -973,6 +971,107 @@ const Create = () => {
   return (
     <div className="contact-form">
       <h3>Contact Form</h3>
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact name
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="" className="control-label">
+            Contact number
+          </label>
+          <input
+            type="text"
+            className="form-control"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+          />
+        </div>
+        <div className="btn-group">
+          <button
+            type="button"
+            className="btn btn-danger"
+            onClick={() => navigate("/")}
+          >
+            Cancel
+          </button>
+          <button type="submit" className="btn btn-primary">
+            {loading ? "Submiting....." : "Submit"}
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default Create;
+```
+
+### Put Request
+
+Di contoh ini Put request dijadikan satu file dengan post request, jadi di dalam function handle submit kita harus beri logic jika terdapat data id di param maka jalankan function put requst tetapi jika tidak ada maka jalankan post request.
+
+```
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import Api from "../api/contactApi";
+
+const Create = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [name, setName] = useState("");
+  const [number, setNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+
+//------------------------------------------------------------------------
+  useEffect(() => {
+    if (id) {
+      Api.get(`/contacts/${id}`).then((res) => {
+        const { data } = res;
+        setName(data.name);
+        setNumber(data.number);
+      });
+    }
+  }, [id]);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const contact = { name, number };
+    setLoading(true);
+
+    if (id) {
+      updateContact(contact);
+    } else {
+      createContact(contact);
+    }
+  };
+
+  const createContact = (contact) => {
+    Api.post("/contacts", contact).then((res) => {
+      setLoading(false);
+      navigate("/");
+    });
+  };
+
+  const updateContact = (contact) => {
+    Api.put(`/contacts/${id}`, contact).then(() => {
+      setLoading(false);
+      navigate("/");
+    });
+  };
+//------------------------------------------------------------------------
+
+  return (
+    <div className="contact-form">
+      <h3>{id ? "Upadate" : "Add"} Contact</h3>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="" className="control-label">
