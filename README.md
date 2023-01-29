@@ -1016,6 +1016,35 @@ const Create = () => {
 export default Create;
 ```
 
+## Active Link
+
+Active Link ini digunakan di dalam component navbar untuk membuat salah satu menu navigasinya memiliki style yang berbeda (bisanya warnanya lebih gelap atau lebih terang atu bisa juga di beri underline) yang menandakan bahwa menu tersebut sedang active, yang berarti bahwa kita sedang berada di page tempat path menu navigasi tersebut. Untuk bisa menggunakannya kita harus import NavLink dari react-router-dom.
+
+```
+import React from "react";
+import { NavLink } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <nav>
+      <h1>Phone Contact</h1>
+      <div className="nav-menu">
+        <NavLink to="/" activeclassname="active">
+          Home
+        </NavLink>
+        <NavLink to="create" activeclassname="active">
+          New Contact
+        </NavLink>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+```
+
+Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassname"active"` artinya saat kita berada di page dengan path `/`, class `active` tersebut akan dijalankan. Di mana class `active` inilah yang akan membuat style pada menu navbar dengan path `/` ini akan berbeda. class `active` tersebut bisa kita set sendiri.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
