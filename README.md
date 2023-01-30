@@ -1,3 +1,7 @@
+## Roadmap
+
+Untuk alur belajar react kita bia mengikuti roadmap [ini](https://roadmap.sh/react).
+
 ## Persiapan Project
 
 - Install React
@@ -1145,6 +1149,8 @@ Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassn
 
 ## Redux
 
+### Prepare
+
 Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
 
 ```
@@ -1154,34 +1160,35 @@ npm i axios redux react-redux redux-thunk
 Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
 
 - Di dalam folder src buat folder utils dan di dalamnya buat folder redux. Di dalam folder redux inilah kita akan menampung semua file - file yang berhubungan dengan redux.
-- Buat folder actions
-- Di dalam file reducers buat folder kontak untuk menyimpan state yang berhubungan dengan kontak. di dalam folder kontak buat file `index.js` dan code berikut:
+- Di dalam folder actions
+- Di dalam folder src buat folder reducers, kemudian di dalam folder reducers ini buat folder kontak untuk menyimpan state yang berhubungan dengan kontak. Di dalam folder kontak buat file `index.js` dan code berikut:
 
-```
-const initialState = {};
+  ```
+  const initialState = {};
 
-const kontak = (state = initialState, action) => {
-  switch (action.type) {
-    default:
-      return state;
-  }
-};
+  const kontak = (state = initialState, action) => {
+    switch (action.type) {
+      default:
+        return state;
+    }
+  };
 
-export default kontak;
-```
+  export default kontak;
+  ```
 
 - Kemudian di dalam folder `reducers` (src/utils/redux/reducers) buat file `index.js`. Di dalam file `index.js` ini kita kumpulkan semua reducers dengan menggunakan `combindeReducers` yang kita import dari redux:
 
-```
-import { combineReducers } from "redux";
-import KontakReducer from "./kontak";
+  ```
+  import { combineReducers } from "redux";
+  import KontakReducer from "./kontak";
 
-export default combineReducers({
-  KontakReducer,
-});
-```
+  export default combineReducers({
+    KontakReducer,
+  });
+  ```
 
 - Di file `index.js` (src/routes/index.js) jalankan langakah - langkah berikut:
+
   - Import:
     - legacy_createStore (agar lebih rapi jadikan as createStore), compose, dan applyMiddleware dari redux
     - Provider dari react-redux
@@ -1189,34 +1196,120 @@ export default combineReducers({
   - Inisialisasi Store menggunakan createStore, reducers (yang kita buat tadi), dan middleware thunk
   - Terakhir bungkus component App menggunakan Provider dengan parameter store tadi.
 
-```
-import React from "react";
-import ReactDOM from "react-dom/client";
-import "./styles/index.css";
-import App from "./routes/App.js";
-import {
-  legacy_createStore as createStore,
-  applyMiddleware,
-  compose,
-} from "redux";
-import thunk from "redux-thunk";
-import reducers from "./utils/redux/reducers";
-import { Provider } from "react-redux";
+  ```
+  import React from "react";
+  import ReactDOM from "react-dom/client";
+  import "./styles/index.css";
+  import App from "./routes/App.js";
+  import {
+    legacy_createStore as createStore,
+    applyMiddleware,
+    compose,
+  } from "redux";
+  import thunk from "redux-thunk";
+  import reducers from "./utils/redux/reducers";
+  import { Provider } from "react-redux";
 
-const store = createStore(reducers, compose(applyMiddleware(thunk)));
+  const store = createStore(reducers, compose(applyMiddleware(thunk)));
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(
-  <>
-    <Provider store={store}>
-      <App />
-    </Provider>
-  </>
-);
-```
+  const root = ReactDOM.createRoot(document.getElementById("root"));
+  root.render(
+    <>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </>
+  );
+  ```
+
+### Setting json-server (fake api)
+
+Berikut langkah - langkah untuk setting fake api menggunakan json-server [[4]](https://www.youtube.com/watch?v=P58T93q9QrE&list=PLW-kCRbRHdAGefLJN0PbmcGz5zp6Kt0Ut&index=12&t=4s):
+
+- Install json-server, dengan command:
+  ```
+  npm i json-server
+  ```
+- Buat file json dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
+
+  ```
+  {
+    "kontaks": [
+      {
+        "id": 1,
+        "nama": "Paijo",
+        "No": "086745455454"
+      },
+      {
+        "id": 2,
+        "nama": "Tukijo",
+        "No": "086749499494"
+      }
+    ]
+  }
+  ```
+
+- Selanjutnya di file `package.json` tepatnya di object scripts tambahkan property baru dengan key `server` dan valuenya `json-server -w <path file json> -p <port>`
+
+  ```
+  {
+    "name": "sinau-redux",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+      "@testing-library/jest-dom": "^5.16.5",
+      "@testing-library/react": "^13.4.0",
+      "@testing-library/user-event": "^13.5.0",
+      "axios": "^1.2.6",
+      "json-server": "^0.17.1",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "react-redux": "^8.0.5",
+      "react-router-dom": "^6.8.0",
+      "react-scripts": "5.0.1",
+      "redux": "^4.2.1",
+      "redux-thunk": "^2.4.2",
+      "web-vitals": "^2.1.4"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject",
+      //-------------------------------------------------------------------------------
+      "server": "json-server -w db/db.json -p 2023"
+      //-------------------------------------------------------------------------------
+    },
+    "eslintConfig": {
+      "extends": [
+        "react-app",
+        "react-app/jest"
+      ]
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
+  }
+  ```
+
+- Terakhir untuk menjalankannya di terminal lakukan command:
+
+  ```
+  npm run server
+  ```
 
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
 - [[2] github.com/argianardi/ReactRouterV6](https://github.com/argianardi/ReactRouterV6)
 - [[3] youtube.com/WahidevAcademy](https://www.youtube.com/@WahidevAcademy)
+- [[4] youtube.com/@siciliancode3599](https://www.youtube.com/@siciliancode3599)
