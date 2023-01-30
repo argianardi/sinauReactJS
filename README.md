@@ -7,40 +7,39 @@
       npx create-react-app .
   ```
 
-- Rapikan file dan folder bawaan react
-  Berikut langkah – langkah untuk membuat file dan folder kita rapi:
+- Rapikan file dan folder bawaan react. Berikut langkah – langkah untuk merapikan file dan folder kita:
 
   - Buka index.js hapus reportWebVitals() dan commen2 di atasnya
-  - Buat folder dan pindahkan file App.js ke folder routes tersebut
-  - Hapus file App.Test.js dan setupTest.js dan logo.svg
-  - Buat folder styles di dalam folder src dan pindah file index.css dan App.js ke folder styles tersebut dan sesuaikan importnya di file index.js dan App.js
+  - Di dalam folder src, buat folder routes dan pindahkan file App.js ke folder routes tersebut
+  - Hapus file App.Test.js dan setupTest.js, dan logo.svg
+  - Buat folder styles di dalam folder src dan pindah file index.css dan App.js ke folder styles tersebut dan sesuaikan path importnya di file index.js dan App.js
   - Di dalam folder src buat folder components (untuk menampung file component), folder pages (untuk menampung file page) dan folder image untuk menampung file image.
 
     Hasil akhir structure foldernya akan jadi seperti ini:<br>
 
     ```
-    __node_modules
-    __public
-    __src
-    ____components
-    _______FileComponent.jsx
-    ____images
-    _______FileImage.jpg
-    ____pages
-    _______FilePage.jsx
-    ____routes
-    _______App.js
-    ____styles
-    _______App.css
-    _______index.css
-    ____utils
-    _______redux
-    _______context
-    ____index.js
-    __.gitignore
-    __packgage-lock.json
-    __package.json
-    __README.md
+    __|node_modules
+    __|public
+    __|src
+    ____|components
+    _______|FileComponent.jsx
+    ____|images
+    _______|FileImage.jpg
+    ____|pages
+    _______|FilePage.jsx
+    ____|routes
+    _______|App.js
+    ____|styles
+    _______|App.css
+    _______|index.css
+    ____|utils
+    _______|redux
+    _______|context
+    ____|index.js
+    __|.gitignore
+    __|packgage-lock.json
+    __|package.json
+    __|README.md
     ```
 
 - Selain itu terdapat beberapa hal yang harus diperhatikan:
@@ -1144,7 +1143,80 @@ export default Navbar;
 
 Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassname"active"` artinya saat kita berada di page dengan path `/`, class `active` tersebut akan dijalankan. Di mana class `active` inilah yang akan membuat style pada menu navbar dengan path `/` ini akan berbeda. class `active` tersebut bisa kita set sendiri.
 
+## Redux
+
+Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
+
+```
+npm i axios redux react-redux redux-thunk
+```
+
+Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
+
+- Di dalam folder src buat folder utils dan di dalamnya buat folder redux. Di dalam folder redux inilah kita akan menampung semua file - file yang berhubungan dengan redux.
+- Buat folder actions
+- Di dalam file reducers buat folder kontak untuk menyimpan state yang berhubungan dengan kontak. di dalam folder kontak buat file `index.js` dan code berikut:
+
+```
+const initialState = {};
+
+const kontak = (state = initialState, action) => {
+  switch (action.type) {
+    default:
+      return state;
+  }
+};
+
+export default kontak;
+```
+
+- Kemudian di dalam folder `reducers` (src/utils/redux/reducers) buat file `index.js`. Di dalam file `index.js` ini kita kumpulkan semua reducers dengan menggunakan `combindeReducers` yang kita import dari redux:
+
+```
+import { combineReducers } from "redux";
+import KontakReducer from "./kontak";
+
+export default combineReducers({
+  KontakReducer,
+});
+```
+
+- Di file `index.js` (src/routes/index.js) jalankan langakah - langkah berikut:
+  - Import:
+    - legacy_createStore (agar lebih rapi jadikan as createStore), compose, dan applyMiddleware dari redux
+    - Provider dari react-redux
+    - redux-thunk dari redux-thunk
+  - Inisialisasi Store menggunakan createStore, reducers (yang kita buat tadi), dan middleware thunk
+  - Terakhir bungkus component App menggunakan Provider dengan parameter store tadi.
+
+```
+import React from "react";
+import ReactDOM from "react-dom/client";
+import "./styles/index.css";
+import App from "./routes/App.js";
+import {
+  legacy_createStore as createStore,
+  applyMiddleware,
+  compose,
+} from "redux";
+import thunk from "redux-thunk";
+import reducers from "./utils/redux/reducers";
+import { Provider } from "react-redux";
+
+const store = createStore(reducers, compose(applyMiddleware(thunk)));
+
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(
+  <>
+    <Provider store={store}>
+      <App />
+    </Provider>
+  </>
+);
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
 - [[2] github.com/argianardi/ReactRouterV6](https://github.com/argianardi/ReactRouterV6)
+- [[3] youtube.com/WahidevAcademy](https://www.youtube.com/@WahidevAcademy)
