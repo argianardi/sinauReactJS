@@ -1149,6 +1149,23 @@ Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassn
 
 ## Redux
 
+Redux adalah lebrary yang digunakan untuk mengelola state agar bisa dijadikan global state. Global state adalah state yang dapat dipakai di semua
+komponen atau halaman. Redux ini ibarat data base di fronted di mana kita bisa menambah, mengahapus dan mengambil data yang dibungkus dalam state. Redux memiliki tiga komponen utama yaitu action, reducer, dan store
+
+- Action dalah sebuah function yang mereturn sebuah objek. Objek tersebut
+  memiliki sebuah property wajib yaitu type. Type inilah yang menentukan
+  bagaimana statenya akan diubah.
+- Reducer adalah sebuah fungsi yang tugasnya untuk mengolah state
+  yang ada di store. Misal menambah data, menghapus data, mengambil
+  data, dsb. Ada 2 parameter wajib dari reducer, yaitu state dan action.
+- Store adalah tempat untuk menampung state.
+
+Sebaiknya redux ini digunakan jika:
+
+- Banyak data yang berubah dari waktu ke waktu
+- Pengelolaan state harus dilakukan di satu tempat
+- Mengelola state di top-level component sudah tidak lagi relevan
+
 ### Prepare
 
 Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
