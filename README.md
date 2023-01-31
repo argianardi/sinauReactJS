@@ -1497,7 +1497,7 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
           getListContactResult.map((contact) => (
             <p key={contact.id}>
               {" "}
-              {contact.nama} - {contact.no}
+              {contact.name} - {contact.nohp}
             </p>
           ))
         ) : getListContactLoading ? (
@@ -1542,6 +1542,228 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
   3. Gagal dapat data: Request failed with status code 404 contactAction.js:35
   4. masuk reducer index.js:12
   ```
+
+### Post Request
+
+- Karena kita sudah prepare di bagian get request tadi, kita bisa langsung ke bagian action [src/utils/redux/actions/contactAction.js]. Sama seperti di get request tadi lakukan hal berikut:
+
+  1. Membuat constanta untuk post request yang nantinya akan dijadikan type untuk dipassing ke reducers
+  2. Buat function untuk mereturn dispatch untuk post request dengan parameter data.
+
+     - Pertama kita harus buat dispatch untuk loading yang nantinya akan kita oper ke reducer
+     - Selanjutnya kita buat dispatch untuk post Api, kita siapkan 2 dispatch. Satu dispatch untuk kondisi post request sukes dan satu lagi dispatch untuk kondisi post request api gagal.
+
+  ```
+  import axios from "axios";
+
+  export const GET_LIST_CONTACT = "GET_LIST_CONTACT";
+  //----------------------------------------------------------------------------i
+  export const ADD_CONTACT = "ADD_CONTACT";
+  //-----------------------------------------------------------------------------
+
+  export const getListContact = () => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: GET_LIST_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // get API
+      axios
+        .get("http://localhost:2023/contacts")
+        .then((response) => {
+          // berhasil get api
+          dispatch({
+            type: GET_LIST_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal get api
+          dispatch({
+            type: GET_LIST_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+
+  //-----------------------------------------------------------------------------ii
+  export const addContact = (data) => {
+    console.log("2. masuk action");
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: ADD_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // post API
+      axios
+        .post("http://localhost:2023/contacts", data)
+        .then((response) => {
+          // berhasil post api
+          console.log("3. Berhasil dapat data: ", response);
+          dispatch({
+            type: ADD_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal post api
+          console.log("3. Gagal dapat data:", error.message);
+          dispatch({
+            type: ADD_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+  //--------------------------------------------------------------
+  ```
+
+- Selanjutnya kita masuk ke reducer bagian contact [src/utils/reducers/contact/index.js].
+
+  1. Import constanta type `ADD_CONTACT` yang kita buat di action contact [src/utils/redux/actions/contactAction.js] tadi.
+  2. Buat state di bagian `initalState` post request
+  3. Buat switch case menggunakan type yang kita import tadi (`ADD_CONTACT`)
+
+  ```
+  //---------------------------------------------------------------------------i
+  import { GET_LIST_CONTACT, ADD_CONTACT } from "../../actions/contactAction";
+  //---------------------------------------------------------------------------
+
+  const initialState = {
+    // get request
+    getListContactResult: false,
+    getListContactLoading: false,
+    getListContactError: false,
+
+  //---------------------------------------------------------------------------ii
+    // post request
+    addContactResult: false,
+    addContactLoading: false,
+    addContactError: false,
+  //---------------------------------------------------------------------------
+  };
+
+  const contact = (state = initialState, action) => {
+    switch (action.type) {
+      case GET_LIST_CONTACT:
+        return {
+          ...state,
+          getListContactResult: action.payload.data,
+          getListContactLoading: action.payload.loading,
+          getListContactError: action.payload.errorMessage,
+        };
+
+      //---------------------------------------------------------------------------iii
+      case ADD_CONTACT:
+        console.log("4. masuk reducer");
+        return {
+          ...state,
+          addContactResult: action.payload.data,
+          addContactLoading: action.payload.loading,
+          addContactError: action.payload.errorMessage,
+        };
+      //---------------------------------------------------------------------------
+      default:
+        return state;
+    }
+  };
+
+  export default contact;
+  ```
+
+- Selanjutnya kita ke folder components [src/components] Buat component `AddContact` [src/components/AddContact.jsx]
+
+  1. Buat form, state dan event handler untuk menambahkan data untuk post request
+  2. Di dalam function handleSubmit tambahkan action `addContact` yang kita buat di `contactAction` [src/utils/redux/actions/contactAction.js] tadi menggunakan dispatch
+  3. Karena component `AddContact` diletakkan satu halaman (di halaman Home) dengan component `ListContact`, agar setelah kita menambahkan hasilnya datanya bisa langsung terupdate tanpa harus direload kita harus memanggil 'getListContact()' dari action [src/utils/redux/actions/contactAction.js] di dalam useEffect dengan logic jika `addContactResult` true maka panggil action `getListContact()` tadi.
+
+     ```
+     import React, { useEffect, useState } from "react";
+     import { useDispatch, useSelector } from "react-redux";
+     import {
+       addContact,
+       getListContact,
+     } from "../utils/redux/actions/contactAction";
+
+     const AddContact = () => {
+       const dispatch = useDispatch();
+       //-----------------------------------------------------------------------------------------iii
+       const { addContactResult } = useSelector((state) => state.ContactReducer);
+      //-------------------------------------------------------------------------------------------
+       const [name, setName] = useState("");
+       const [nohp, setNohp] = useState("");
+
+       const handleSubmit = (e) => {
+         e.preventDefault();
+         console.log("1. masuk handle submit");
+         //-------------------------------------------------------------------------------------------ii
+         dispatch(addContact({ name, nohp }));
+         //-------------------------------------------------------------------------------------------
+       };
+
+      //-------------------------------------------------------------------------------------------iii
+       useEffect(() => {
+         if (addContactResult) {
+           dispatch(getListContact());
+         }
+       }, [addContactResult, dispatch]);
+       //-------------------------------------------------------------------------------------------
+
+       return (
+         <div>
+           <h4>Add Contact</h4>
+           <form onSubmit={handleSubmit}>
+             <input
+               type="text"
+               name="name"
+               placeholder="Name...."
+               value={name}
+               onChange={(e) => setName(e.target.value)}
+             />
+             <input
+               type="text"
+               name="nohp"
+               placeholder="No HP...."
+               value={nohp}
+               onChange={(e) => setNohp(e.target.value)}
+             />
+             <button type="submit">Submit</button>
+           </form>
+         </div>
+       );
+     };
+
+     export default AddContact;
+     ```
 
 ## Referensi
 
