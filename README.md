@@ -809,6 +809,91 @@ export default Home;
 
 Hasilnya, setiap kita ketikkan text di dalam component input itu, maka `console.log('Always rendered.')` akan selalu dijalankan. Hal ini bisa menyebabkan crash atau memory leak.
 
+## Setting json-server (fake api)
+
+Berikut langkah - langkah untuk setting fake api menggunakan json-server [[4]](https://www.youtube.com/watch?v=P58T93q9QrE&list=PLW-kCRbRHdAGefLJN0PbmcGz5zp6Kt0Ut&index=12&t=4s):
+
+- Install json-server, dengan command:
+  ```
+  npm i json-server
+  ```
+- Buat file json dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
+
+  ```
+  {
+    "kontaks": [
+      {
+        "id": 1,
+        "nama": "Paijo",
+        "No": "086745455454"
+      },
+      {
+        "id": 2,
+        "nama": "Tukijo",
+        "No": "086749499494"
+      }
+    ]
+  }
+  ```
+
+- Selanjutnya di file `package.json` tepatnya di object scripts tambahkan property baru dengan key `server` dan valuenya `json-server -w <path file json> -p <port>`
+
+  ```
+  {
+    "name": "sinau-redux",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+      "@testing-library/jest-dom": "^5.16.5",
+      "@testing-library/react": "^13.4.0",
+      "@testing-library/user-event": "^13.5.0",
+      "axios": "^1.2.6",
+      "json-server": "^0.17.1",
+      "react": "^18.2.0",
+      "react-dom": "^18.2.0",
+      "react-redux": "^8.0.5",
+      "react-router-dom": "^6.8.0",
+      "react-scripts": "5.0.1",
+      "redux": "^4.2.1",
+      "redux-thunk": "^2.4.2",
+      "web-vitals": "^2.1.4"
+    },
+    "scripts": {
+      "start": "react-scripts start",
+      "build": "react-scripts build",
+      "test": "react-scripts test",
+      "eject": "react-scripts eject",
+      //-------------------------------------------------------------------------------
+      "server": "json-server -w db/db.json -p 2023"
+      //-------------------------------------------------------------------------------
+    },
+    "eslintConfig": {
+      "extends": [
+        "react-app",
+        "react-app/jest"
+      ]
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    }
+  }
+  ```
+
+- Terakhir untuk menjalankannya di terminal lakukan command:
+
+  ```
+  npm run server
+  ```
+
 ## CRUD (post/get/put/delete request)
 
 ### Get request
@@ -1149,16 +1234,13 @@ Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassn
 
 ## Redux
 
-Redux adalah lebrary yang digunakan untuk mengelola state agar bisa dijadikan global state. Global state adalah state yang dapat dipakai di semua
-komponen atau halaman. Redux ini ibarat data base di fronted di mana kita bisa menambah, mengahapus dan mengambil data yang dibungkus dalam state. Redux memiliki tiga komponen utama yaitu action, reducer, dan store
+Redux adalah lebrary yang digunakan untuk mengelola state agar bisa dijadikan global state. Global state adalah state yang dapat dipakai di semua komponen atau halaman. Redux ini ibarat data base di fronted di mana kita bisa menambah, mengahapus dan mengambil data yang dibungkus dalam state. Redux memiliki tiga komponen utama yaitu action, reducer, dan store:
 
-- Action dalah sebuah function yang mereturn sebuah objek. Objek tersebut
-  memiliki sebuah property wajib yaitu type. Type inilah yang menentukan
-  bagaimana statenya akan diubah.
-- Reducer adalah sebuah fungsi yang tugasnya untuk mengolah state
-  yang ada di store. Misal menambah data, menghapus data, mengambil
-  data, dsb. Ada 2 parameter wajib dari reducer, yaitu state dan action.
+- Action dalah sebuah function yang mereturn sebuah objek. Objek tersebut memiliki sebuah property wajib yaitu type. Type inilah yang menentukan bagaimana statenya akan diubah.
+- Reducer adalah sebuah fungsi yang tugasnya untuk mengolah state yang ada di store. Misal menambah data, menghapus data, mengambil data, dsb. Ada 2 parameter wajib dari reducer, yaitu state dan action.
 - Store adalah tempat untuk menampung state.
+
+Pada dasarnya, terdapat tiga fungsionalitas utama yang ditambahkan oleh redux kedalam aplikasi, Yaitu tempat untuk menyimpan keseluruhan state aplikasi, mekanisme untuk men-dispatch action kedalam reducer, dan mekanisme untuk memberi tahu setiap kali update state terjadi.
 
 Sebaiknya redux ini digunakan jika:
 
@@ -1166,7 +1248,7 @@ Sebaiknya redux ini digunakan jika:
 - Pengelolaan state harus dilakukan di satu tempat
 - Mengelola state di top-level component sudah tidak lagi relevan
 
-### Prepare
+### Prepare & Get request
 
 Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
 
@@ -1177,151 +1259,288 @@ npm i axios redux react-redux redux-thunk
 Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
 
 - Di dalam folder src buat folder utils dan di dalamnya buat folder redux. Di dalam folder redux inilah kita akan menampung semua file - file yang berhubungan dengan redux.
-- Di dalam folder actions
-- Di dalam folder src buat folder reducers, kemudian di dalam folder reducers ini buat folder kontak untuk menyimpan state yang berhubungan dengan kontak. Di dalam folder kontak buat file `index.js` dan code berikut:
+- Di dalam folder src buat folder reducers, kemudian di dalam folder reducers ini buat folder contact untuk mengelola state yang berhubungan dengan contact. Di dalam folder contact buat file `index.js` dan code berikut:
 
   ```
   const initialState = {};
 
-  const kontak = (state = initialState, action) => {
+  const contact = (state = initialState, action) => {
     switch (action.type) {
       default:
         return state;
     }
   };
 
-  export default kontak;
+  export default contact;
   ```
 
 - Kemudian di dalam folder `reducers` (src/utils/redux/reducers) buat file `index.js`. Di dalam file `index.js` ini kita kumpulkan semua reducers dengan menggunakan `combindeReducers` yang kita import dari redux:
 
   ```
   import { combineReducers } from "redux";
-  import KontakReducer from "./kontak";
+  import contactReducer from "./contact";
 
   export default combineReducers({
-    KontakReducer,
+    contactReducer,
   });
   ```
 
 - Di file `index.js` (src/routes/index.js) jalankan langakah - langkah berikut:
 
-  - Import:
-    - legacy_createStore (agar lebih rapi jadikan as createStore), compose, dan applyMiddleware dari redux
-    - Provider dari react-redux
-    - redux-thunk dari redux-thunk
-  - Inisialisasi Store menggunakan createStore, reducers (yang kita buat tadi), dan middleware thunk
-  - Terakhir bungkus component App menggunakan Provider dengan parameter store tadi.
+  1. Import:
+
+     - legacy_createStore (agar lebih rapi jadikan as createStore), compose, dan applyMiddleware dari redux
+     - Provider dari react-redux
+     - redux-thunk dari redux-thunk
+
+  2. Inisialisasi Store menggunakan createStore, reducers (yang kita buat tadi), dan middleware thunk
+  3. Terakhir bungkus component App menggunakan Provider dengan parameter store tadi.
 
   ```
   import React from "react";
   import ReactDOM from "react-dom/client";
   import "./styles/index.css";
   import App from "./routes/App.js";
+  //------------------------------------------------------------------------------i
   import {
     legacy_createStore as createStore,
     applyMiddleware,
     compose,
   } from "redux";
   import thunk from "redux-thunk";
-  import reducers from "./utils/redux/reducers";
   import { Provider } from "react-redux";
+  //--------------------------------------------------------------------------------
+  import reducers from "./utils/redux/reducers";
 
+  //-------------------------------------------------------------------------------ii
   const store = createStore(reducers, compose(applyMiddleware(thunk)));
+  //--------------------------------------------------------------------------------
 
   const root = ReactDOM.createRoot(document.getElementById("root"));
   root.render(
     <>
+  //-------------------------------------------------------------------------------iii
       <Provider store={store}>
         <App />
       </Provider>
+  //--------------------------------------------------------------------------------
     </>
   );
   ```
 
-### Setting json-server (fake api)
+- Di dalam folder `src` buat folder actions, kemudian di dalam folder `actions` ini buat file `contactAction.js.` File `contactAction.js` ini akan memuat code action untuk contact. Di dalam file ini kita melakukan:
 
-Berikut langkah - langkah untuk setting fake api menggunakan json-server [[4]](https://www.youtube.com/watch?v=P58T93q9QrE&list=PLW-kCRbRHdAGefLJN0PbmcGz5zp6Kt0Ut&index=12&t=4s):
+  1. Import axios
+  2. Membuat constanta yang nantinya akan dijadikan type untuk dipassing ke reducers
+  3. Buat function untuk mereturn dispatch. Dispatch berfungsi sebagai penghubung untuk meneruskan semua action yang didapat dari event handler di UI ke Redux store dan menghubungkan action ke reducer.
 
-- Install json-server, dengan command:
-  ```
-  npm i json-server
-  ```
-- Buat file json dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
+     - Pertama kita harus buat dispatch untuk loading yang nantinya akan kita oper ke reducer
+     - Selanjutnya kita buat dispatch untuk get Api, kita siapkan 2 dispatch. Satu dispatch untuk kondisi sukes get request api dan satu lagi dispatch untuk kondisi gagal get request api.
 
   ```
-  {
-    "kontaks": [
-      {
-        "id": 1,
-        "nama": "Paijo",
-        "No": "086745455454"
-      },
-      {
-        "id": 2,
-        "nama": "Tukijo",
-        "No": "086749499494"
+  //----------------------------------------------------------------------------i&ii
+    import axios from "axios";
+
+    export const GET_LIST_CONTACT = "GET_LIST_CONTACT";
+  //--------------------------------------------------------------------------------
+
+  //-----------------------------------------------------------------------------iii
+    export const getListContact = () => {
+      console.log("2. masuk action");
+
+      return (dispatch) => {
+        // Loading
+        dispatch({
+          type: GET_LIST_CONTACT,
+          payload: {
+            loading: true,
+            data: false,
+            errorMessage: false,
+          },
+        });
+
+        // get API
+        axios
+          .get("http://localhost:2023/contacts")
+          .then((response) => {
+            // berhasil get api
+            console.log("3. Berhasil dapat data: ", response);
+            dispatch({
+              type: GET_LIST_CONTACT,
+              payload: {
+                loading: false,
+                data: response.data,
+                errorMessage: false,
+              },
+            });
+          })
+          .catch((error) => {
+            // gagal get api
+            console.log("4. Gagal dapat data:", error.message);
+            dispatch({
+              type: GET_LIST_CONTACT,
+              payload: {
+                loading: false,
+                data: false,
+                errorMessage: error.message,
+              },
+            });
+          });
+      };
+    };
+  //--------------------------------------------------------------------------------
+  ```
+
+- Selanjutnya kita ke component `ListContact` [src/components/ListContact.jsx], kita panggil function `getListContact()` (function yang mereturn dispatch) di action yang kita buat tadi. Panggil action tadi di bagian useEffect menggunakan dispatch.
+
+  ```
+  import React, { useEffect } from "react";
+  //--------------------------------------------------------------------------------
+  import { useDispatch } from "react-redux";
+  import { getListContact } from "../utils/redux/actions/contactAction";
+  //--------------------------------------------------------------------------------
+
+  const ListContact = () => {
+    //------------------------------------------------------------------------------
+    const dispatch = useDispatch();
+    //------------------------------------------------------------------------------
+
+    useEffect(() => {
+      // panggil action getListContact
+      console.log("1. useEffect component did mount (di ListContact Component");
+      //----------------------------------------------------------------------------
+      dispatch(getListContact());
+     //-----------------------------------------------------------------------------
+    }, [dispatch]);
+
+    return (
+      <div>
+        <h1>ListKontak</h1>
+      </div>
+    );
+  };
+
+  export default ListContact;
+  ```
+
+- Kemudian jika kita coba jalankan project kita maka di dalam console akan tampil seperti ini:
+
+  ```
+  1. useEffect component did mount (di ListContact Component ListContact.jsx:10
+  2. masuk action contactAction.js:6
+  3. Berhasil dapat data:
+  Object { data: (2) […], status: 200, statusText: "OK", headers: {…}, config: {…}, request: XMLHttpRequest }
+  ```
+
+  Hasil tersebut menandakan bahwa kita telah berhasil sampai tahap ini, sekaligus menunjukkan alurnya dimulai dari `useEffect` kemudian masuk ke `action` dan menjalankan dispatch untuk get request.
+
+- Selanjutnya kita masuk ke reducer bagian contact [src/utils/reducers/contact/index.js].
+
+  - Import constanta type `GET_LIST_CONTACT` yang kita buat di action contact tadi [src/utils/redux/actions/contactAction.js]
+  - Buat state di bagian `initalState`
+  - Buat switch case menggunakan type yang kita import tadi (`GET_LIST_CONTACT`)
+
+    ```
+    import { GET_LIST_CONTACT } from "../../actions/contactAction";
+
+    const initialState = {
+      getListContactResult: false,
+      getListContactLoading: false,
+      getListContactError: false,
+    };
+
+    const contact = (state = initialState, action) => {
+      switch (action.type) {
+        case GET_LIST_CONTACT:
+          console.log("4. masuk reducer");
+          return {
+            ...state,
+            getListContactResult: action.payload.data,
+            getListContactLoading: action.payload.loading,
+            getListContactError: action.payload.errorMessage,
+          };
+        default:
+          return state;
       }
-    ]
-  }
-  ```
+    };
 
-- Selanjutnya di file `package.json` tepatnya di object scripts tambahkan property baru dengan key `server` dan valuenya `json-server -w <path file json> -p <port>`
+    export default contact;
+    ```
 
-  ```
-  {
-    "name": "sinau-redux",
-    "version": "0.1.0",
-    "private": true,
-    "dependencies": {
-      "@testing-library/jest-dom": "^5.16.5",
-      "@testing-library/react": "^13.4.0",
-      "@testing-library/user-event": "^13.5.0",
-      "axios": "^1.2.6",
-      "json-server": "^0.17.1",
-      "react": "^18.2.0",
-      "react-dom": "^18.2.0",
-      "react-redux": "^8.0.5",
-      "react-router-dom": "^6.8.0",
-      "react-scripts": "5.0.1",
-      "redux": "^4.2.1",
-      "redux-thunk": "^2.4.2",
-      "web-vitals": "^2.1.4"
-    },
-    "scripts": {
-      "start": "react-scripts start",
-      "build": "react-scripts build",
-      "test": "react-scripts test",
-      "eject": "react-scripts eject",
-      //-------------------------------------------------------------------------------
-      "server": "json-server -w db/db.json -p 2023"
-      //-------------------------------------------------------------------------------
-    },
-    "eslintConfig": {
-      "extends": [
-        "react-app",
-        "react-app/jest"
-      ]
-    },
-    "browserslist": {
-      "production": [
-        ">0.2%",
-        "not dead",
-        "not op_mini all"
-      ],
-      "development": [
-        "last 1 chrome version",
-        "last 1 firefox version",
-        "last 1 safari version"
-      ]
-    }
-  }
-  ```
+- Selanjutnya kita ke component `ListContact` [src/components/ListContact.jsx]
 
-- Terakhir untuk menjalankannya di terminal lakukan command:
+  1. Import state getListContactResult, getListContactLoading dan getListContactError yang kita buat di bagian reducers tadi menggunakan useSelector yang kita import dari react-redux
+  2. Tampilkan ketiga state tadi (getListContactResult, getListContactLoading dan getListContactError) ke view/UI dengan logic jika di kondisi state `getListResult` bernilai true maka lakukan maping, tetapi jika state `getListResult` bernilai false dan state `getListContactLoading` true maka tampilkan keterangan loading, tetapi jika state `getListResult` dan `getListLoading` bernilai false dan state `getListContactError` true maka tampilkan error message.
 
   ```
-  npm run server
+  import React, { useEffect } from "react";
+  import { useDispatch, useSelector } from "react-redux";
+  import { getListContact } from "../utils/redux/actions/contactAction";
+
+  const ListContact = () => {
+    //--------------------------------------------------------------------------------------------------------------------i
+    const { getListContactResult, getListContactLoading, getListContactError } = useSelector((state) => state.ContactReducer);
+    //----------------------------------------------------------------------------------------------------------------------
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      // panggil action getListContact
+      console.log("1. useEffect component did mount (di ListContact Component)");
+      dispatch(getListContact());
+    }, [dispatch]);
+
+    return (
+      <>
+        <h4>ListKontak</h4>
+        //--------------------------------------------------------------------------------------------------------------------ii
+        {getListContactResult ? (
+          getListContactResult.map((contact) => (
+            <p key={contact.id}>
+              {" "}
+              {contact.nama} - {contact.no}
+            </p>
+          ))
+        ) : getListContactLoading ? (
+          <p>Loading....</p>
+        ) : (
+          <p>{getListContactError ? getListContactError : "Data Kosong"}</p>
+        )}
+        //----------------------------------------------------------------------------------------------------------------------
+      </>
+    );
+  };
+
+  export default ListContact;
+  ```
+
+  Maka jika kita coba jalankan project kita maka data state yang berisi nama dan no hp user akan tampil di UI component `ListContact` dan di console akan tampil seperti ini (di kondisi get requesnya tidak error):
+
+  ```
+  1. useEffect component did mount (di ListContact Component ListContact.jsx:12
+  2. masuk action contactAction.js:6
+  4. masuk reducer index.js:12
+  3. Berhasil dapat data:
+  Object { data: (2) […], status: 200, statusText: "OK", headers: {…}, config: {…}, request: XMLHttpRequest }
+  contactAction.js:23
+  4. masuk reducer index.js:12
+  ```
+
+  Di sana terlihat alurnya:
+
+  - pertama masuk ke `useEffect`
+  - Kemudian ke `action`(awal action) kemudian masuk dispatch loading
+  - Lanjut ke `reducer` untuk mendapatkan hasil payload loading
+  - Setalah payload loading bernilai false masuk ke `action` lagi untuk menjalankan dispatch get request
+  - Terkhir masuk ke `reducer` lagi untuk mendapatkan hasil get request bisa data atau error message, jika requestnya berhasil maka kita akan mendapatkan data tetapi jika gagal maka kita akan mendapatkan error message.
+
+  Berikut hasilnya di console jika get requestnya gagal:
+
+  ```
+  1. useEffect component did mount (di ListContact Component ListContact.jsx:12
+  2. masuk action contactAction.js:6
+  4. masuk reducer index.js:12
+  3. Gagal dapat data: Request failed with status code 404 contactAction.js:35
+  4. masuk reducer index.js:12
   ```
 
 ## Referensi
