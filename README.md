@@ -1242,6 +1242,8 @@ Redux adalah lebrary yang digunakan untuk mengelola state agar bisa dijadikan gl
 
 Pada dasarnya, terdapat tiga fungsionalitas utama yang ditambahkan oleh redux kedalam aplikasi, Yaitu tempat untuk menyimpan keseluruhan state aplikasi, mekanisme untuk men-dispatch action kedalam reducer, dan mekanisme untuk memberi tahu setiap kali update state terjadi.
 
+Satu-satunya cara untuk mengubah state di dalam store adalah dengan memanggil method bernama dispatch yang berisi action, kemudian Redux akan mengeksekusi reducer yang sesuai. Dan Selector merupakan function yang digunakan untuk mendapatkan data dari state yang ada di dalam store.
+
 Sebaiknya redux ini digunakan jika:
 
 - Banyak data yang berubah dari waktu ke waktu
@@ -1437,7 +1439,7 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
 - Selanjutnya kita masuk ke reducer bagian contact [src/utils/reducers/contact/index.js].
 
   - Import constanta type `GET_LIST_CONTACT` yang kita buat di action contact tadi [src/utils/redux/actions/contactAction.js]
-  - Buat state di bagian `initalState`
+  - Buat state get request di bagian `initalState`
   - Buat switch case menggunakan type yang kita import tadi (`GET_LIST_CONTACT`)
 
     ```
@@ -1650,7 +1652,7 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
 - Selanjutnya kita masuk ke reducer bagian contact [src/utils/reducers/contact/index.js].
 
   1. Import constanta type `ADD_CONTACT` yang kita buat di action contact [src/utils/redux/actions/contactAction.js] tadi.
-  2. Buat state di bagian `initalState` post request
+  2. Buat state di bagian post request `initalState`
   3. Buat switch case menggunakan type yang kita import tadi (`ADD_CONTACT`)
 
   ```
@@ -1704,7 +1706,7 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
 
   1. Buat form, state dan event handler untuk menambahkan data untuk post request
   2. Di dalam function handleSubmit tambahkan action `addContact` yang kita buat di `contactAction` [src/utils/redux/actions/contactAction.js] tadi menggunakan dispatch
-  3. Karena component `AddContact` diletakkan satu halaman (di halaman Home) dengan component `ListContact`, agar setelah kita menambahkan hasilnya datanya bisa langsung terupdate tanpa harus direload kita harus memanggil 'getListContact()' dari action [src/utils/redux/actions/contactAction.js] di dalam useEffect dengan logic jika `addContactResult` true maka panggil action `getListContact()` tadi.
+  3. Karena component `AddContact` diletakkan satu halaman (di halaman Home) dengan component `ListContact`, agar setelah kita menambahkan hasilnya datanya bisa langsung terupdate tanpa harus direload kita harus memanggil 'getListContact()' dari action [src/utils/redux/actions/contactAction.js] di dalam useEffect dengan logic jika `addContactResult`(dari reducer) true maka panggil action `getListContact()` tadi.
 
      ```
      import React, { useEffect, useState } from "react";
@@ -1764,6 +1766,283 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
 
      export default AddContact;
      ```
+
+### Delete Request
+
+- Sama seperti post request tadi, Karena kita sudah prepare di bagian get request jadi kita bisa langsung ke bagian action [src/utils/redux/actions/contactAction.js] dan lakukan:
+
+  1. Buat constanta untuk delete request yang nantinya akan dijadikan type untuk dipassing ke reducers
+  2. Buat function untuk mereturn dispatch untuk Delete request dengan parameter data.
+
+     - Pertama kita harus buat dispatch untuk loading yang nantinya akan kita oper ke reducer
+     - Selanjutnya kita buat dispatch untuk delete Api, kita siapkan 2 dispatch. Satu dispatch untuk kondisi post request sukes dan satu lagi dispatch untuk kondisi post request api gagal.
+
+  ```
+  import axios from "axios";
+
+  export const GET_LIST_CONTACT = "GET_LIST_CONTACT";
+  export const ADD_CONTACT = "ADD_CONTACT";
+  //------------------------------------------------------------------------------i
+  export const DELETE_CONTACT = "DELETE_CONTACT";
+  //------------------------------------------------------------------------------
+
+  export const getListContact = () => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: GET_LIST_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // get API
+      axios
+        .get("http://localhost:2023/contacts")
+        .then((response) => {
+          // berhasil get api
+          dispatch({
+            type: GET_LIST_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal get api
+          dispatch({
+            type: GET_LIST_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+
+  export const addContact = (data) => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: ADD_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // post API
+      axios
+        .post("http://localhost:2023/contacts", data)
+        .then((response) => {
+          // berhasil post api
+          dispatch({
+            type: ADD_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal post api
+          dispatch({
+            type: ADD_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+
+  //------------------------------------------------------------------------------ii
+  export const deleteContact = (id) => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: DELETE_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // Delete API
+      axios
+        .delete(`http://localhost:2023/contacts/${id}`)
+        .then((response) => {
+          // berhasil delete api
+          console.log("3. Berhasil delete data: ", response);
+          dispatch({
+            type: DELETE_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal delete api
+          console.log("3. Gagal delete data:", error.message);
+          dispatch({
+            type: DELETE_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+  //------------------------------------------------------------------------------
+  ```
+
+- Selanjutnya kita masuk ke reducer bagian contact [src/utils/reducers/contact/index.js].
+
+  1. Import constanta type `DELETE_CONTACT` yang kita buat di action contact [src/utils/redux/actions/contactAction.js] tadi.
+  2. Buat state delete request di bagian `initalState`
+  3. Buat switch case menggunakan type yang kita import tadi (`DELETE_CONTACT`)
+
+     ```
+     //------------------------------------------------------------------------------i
+     import {
+       GET_LIST_CONTACT,
+       ADD_CONTACT,
+       DELETE_CONTACT,
+     } from "../../actions/contactAction";
+     //------------------------------------------------------------------------------
+
+     const initialState = {
+       // get request
+       getListContactResult: false,
+       getListContactLoading: false,
+       getListContactError: false,
+
+       // post request
+       addContactResult: false,
+       addContactLoading: false,
+       addContactError: false,
+
+      //-----------------------------------------------------------------------------ii
+       // delete request
+       deleteContactResult: false,
+       deleteContactLoading: false,
+       deleteContactError: false,
+      //------------------------------------------------------------------------------
+     };
+
+     const contact = (state = initialState, action) => {
+       switch (action.type) {
+         case GET_LIST_CONTACT:
+           return {
+             ...state,
+             getListContactResult: action.payload.data,
+             getListContactLoading: action.payload.loading,
+             getListContactError: action.payload.errorMessage,
+           };
+
+         case ADD_CONTACT:
+           return {
+             ...state,
+             addContactResult: action.payload.data,
+             addContactLoading: action.payload.loading,
+             addContactError: action.payload.errorMessage,
+           };
+
+        //----------------------------------------------------------------------------iii
+         case DELETE_CONTACT:
+           console.log("4. masuk reducer");
+           return {
+             ...state,
+             deleteContactResult: action.payload.data,
+             deleteContactLoading: action.payload.loading,
+             deleteContactError: action.payload.errorMessage,
+           };
+        //------------------------------------------------------------------------------
+         default:
+           return state;
+       }
+     };
+
+     export default contact;
+     ```
+
+- Terakhir kita ke component `ListContact` [src/components/AddContact.jsx]
+
+  1. Tambahkan button delete yang nantinya akan digunakan untuk menghandle event delete contact
+  2. Di dalam button delete tambahkan event onClick dengan value action deleteContact yang kita buat tadi dengan memasukkan parameter contact id dan dibungkus dengan dispatch.
+  3. Karena component bagian delete ini diletakkan satu halaman (di halaman Home) dengan satu tampilan list contact di component `ListContact`, agar setelah di delete datanya bisa langsung terupdate tanpa harus direload kita harus memanggil `getListContact()` dari action [src/utils/redux/actions/contactAction.js] di dalam useEffect dengan logic jika `deleteContactResult`(dari reducer) true maka panggil action `getListContact()` tadi.
+
+  ```
+  import React, { useEffect } from "react";
+  import { useDispatch, useSelector } from "react-redux";
+  import {
+    deleteContact,
+    getListContact,
+  } from "../utils/redux/actions/contactAction";
+
+  const ListContact = () => {
+    const {
+      getListContactResult,
+      getListContactLoading,
+      getListContactError,
+      deleteContactResult,
+    } = useSelector((state) => state.ContactReducer);
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+      // panggil action getListContact
+      dispatch(getListContact());
+    }, [dispatch]);
+
+  //-----------------------------------------------------------------------------------iii
+    useEffect(() => {
+      if (deleteContactResult) {
+        dispatch(getListContact());
+      }
+    }, [deleteContactResult, dispatch]);
+  //-----------------------------------------------------------------------------------
+
+    return (
+      <>
+        <h4>ListKontak</h4>
+        {getListContactResult ? (
+          getListContactResult.map((contact) => (
+            <p key={contact.id}>
+              {" "}
+              {contact.name} - {contact.nohp}
+    //-----------------------------------------------------------------------------------i&ii
+              <button onClick={() => dispatch(deleteContact(contact.id))}>
+                Delete
+              </button>
+    //-----------------------------------------------------------------------------------
+            </p>
+          ))
+        ) : getListContactLoading ? (
+          <p>Loading....</p>
+        ) : (
+          <p>{getListContactError ? getListContactError : "Data Kosong"}</p>
+        )}
+      </>
+    );
+  };
+
+  export default ListContact;
+  ```
 
 ## Referensi
 
