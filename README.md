@@ -2044,6 +2044,765 @@ Selanjutnya jalankan langkah - langkah berikut [[1]](https://www.youtube.com/wat
   export default ListContact;
   ```
 
+### Update Data
+
+- Sama seperti post request dan delete request, karena kita sudah prepare di bagian get request jadi kita bisa langsung ke bagian action [src/utils/redux/actions/contactAction.js] dan lakukan:
+
+- Di bagian action contact [src/utils/redux/actions/contactAction.js], lakukan:
+
+  1. Buat constanta `DETAIL_CONTACT` yang nantinya akan dijadikan type untuk dipassing ke reducers.
+  2. Buat function untuk mereturn dispatch untuk type `DETAIL_CONTACT` tadi
+
+  ```
+  import axios from "axios";
+
+  export const GET_LIST_CONTACT = "GET_LIST_CONTACT";
+  export const ADD_CONTACT = "ADD_CONTACT";
+  export const DELETE_CONTACT = "DELETE_CONTACT";
+  //-------------------------------------------------------------------------------i
+  export const DETAIL_CONTACT = "DETAIL_CONTACT";
+  //---------------------------------------------------------------------------------
+
+  export const getListContact = () => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: GET_LIST_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // get API
+      axios
+        .get("http://localhost:2023/contacts")
+        .then((response) => {
+          // berhasil get api
+          dispatch({
+            type: GET_LIST_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal get api
+          dispatch({
+            type: GET_LIST_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+
+  export const addContact = (data) => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: ADD_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // post API
+      axios
+        .post("http://localhost:2023/contacts", data)
+        .then((response) => {
+          // berhasil post api
+          dispatch({
+            type: ADD_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal post api
+          dispatch({
+            type: ADD_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+
+  export const deleteContact = (id) => {
+    return (dispatch) => {
+      // Loading
+      dispatch({
+        type: DELETE_CONTACT,
+        payload: {
+          loading: true,
+          data: false,
+          errorMessage: false,
+        },
+      });
+
+      // Delete API
+      axios
+        .delete(`http://localhost:2023/contacts/${id}`)
+        .then((response) => {
+          // berhasil delete api
+          console.log("3. Berhasil delete data: ", response);
+          dispatch({
+            type: DELETE_CONTACT,
+            payload: {
+              loading: false,
+              data: response.data,
+              errorMessage: false,
+            },
+          });
+        })
+        .catch((error) => {
+          // gagal delete api
+          console.log("3. Gagal delete data:", error.message);
+          dispatch({
+            type: DELETE_CONTACT,
+            payload: {
+              loading: false,
+              data: false,
+              errorMessage: error.message,
+            },
+          });
+        });
+    };
+  };
+
+  //---------------------------------------------------------------------------------ii
+  export const detailContact = (data) => {
+    return (dispatch) => {
+      dispatch({
+        type: DETAIL_CONTACT,
+        payload: {
+          data: data,
+        },
+      });
+    };
+  };
+  //---------------------------------------------------------------------------------
+  ```
+
+- Selanjutnya kita masuk ke reducer bagian contact [src/utils/reducers/contact/index.js].
+
+  1. Import constanta type `DETAIL_CONTACT` yang kita buat di action contact [src/utils/redux/actions/contactAction.js] tadi.
+  2. Buat state detail Contact result di bagian `initalState`
+  3. Buat case menggunakan type yang kita import tadi (`DETAIL_CONTACT`)
+
+  ```
+  import {
+    GET_LIST_CONTACT,
+    ADD_CONTACT,
+    DELETE_CONTACT,
+    //-------------------------------------------------------i
+    DETAIL_CONTACT,
+    //-------------------------------------------------------
+  } from "../../actions/contactAction";
+
+  const initialState = {
+    // get request
+    getListContactResult: false,
+    getListContactLoading: false,
+    getListContactError: false,
+
+    // post request
+    addContactResult: false,
+    addContactLoading: false,
+    addContactError: false,
+
+    // delete request
+    deleteContactResult: false,
+    deleteContactLoading: false,
+    deleteContactError: false,
+
+    //-------------------------------------------------------ii
+    // detail contact
+    detailContactResult: false,
+    //-------------------------------------------------------
+  };
+
+  const contact = (state = initialState, action) => {
+    switch (action.type) {
+      case GET_LIST_CONTACT:
+        return {
+          ...state,
+          getListContactResult: action.payload.data,
+          getListContactLoading: action.payload.loading,
+          getListContactError: action.payload.errorMessage,
+        };
+
+      case ADD_CONTACT:
+        return {
+          ...state,
+          addContactResult: action.payload.data,
+          addContactLoading: action.payload.loading,
+          addContactError: action.payload.errorMessage,
+        };
+
+      case DELETE_CONTACT:
+        return {
+          ...state,
+          deleteContactResult: action.payload.data,
+          deleteContactLoading: action.payload.loading,
+          deleteContactError: action.payload.errorMessage,
+        };
+
+      //-------------------------------------------------------iii
+      case DETAIL_CONTACT:
+        return {
+          ...state,
+          detailContactResult: action.payload.data,
+        };
+      //-------------------------------------------------------
+
+      default:
+        return state;
+    }
+  };
+
+  export default contact;
+  ```
+
+- Selanjutnya ke component `ListContact` [src/components/ListContact.jsx]
+
+  1. Buat button Edit yang nantinya akan digunakan untuk menghandle event untuk mendapatkan data contact yang button editnya ini diklik
+  2. Di dalam button edit tambahkan event onClick dengan value action `detailContact` yang kita buat tadi(di bagian action) dengan memasukkan parameter contact (berisi object data contact) dan dibungkus dengan dispatch.
+  3. Sampai di tahap ini jika kita tekan button edit salah satu contact, di redux dev tools tepatnya di bagian state akan terlihat state `detailContactResult` berisi data contact (id, name, nohp) yang kita klik button editnya
+
+```
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  deleteContact,
+  detailContact,
+  getListContact,
+} from "../utils/redux/actions/contactAction";
+
+const ListContact = () => {
+  const {
+    getListContactResult,
+    getListContactLoading,
+    getListContactError,
+    deleteContactResult,
+  } = useSelector((state) => state.ContactReducer);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    // panggil action getListContact
+    dispatch(getListContact());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (deleteContactResult) {
+      dispatch(getListContact());
+    }
+  }, [deleteContactResult, dispatch]);
+
+  return (
+    <>
+      <h4>ListKontak</h4>
+      {getListContactResult ? (
+        getListContactResult.map((contact) => (
+          <p key={contact.id}>
+            {" "}
+            {contact.name} - {contact.nohp}
+            <button onClick={() => dispatch(deleteContact(contact.id))}>
+              Delete
+            </button>
+            //--------------------------------------------------------------------i&ii
+            <button
+              style={{ marginLeft: "10px" }}
+              onClick={() => dispatch(detailContact(contact))}
+            >
+              Edit
+            </button>
+            //--------------------------------------------------------------------
+          </p>
+        ))
+      ) : getListContactLoading ? (
+        <p>Loading....</p>
+      ) : (
+        <p>{getListContactError ? getListContactError : "Data Kosong"}</p>
+      )}
+    </>
+  );
+};
+
+export default ListContact;
+```
+
+- Kemudian untuk membuat saat kita menekan button edit secara otomatis data contact yang diklik tersebut muncul di form name dan no hp, kita ke component `AddContact` [src/components/AddContact.jsx]. Lakukan:
+
+  1. buat state id dan tambahkan state `detailContactResult`
+  2. Dengan menggunakan useEffect ganti data name, nohp dan id dengan data name, nohp dan id dari state `detailContactResult`. Dan disertai logic pergantian data tersebut akan dilakukan jika state `detailContactResult` bernilai true (ada nilainya).
+  3. Maka sampai disini ketika kita menekan button edit maka form name dan nohp akan muncul data name dan nohp contact yang button editnya tersebut di tekan.
+
+  ```
+  import React, { useEffect, useState } from "react";
+  import { useDispatch, useSelector } from "react-redux";
+  import {
+    addContact,
+    getListContact,
+    updateContact,
+  } from "../utils/redux/actions/contactAction";
+
+  const AddContact = () => {
+    const dispatch = useDispatch();
+    //-----------------------------------------------------------------------i
+    const { addContactResult, detailContactResult } =
+      useSelector((state) => state.ContactReducer);
+    //-----------------------------------------------------------------------
+
+    const [name, setName] = useState("");
+    const [nohp, setNohp] = useState("");
+    //-----------------------------------------------------------------------i
+    const [id, setId] = useState("");
+    //-----------------------------------------------------------------------
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+        dispatch(addContact({ name, nohp }));
+    };
+
+    useEffect(() => {
+      if (addContactResult) {
+        dispatch(getListContact());
+        setName("");
+        setNohp("");
+      }
+    }, [addContactResult, dispatch]);
+
+    //-----------------------------------------------------------------------ii
+    useEffect(() => {
+      if (detailContactResult) {
+        setName(detailContactResult.name);
+        setNohp(detailContactResult.nohp);
+        setId(detailContactResult.id);
+      }
+    }, [detailContactResult, dispatch]);
+    //-----------------------------------------------------------------------
+
+    return (
+      <div>
+        <h4>{id ? "Edit Contact" : "Add Contact"}</h4>
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Name...."
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            name="nohp"
+            placeholder="No HP...."
+            value={nohp}
+            onChange={(e) => setNohp(e.target.value)}
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    );
+  };
+
+  export default AddContact;
+  ```
+
+- Selanjutnya untuk menjalankan put request kita kembali ke action contact [src/utils/redux/actions/contactAction.js], lakukan:
+
+  1. Buat constanta `UPDATE_CONTACT` yang nantinya akan dijadikan type untuk dipassing ke reducers.
+  2. Buat function untuk mereturn dispatch untuk put request menggunakan type `UPDATE_CONTACT` tadi
+
+```
+import axios from "axios";
+
+export const GET_LIST_CONTACT = "GET_LIST_CONTACT";
+export const ADD_CONTACT = "ADD_CONTACT";
+export const DELETE_CONTACT = "DELETE_CONTACT";
+export const DETAIL_CONTACT = "DETAIL_CONTACT";
+//-----------------------------------------------------------i
+export const UPDATE_CONTACT = "UPDATE_CONTACT";
+//-----------------------------------------------------------
+
+export const getListContact = () => {
+  return (dispatch) => {
+    // Loading
+    dispatch({
+      type: GET_LIST_CONTACT,
+      payload: {
+        loading: true,
+        data: false,
+        errorMessage: false,
+      },
+    });
+
+    // get API
+    axios
+      .get("http://localhost:2023/contacts")
+      .then((response) => {
+        // berhasil get api
+        dispatch({
+          type: GET_LIST_CONTACT,
+          payload: {
+            loading: false,
+            data: response.data,
+            errorMessage: false,
+          },
+        });
+      })
+      .catch((error) => {
+        // gagal get api
+        dispatch({
+          type: GET_LIST_CONTACT,
+          payload: {
+            loading: false,
+            data: false,
+            errorMessage: error.message,
+          },
+        });
+      });
+  };
+};
+
+export const addContact = (data) => {
+  return (dispatch) => {
+    // Loading
+    dispatch({
+      type: ADD_CONTACT,
+      payload: {
+        loading: true,
+        data: false,
+        errorMessage: false,
+      },
+    });
+
+    // post API
+    axios
+      .post("http://localhost:2023/contacts", data)
+      .then((response) => {
+        // berhasil post api
+        dispatch({
+          type: ADD_CONTACT,
+          payload: {
+            loading: false,
+            data: response.data,
+            errorMessage: false,
+          },
+        });
+      })
+      .catch((error) => {
+        // gagal post api
+        dispatch({
+          type: ADD_CONTACT,
+          payload: {
+            loading: false,
+            data: false,
+            errorMessage: error.message,
+          },
+        });
+      });
+  };
+};
+
+export const deleteContact = (id) => {
+  return (dispatch) => {
+    // Loading
+    dispatch({
+      type: DELETE_CONTACT,
+      payload: {
+        loading: true,
+        data: false,
+        errorMessage: false,
+      },
+    });
+
+    // Delete API
+    axios
+      .delete(`http://localhost:2023/contacts/${id}`)
+      .then((response) => {
+        // berhasil delete api
+        console.log("3. Berhasil delete data: ", response);
+        dispatch({
+          type: DELETE_CONTACT,
+          payload: {
+            loading: false,
+            data: response.data,
+            errorMessage: false,
+          },
+        });
+      })
+      .catch((error) => {
+        // gagal delete api
+        console.log("3. Gagal delete data:", error.message);
+        dispatch({
+          type: DELETE_CONTACT,
+          payload: {
+            loading: false,
+            data: false,
+            errorMessage: error.message,
+          },
+        });
+      });
+  };
+};
+
+export const detailContact = (data) => {
+  return (dispatch) => {
+    dispatch({
+      type: DETAIL_CONTACT,
+      payload: {
+        data: data,
+      },
+    });
+  };
+};
+
+//-----------------------------------------------------------ii
+export const updateContact = (data) => {
+  return (dispatch) => {
+    // Loading
+    dispatch({
+      type: UPDATE_CONTACT,
+      payload: {
+        loading: true,
+        data: false,
+        errorMessage: false,
+      },
+    });
+
+    // put API
+    axios
+      .put(`http://localhost:2023/contacts/${data.id}`, data)
+      .then((response) => {
+        // berhasil put api
+        dispatch({
+          type: UPDATE_CONTACT,
+          payload: {
+            loading: false,
+            data: response.data,
+            errorMessage: false,
+          },
+        });
+      })
+      .catch((error) => {
+        // gagal put api
+        dispatch({
+          type: UPDATE_CONTACT,
+          payload: {
+            loading: false,
+            data: false,
+            errorMessage: error.message,
+          },
+        });
+      });
+  };
+};
+//-----------------------------------------------------------
+```
+
+- Selanjutnya kita masuk ke reducer bagian contact lagi [src/utils/reducers/contact/index.js].
+
+  1. Import constanta type `UPDATE_CONTACT` yang kita buat di action contact [src/utils/redux/actions/contactAction.js] tadi.
+  2. Buat state updateContact(untuk result, loading dan error) di bagian `initalState`
+  3. Buat case menggunakan type yang kita import tadi (`UPDATE_CONTACT`)
+
+  ```
+  import {
+    GET_LIST_CONTACT,
+    ADD_CONTACT,
+    DELETE_CONTACT,
+    DETAIL_CONTACT,
+    //---------------------------------------------------------i
+    UPDATE_CONTACT,
+    //---------------------------------------------------------
+  } from "../../actions/contactAction";
+
+  const initialState = {
+    // get request
+    getListContactResult: false,
+    getListContactLoading: false,
+    getListContactError: false,
+
+    // post request
+    addContactResult: false,
+    addContactLoading: false,
+    addContactError: false,
+
+    // delete request
+    deleteContactResult: false,
+    deleteContactLoading: false,
+    deleteContactError: false,
+
+    // detail contact
+    detailContactResult: false,
+
+    //---------------------------------------------------------ii
+    //update request
+    updateContactResult: false,
+    updateContactLoading: false,
+    updateContactError: false,
+    //---------------------------------------------------------
+  };
+
+  const contact = (state = initialState, action) => {
+    switch (action.type) {
+      case GET_LIST_CONTACT:
+        return {
+          ...state,
+          getListContactResult: action.payload.data,
+          getListContactLoading: action.payload.loading,
+          getListContactError: action.payload.errorMessage,
+        };
+
+      case ADD_CONTACT:
+        return {
+          ...state,
+          addContactResult: action.payload.data,
+          addContactLoading: action.payload.loading,
+          addContactError: action.payload.errorMessage,
+        };
+
+      case DELETE_CONTACT:
+        return {
+          ...state,
+          deleteContactResult: action.payload.data,
+          deleteContactLoading: action.payload.loading,
+          deleteContactError: action.payload.errorMessage,
+        };
+
+      case DETAIL_CONTACT:
+        return {
+          ...state,
+          detailContactResult: action.payload.data,
+        };
+
+      //---------------------------------------------------------iii
+      case UPDATE_CONTACT:
+        return {
+          ...state,
+          updateContactResult: action.payload.data,
+          updateContactLoading: action.payload.loading,
+          updateContactError: action.payload.errorMessage,
+        };
+        //---------------------------------------------------------
+
+      default:
+        return state;
+    }
+  };
+
+  export default contact;
+  ```
+
+- Kemudian kita kembali lagi ke component `AddContact` [src/components/AddContact.jsx]. Lakukan:
+
+  1.  Di function `handleSubmit()` buat logic jika id bernilai true (ada nilainya) maka jalankan action `updateContact` (diimport dari action) yang memuat paramter id, name, nohp dan dibungkus menggunakan dispatch, tetapi jika id bernilai false (tidak ada nilainya) maka jalankan action `addContact` yang menerima parameter name, nohp dan dibungkus menggunakan dispatch juga.
+  2.  Karena form edit name dan nohp satu page dengan list contact ditampilkan maka untuk membuat data contact otomatis terupdate saat button submit ditekan tanpa harus direload dulu. Kita harus memanggil state global updateContactResult yang ada di ruducer menggunakan useEffect dan dengan logic jika state global `updateContactResult` bernilai true (ada nilainya) jalankan action `getListContact()`
+  3.  Terakhir agar judul Add Contact dan Edit Contactnya dinamis yaitu saat button edit diklik maka judulnya akan berubah menjadi Edit Contact. Maka kita tambahkan logic jika state id bernilai true (ada nilainya) Maka judulnya tadi akan berubah dari Add Contact menjadi Edit Contact.
+
+  ```
+  import React, { useEffect, useState } from "react";
+  import { useDispatch, useSelector } from "react-redux";
+  import {
+    addContact,
+    getListContact,
+    updateContact,
+  } from "../utils/redux/actions/contactAction";
+
+  const AddContact = () => {
+    const dispatch = useDispatch();
+    const { addContactResult, detailContactResult, updateContactResult } =
+      useSelector((state) => state.ContactReducer);
+
+    const [name, setName] = useState("");
+    const [nohp, setNohp] = useState("");
+    const [id, setId] = useState("");
+
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      //--------------------------------------------------------i
+      if (id) {
+        // update Contact
+        dispatch(updateContact({ id, name, nohp }));
+      } else {
+        dispatch(addContact({ name, nohp }));
+      }
+      //--------------------------------------------------------
+    };
+
+    useEffect(() => {
+      if (addContactResult) {
+        dispatch(getListContact());
+        setName("");
+        setNohp("");
+      }
+    }, [addContactResult, dispatch]);
+
+    useEffect(() => {
+      if (detailContactResult) {
+        setName(detailContactResult.name);
+        setNohp(detailContactResult.nohp);
+        setId(detailContactResult.id);
+      }
+    }, [detailContactResult, dispatch]);
+
+    //--------------------------------------------------------ii
+    useEffect(() => {
+      if (updateContactResult) {
+        dispatch(getListContact());
+        setName("");
+        setNohp("");
+        setId("");
+      }
+    }, [updateContactResult, dispatch]);
+    //--------------------------------------------------------
+
+    return (
+      <div>
+        //---------------------------------------------------iii
+        <h4>{id ? "Edit Contact" : "Add Contact"}</h4>
+        //---------------------------------------------------
+        <form onSubmit={handleSubmit}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Name...."
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            type="text"
+            name="nohp"
+            placeholder="No HP...."
+            value={nohp}
+            onChange={(e) => setNohp(e.target.value)}
+          />
+          <button type="submit">Submit</button>
+        </form>
+      </div>
+    );
+  };
+
+  export default AddContact;
+  ```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
