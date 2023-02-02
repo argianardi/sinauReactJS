@@ -1250,6 +1250,8 @@ Sebaiknya redux ini digunakan jika:
 - Pengelolaan state harus dilakukan di satu tempat
 - Mengelola state di top-level component sudah tidak lagi relevan
 
+Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts)
+
 ### Prepare & Get request
 
 Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
