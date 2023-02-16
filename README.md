@@ -2805,9 +2805,26 @@ export const updateContact = (data) => {
   export default AddContact;
   ```
 
+## Redux Toolkit
+
+Redux Toolkit merupakan package yang dikembangkan dan menjadi cara standar baru untuk membuat kode redux dan mengani tiga masalah utama di dalam redux:
+
+- Konfigurasi Redux Store yang terlalu rumit
+- Harus menambahkn banyak package untuk membuat Redux melakukan sesuatu yang berguna
+- Redux membutuhkan terlalu banyak boilerplate code
+
+### Prepare
+
+Untuk bisa menggunakan redux kita harus menginstallnya dulu, kita bisa install redux dan install react (create-react-app) secara bersamaan menggunakan command berikut:
+
+```
+npx create-react-app . --template redux
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
 - [[2] github.com/argianardi/ReactRouterV6](https://github.com/argianardi/ReactRouterV6)
 - [[3] youtube.com/WahidevAcademy](https://www.youtube.com/@WahidevAcademy)
-- [[4] youtube.com/@siciliancode3599](https://www.youtube.com/@siciliancode3599)
+- [[4] youtube.com/siciliancode3599](https://www.youtube.com/@siciliancode3599)
+- [[5] youtube.com/mfikricom](https://www.youtube.com/watch?v=S_zkP5prhaM)
