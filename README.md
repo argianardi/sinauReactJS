@@ -2821,6 +2821,110 @@ Untuk bisa menggunakan redux kita harus menginstallnya dulu, kita bisa install r
 npx create-react-app . --template redux
 ```
 
+- Hapus folder counter pada folder features, app.css, (app.test.js), (serviceworker), index.css dan logo.
+- Masuk ke file store.js (src/app/store.js) hapus reducer counter. Sehingga tampilan codenya akan jadi seperti ini:
+
+  ```
+  import { configureStore } from "@reduxjs/toolkit";
+
+  export const store = configureStore({
+    reducer: {},
+  });
+  ```
+
+- Bersihkan file index.js dan app.js (sesuaikan contennya). Sehingga tampilan code index.js akan jadi seperti ini:
+
+  ```
+  import React from "react";
+  import { createRoot } from "react-dom/client";
+  import { Provider } from "react-redux";
+  import { store } from "./app/store";
+  import App from "./App";
+  import reportWebVitals from "./reportWebVitals";
+
+  const container = document.getElementById("root");
+  const root = createRoot(container);
+
+  root.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </React.StrictMode>
+  );
+
+  reportWebVitals();
+  ```
+
+  Dan tampilan code di file app.js akan jadi seperti ini:
+
+  ```
+  import React from "react";
+
+  function App() {
+    return (
+      <div>
+        <h1>Hello world</h1>
+      </div>
+    );
+  }
+
+  export default App;
+  ```
+
+- Install frame work CSS untuk mempermudah styling, di contoh kali ini kita menggunakan `bulma`:
+
+  - Install bulma dengan command:
+
+    ```
+    npm i bulma
+    ```
+
+  - Integrasikan bulma ke project kita dengan cara import bulma ke file `index.js`
+
+    ```
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    import { Provider } from "react-redux";
+    import { store } from "./app/store";
+    import App from "./App";
+    import reportWebVitals from "./reportWebVitals";
+    //----------------------------------------------------------
+    import "bulma/css/bulma.css";
+    //----------------------------------------------------------
+
+    const container = document.getElementById("root");
+    const root = createRoot(container);
+
+    root.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </React.StrictMode>
+    );
+
+    reportWebVitals();
+    ```
+
+  - Untuk memeriksa keberhasilan integrasi bulma css yang kita lakukan, tambahkan class `container` di file `App.js` jika ukuran dan bentuk tulisan `Hello world` berubah berarti berhasil.
+
+    ```
+    import React from "react";
+
+    function App() {
+      return (
+    //--------------------------------------------------
+        <div className="container">
+    //--------------------------------------------------
+          <h1>Hello world</h1>
+        </div>
+      );
+    }
+
+    export default App;
+    ```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
