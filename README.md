@@ -46,6 +46,8 @@ Untuk alur belajar react kita bia mengikuti roadmap [ini](https://roadmap.sh/rea
     __|README.md
     ```
 
+    folder utils digunakan untuk menyimpan file yang berisi function yang digunakan sebagai alat bantu atau utilitas yang dapat digunakan di seluruh bagian kode dalam proyek yang sama, contohnya untuk menampung code - code redux atau context.
+
 - Selain itu terdapat beberapa hal yang harus diperhatikan:
 
   - untuk nama components/class dibuat dengan pascal case, contohnya HomePage
@@ -2925,6 +2927,40 @@ npx create-react-app . --template redux
     export default App;
     ```
 
+### Buat Slice
+
+Slice adalah sebuah object yang memiliki tiga bagian utama, yaitu initial state, function reducer dan nama dari slice sebagai identifikasi [[6]](https://devsaurus.com/add-redux#step-by-step). Slice dibuat di folder `features` (src/features). Kali ini kita akan membuat slice untuk fitur product di dalam file `productSlice.js` di dalam folder `features` tadi, Di dalam file tersebut yang kita lakukan[[6]](https://devsaurus.com/add-redux#step-by-step):
+
+- Import function createSlice yang berfungsi untuk membuat slice
+- Membuat initialState untuk data notes
+- Menambahkan field reducers untuk menampung semua function reducer yang akan dibuat nanti
+
+  Berikut source code di file `productSlice.js`:
+
+  ```
+  import { createSlice } from "@reduxjs/toolkit";
+
+  const productSlice = createSlice({
+    name: "product",
+    initialState: {
+      title: "",
+      price: "",
+    },
+    reducers: {
+      update: (state, action) => {
+        state.title = action.payload.title;
+        state.price = action.payload.price;
+      },
+    },
+  });
+
+  export const { update } = productSlice.actions;
+  export default productSlice.reducer;
+  ```
+
+Semua reducer yang ada di dalam slice harus ditambahkan ke Redux store.
+Payload merupakan data yang kita kirimkan ke action.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
@@ -2932,3 +2968,4 @@ npx create-react-app . --template redux
 - [[3] youtube.com/WahidevAcademy](https://www.youtube.com/@WahidevAcademy)
 - [[4] youtube.com/siciliancode3599](https://www.youtube.com/@siciliancode3599)
 - [[5] youtube.com/mfikricom](https://www.youtube.com/watch?v=S_zkP5prhaM)
+- [[6] devsaurus.com/](https://devsaurus.com/)
