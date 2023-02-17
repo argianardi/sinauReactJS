@@ -1252,7 +1252,17 @@ Sebaiknya redux ini digunakan jika:
 - Pengelolaan state harus dilakukan di satu tempat
 - Mengelola state di top-level component sudah tidak lagi relevan
 
-Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts)
+Istilah - istilah yang ada di dalam React:
+
+- Store: Store adalah tempat di mana state (keadaan) aplikasi disimpan. Store ini bersifat immutable (tidak dapat diubah), artinya state hanya dapat diubah melalui action.
+- Action: Action adalah objek yang digunakan untuk mengirim perintah ke store untuk mengubah state. Action harus memiliki properti "type" yang menjelaskan tipe perubahan yang akan dilakukan, dan dapat memiliki properti lain yang dibutuhkan.
+- Reducer: Reducer adalah sebuah fungsi yang menerima dua parameter yaitu state dan action, dan menghasilkan state baru yang telah diperbarui. Reducer harus bersifat pure (murni), artinya tidak boleh mengubah parameter yang diterimanya, dan harus selalu menghasilkan hasil yang sama jika diberikan parameter yang sama.
+- Dispatch adalah function yang digunakan untuk memperbarui state di dalam store. Jadi dispatch ini digunakan untuk mengirimkan action ke store. Setelah action terkirim ke store, reducer akan memeriksa tipe action dan mengubah state di dalam store sesuai dengan informasi yang ada pada objek action. Setelah state di dalam store berhasil diperbarui, Redux akan memberi tahu semua komponen yang terhubung ke store Redux sehingga tampilan dari aplikasi dapat diperbarui sesuai dengan state yang baru.
+- Selector: Selector adalah sebuah sebuah hook yang digunakan untuk memilih dan mengambil state yang tersimpan di store agar bisa digunakan oleh komponen react untuk di tampilkan ke dalam UI. Selector dapat digunakan untuk memisahkan state menjadi beberapa bagian kecil, yang kemudian dapat diakses dan digunakan oleh komponen React.
+- Middleware: Middleware adalah fungsi yang berjalan di antara dispatch dan reducer. Middleware dapat digunakan untuk melakukan tugas tertentu, seperti logging, atau memodifikasi action sebelum action tersebut dijalankan oleh reducer.
+- Provider: Provider adalah komponen React yang digunakan untuk memberikan store ke seluruh komponen dalam aplikasi. Provider akan menempatkan store di dalam context React, sehingga komponen dalam aplikasi dapat mengakses store melalui context.
+
+Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts).
 
 ### Prepare & Get request
 
@@ -2976,6 +2986,33 @@ export const store = configureStore({
   reducer: { product: productReducer },
   //----------------------------------------------------------
 });
+```
+
+### Menampilkan State
+
+Selanjutnya kita bisa menampilkan state di dalam store ke dalam UI, state yang akan ditampilkan harus dipanggil menggunakan hook `useSelector.
+
+```
+import React from "react";
+//---------------------------------------------------------------------
+import { useSelector } from "react-redux";
+//---------------------------------------------------------------------
+
+const ShowProduct = () => {
+  //---------------------------------------------------------------------
+  const { title, price } = useSelector((state) => state.product);
+  //---------------------------------------------------------------------
+  return (
+    <div className="box mt-5">
+      //---------------------------------------------------------------------
+      <h4 className="title is-4">Title: {title}</h4>
+      <h4 className="title is-4"> Price: {price} </h4>
+      //---------------------------------------------------------------------
+    </div>
+  );
+};
+
+export default ShowProduct;
 ```
 
 ## Referensi
