@@ -2961,6 +2961,23 @@ Slice adalah sebuah object yang memiliki tiga bagian utama, yaitu initial state,
 Semua reducer yang ada di dalam slice harus ditambahkan ke Redux store.
 Payload merupakan data yang kita kirimkan ke action.
 
+### Buat Store
+
+Di bagian store (src/utils/redux/store/store.js) tambahkan reducer untuk fitur yang kita buat (di contoh ini product) di bagian slice tadi (product slice) yang tersimpan di file `productSlice.js` (src/utils/redux/fitures/productSlice.js)
+
+```
+import { configureStore } from "@reduxjs/toolkit";
+//----------------------------------------------------------
+import productReducer from "../features/productSlice";
+//----------------------------------------------------------
+
+export const store = configureStore({
+  //----------------------------------------------------------
+  reducer: { product: productReducer },
+  //----------------------------------------------------------
+});
+```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
