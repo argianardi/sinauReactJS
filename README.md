@@ -2990,7 +2990,7 @@ export const store = configureStore({
 
 ### Menampilkan State
 
-Selanjutnya kita bisa menampilkan state di dalam store ke dalam UI, state yang akan ditampilkan harus dipanggil menggunakan hook `useSelector.
+Selanjutnya kita bisa menampilkan state di dalam store ke dalam UI, state yang akan ditampilkan harus dipanggil menggunakan hook `useSelector`.
 
 ```
 import React from "react";
@@ -3014,6 +3014,75 @@ const ShowProduct = () => {
 
 export default ShowProduct;
 ```
+
+### Update State
+
+Untuk mengupdate state di dalam store kita harus menggunakan `dispatch`. Function `dispatch` digunakan untuk melakukan perubahan pada state yang ada di dalam store. Fungsi ini menerima sebuah objek action sebagai argumen, dan mengirim objek action tersebut ke reducer. Reducer adalah sebuah fungsi yang mengambil state dan objek action sebagai argumen, dan mengembalikan state yang baru berdasarkan objek aksi tersebut.
+
+Setelah reducer mengembalikan state yang baru, store akan menyimpan state tersebut dan mengirimkan perubahan tersebut ke semua komponen yang terhubung dengan store. Komponen-komponen tersebut akan mengambil data dari store yang baru dan memperbarui tampilan sesuai dengan state yang baru.
+
+```
+import React, { useState } from "react";
+//-----------------------------------------------------------------
+import { useDispatch } from "react-redux";
+import { update } from "../utils/redux/features/productSlice";
+//-----------------------------------------------------------------
+
+const AddProducts = () => {
+  //-----------------------------------------------------------------
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const dispatch = useDispatch();
+
+  const updateProduct = (e) => {
+    e.preventDefault();
+    dispatch(update({ title, price }));
+  };
+  //-----------------------------------------------------------------
+
+  return (
+    <div>
+      <form onSubmit={updateProduct} className="box mt-5">
+        <div className="field">
+          <label className="label">Title</label>
+          <div className="control">
+            <input
+              type="text"
+              placeholder="Title"
+              className="input"
+        //-----------------------------------------------------------------
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+        //-----------------------------------------------------------------
+            />
+          </div>
+          <div className="field">
+            <label className="label">Price</label>
+            <div className="control">
+              <input
+                type="text"
+                placeholder="Price"
+                className="input"
+        //-----------------------------------------------------------------
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+        //-----------------------------------------------------------------
+              />
+            </div>
+          </div>
+          <div className="field">
+            <button className="button is-success">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default AddProducts;
+```
+
+Pada contoh di atas kita melakukan update state title dan price.
 
 ## Referensi
 
