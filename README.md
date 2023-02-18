@@ -819,7 +819,7 @@ Berikut langkah - langkah untuk setting fake api menggunakan json-server [[4]](h
   ```
   npm i json-server
   ```
-- Buat file json dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
+- Buat file json di dalam folder baru (sebaiknya diberi nama db) dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
 
   ```
   {
@@ -3082,7 +3082,28 @@ const AddProducts = () => {
 export default AddProducts;
 ```
 
-Pada contoh di atas kita melakukan update state title dan price.
+Pada contoh di atas kita melakukan update state title dan price. Di mana function `update` di file `productSlice.js` (src/utils/redux/features/productSlice.js) bertindak sebagai action. Berikut code di file `productSlice.js`
+
+```
+import { createSlice } from "@reduxjs/toolkit";
+
+const productSlice = createSlice({
+  name: "product",
+  initialState: {
+    title: "",
+    price: "",
+  },
+  reducers: {
+    update: (state, action) => {
+      state.title = action.payload.title;
+      state.price = action.payload.price;
+    },
+  },
+});
+
+export const { update } = productSlice.actions;
+export default productSlice.reducer;
+```
 
 ## Referensi
 
