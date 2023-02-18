@@ -3105,6 +3105,47 @@ export const { update } = productSlice.actions;
 export default productSlice.reducer;
 ```
 
+### Fetching API Menggunakan Redux Toolkit
+
+#### Get Request
+
+Kita bisa melakukan fetching API menggunakan `createAsyncThunk` dan `createEntityAdapter`:
+
+- `createAsyncThunk` <br/>
+  adalah utilitas yang disediakan oleh Redux Toolkit untuk memudahkan pengambilan data dari sumber eksternal seperti API. Dengan `createAsyncThunk`, kita dapat membuat async thunk yang mengambil data dari API dengan mudah, dan memperbarui status dalam state Redux saat data sudah selesai diambil.
+
+  `createAsyncThunk` menghasilkan sebuah async thunk yang dapat digunakan untuk mengambil data dari sumber eksternal dan menyimpannya pada state Redux. Dalam proses pengambilan data, `createAsyncThunk` juga memperbarui status dalam state Redux sehingga kita dapat menampilkan pesan loading atau error kepada user.
+
+  `createAsyncThunk` membutuhkan dua parameter utama: nama async thunk dan callback function yang berisi kode untuk mengambil data dari sumber eksternal. Callback function ini harus mengembalikan sebuah promise yang berisi data yang diambil.
+
+  Dalam penggunaannya, `createAsyncThunk` biasanya digunakan bersama dengan createSlice dan adaptor seperti createEntityAdapter pada Redux Toolkit untuk mempermudah pengambilan dan pengelolaan data dari sumber eksternal. Dengan `createAsyncThunk`, pengambilan dan pengelolaan data pada aplikasi React JS menjadi lebih mudah dan efisien.
+
+- `createEntityAdapter` <br/>
+  adalah utilitas yang disediakan oleh Redux Toolkit untuk memudahkan pengolahan data dari sumber eksternal seperti API. Dengan `createEntityAdapter`, kita dapat dengan mudah menambah, menghapus, dan memperbarui data dalam bentuk objek tanpa harus menuliskan kode boilerplate yang banyak.
+
+  <p style="font-size: 12px"> <b>Note</b>: Kode boilerplate adalah kode yang banyak diulang dan memiliki pola yang sama dalam berbagai bagian dari sebuah aplikasi.</p>
+
+  `createEntityAdapter` menghasilkan sebuah adaptor yang berisi beberapa method untuk mengelola data dalam bentuk objek. Adaptor ini dapat digunakan untuk membuat sebuah slice pada Redux store. Adaptor ini mengikuti pola "normalisasi data" di mana data diatur dalam bentuk objek dan dirujuk oleh ID unik yang bisa dipakai untuk membantu mengelola hubungan antar data.
+
+  Adaptor `createEntityAdapter` memberikan beberapa method yang bisa digunakan seperti addOne, addMany, updateOne, updateMany, removeOne, removeMany, dan getSelectors. Dengan method-method tersebut, kita dapat melakukan operasi CRUD (Create, Read, Update, dan Delete) dengan mudah pada data yang disimpan dalam bentuk objek.
+
+  Dalam penggunaannya, `createEntityAdapter` biasanya digunakan bersama dengan async thunk pada Redux Toolkit untuk memudahkan pengambilan data dari API dan penyimpanan data dalam bentuk objek dalam store Redux. Dengan menggunakan `createEntityAdapter`, pengelolaan data pada store menjadi lebih mudah dan efisien.
+
+Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux Toolkit di React JS menggunakan createAsyncThunk dan createEntityAdapter:
+
+1. Set action, reducer, dan state terkait dengan operasi fetching API tersebut Di bagian Slice (di contoh di file `productSlice.js` [src/utils/redux/features/productSlice.js]):
+   1. Menentukan initial state <br/>
+      Di awal file slice, kita perlu menentukan initial state untuk data yang akan diambil dari API. Initial state ini biasanya berupa objek yang berisi property data, status, dan error. Property data akan berisi data yang diambil dari API, status akan berisi status fetching seperti "idle", "loading", dan "succeeded", sedangkan error akan berisi pesan error jika terjadi error dalam proses fetching.
+   2. Membuat action creator dengan createAsyncThunk <br/>
+      Selanjutnya, kita perlu membuat action creator yang akan digunakan untuk memicu proses fetching. Redux Toolkit menyediakan utilitas createAsyncThunk yang memudahkan pembuatan action creator untuk fetching data secara asynchronous. Kita dapat menyediakan URL endpoint dari API dan metode HTTP yang digunakan, dan createAsyncThunk akan membuat dua action untuk kita, yaitu pending dan fulfilled.
+   3. Membuat reducer <br/>
+      Setelah membuat action creator, kita perlu membuat reducer yang akan merespons action yang dihasilkan. Dalam reducer, kita akan mengubah state berdasarkan status dan data yang diperoleh dari API. Kita juga akan menangani action rejected jika terjadi error pada proses fetching.
+   4. Menambahkan action creator dan reducer ke slice <br/>
+      Setelah membuat action creator dan reducer, kita perlu menambahkannya ke dalam slice. Redux Toolkit menyediakan utilitas createSlice yang memudahkan pembuatan slice dengan action creator dan reducer. Kita perlu menyediakan nama slice, initial state, reducers, dan nama action yang dihasilkan oleh createAsyncThunk.
+   5. Mengekspor action creator dan reducer <br/>
+      Setelah slice selesai dibuat, kita perlu mengekspor action creator dan reducer yang dihasilkan agar bisa digunakan di komponen React. Kita dapat menggunakan fungsi export const untuk mengekspor action creator dan reducer tersebut.
+2. Set action,
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
