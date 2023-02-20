@@ -3134,17 +3134,192 @@ Kita bisa melakukan fetching API menggunakan `createAsyncThunk` dan `createEntit
 Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux Toolkit di React JS menggunakan createAsyncThunk dan createEntityAdapter:
 
 1. Set action, reducer, dan state terkait dengan operasi fetching API tersebut Di bagian Slice (di contoh di file `productSlice.js` [src/utils/redux/features/productSlice.js]):
-   1. Menentukan initial state <br/>
-      Di awal file slice, kita perlu menentukan initial state untuk data yang akan diambil dari API. Initial state ini biasanya berupa objek yang berisi property data, status, dan error. Property data akan berisi data yang diambil dari API, status akan berisi status fetching seperti "idle", "loading", dan "succeeded", sedangkan error akan berisi pesan error jika terjadi error dalam proses fetching.
-   2. Membuat action creator dengan createAsyncThunk <br/>
-      Selanjutnya, kita perlu membuat action creator yang akan digunakan untuk memicu proses fetching. Redux Toolkit menyediakan utilitas createAsyncThunk yang memudahkan pembuatan action creator untuk fetching data secara asynchronous. Kita dapat menyediakan URL endpoint dari API dan metode HTTP yang digunakan, dan createAsyncThunk akan membuat dua action untuk kita, yaitu pending dan fulfilled.
-   3. Membuat reducer <br/>
-      Setelah membuat action creator, kita perlu membuat reducer yang akan merespons action yang dihasilkan. Dalam reducer, kita akan mengubah state berdasarkan status dan data yang diperoleh dari API. Kita juga akan menangani action rejected jika terjadi error pada proses fetching.
-   4. Menambahkan action creator dan reducer ke slice <br/>
-      Setelah membuat action creator dan reducer, kita perlu menambahkannya ke dalam slice. Redux Toolkit menyediakan utilitas createSlice yang memudahkan pembuatan slice dengan action creator dan reducer. Kita perlu menyediakan nama slice, initial state, reducers, dan nama action yang dihasilkan oleh createAsyncThunk.
-   5. Mengekspor action creator dan reducer <br/>
-      Setelah slice selesai dibuat, kita perlu mengekspor action creator dan reducer yang dihasilkan agar bisa digunakan di komponen React. Kita dapat menggunakan fungsi export const untuk mengekspor action creator dan reducer tersebut.
-2. Set action,
+
+   1. Import `createAsyncThunk`, `createEntityAdapter`, dan dependency lain yang dibutuhkan
+   2. Buat createAsyncThunk untuk fetching API get request <br/>
+      Dalam contoh ini kita membuat action creator `getProducts` menggunakan createAsyncThunk. `getProducts` bertugas untuk melakukan fetching data dari API menggunakan axios. Setelah berhasil mendapatkan data dari API, `getProducts` akan mereturn data tersebut.
+   3. Buat instance dari `createEntityAdapter()` untuk mengelola data get request API <br/>
+      Di sini, kita menggunakan `createEntityAdapter` untuk membuat adapter yang memungkinkan kita untuk mengelola data dari API. Adapter ini memungkinkan kita untuk melakukan operasi CRUD pada collection data yang disimpan di dalam state Redux.
+   4. Buat initialState menggunakan `productEntity.getInitialState()` <br/>
+      Di sini, kita menggunakan method getInitialState() dari adapter untuk menginisialisasi state dengan nilai awal. State ini memuat property status dan error yang digunakan untuk mengelola status request API.
+   5. Buat slice menggunakan `createSlice()` <br/>
+      Di sini, kita menggunakan createSlice untuk membuat slice yang memuat reducer dan action creator. Pada extraReducers, kita menggunakan .addCase untuk menangani action creator yang dihasilkan dari createAsyncThunk. Jika action creator berada pada state pending, loading akan disimpan pada state. Jika action creator berada pada state fulfilled, data yang didapat dari API akan disimpan pada state menggunakan productAdapter.setAll(). Jika action creator berada pada state rejected, error message akan disimpan pada state.
+
+      extraReducers adalah argumen yang diterima oleh createSlice di Redux Toolkit yang memungkinkan kita menambahkan kasus reducer tambahan yang tidak terkait dengan action creator yang dihasilkan oleh createSlice. Dalam contoh fetch API dengan createAsyncThunk yang sudah dijelaskan sebelumnya, kita menggunakan extraReducers untuk menambahkan tiga kasus reducer untuk menangani status request API, yaitu pending, fulfilled, dan rejected
+
+   6. Export adapter dan selector <br/>
+      Terakhir, kita hanya perlu mengeksport reducer dari slice dan selector yang digunakan untuk memilih seluruh data post dari collection products pada state. Kita bisa menggunakan selector ini di dalam komponen React untuk memuat data dari state.
+
+   Berikut tampilan code di file `productSlice.js`:
+
+   ```
+   //------------------------------------i-------------------------------------------------
+   import {createAsyncThunk, createEntityAdapter, createSlice,} from "@reduxjs/toolkit";
+   import axios from "axios";
+   //--------------------------------------------------------------------------------------
+
+   //------------------------------------ii-------------------------------------------------
+   // Buat thunk untuk mengambil data
+   export const getProducts = createAsyncThunk(
+     "products/getProducts",
+     async () => {
+       const response = await axios.get(" http://localhost:2023/products");
+       return response.data;
+     }
+   );
+   //--------------------------------------------------------------------------------------
+
+   //------------------------------------iii-------------------------------------------------
+   // Buat adapter untuk menyimpan data dalam array entities
+   const productsAdapter = createEntityAdapter({
+     selectId: (product) => product.id,
+   });
+   //--------------------------------------------------------------------------------------
+
+   //-------------------------------------iv--------------------------------------------------
+   // Buat initial state untuk mengisi nilai awal state
+   const initialState = productsAdapter.getInitialState({
+     status: "idle",
+     error: null,
+   });
+   //----------------------------------------------------------------------------------------
+
+   //-------------------------------------v--------------------------------------------------
+   // Buat slice untuk mengelola state
+   const productSlice = createSlice({
+     name: "products",
+     initialState,
+     reducers: {},
+     extraReducers: (builder) => {
+       builder
+         .addCase(getProducts.pending, (state) => {
+           state.status = "loading";
+         })
+         .addCase(getProducts.fulfilled, (state, action) => {
+           state.status = "succeeded";
+           productsAdapter.setAll(state, action.payload);
+         })
+         .addCase(getProducts.rejected, (state, action) => {
+           state.status = "failed";
+           state.error = action.error.message;
+         });
+     },
+   });
+   //----------------------------------------------------------------------------------------
+
+   //-------------------------------------vi--------------------------------------------------
+   export default productSlice.reducer;
+   export const { selectAll: selectAllProducts } = productsAdapter.getSelectors(
+     (state) => state.products
+   );
+   //-----------------------------------------------------------------------------------------
+   ```
+
+2. Selanjutny, kita harus menggabungkan slice yang telah dibuat ke dalam store di file `store.js` [src/utils/redux/store/store.js]
+
+   ```
+   import { configureStore } from "@reduxjs/toolkit";
+   import productReducer from "../features/productSlice";
+
+   export const store = configureStore({
+     reducer: { products: productReducer },
+   });
+   ```
+
+   Dalam contoh di atas, kita menggunakan configureStore dari Redux Toolkit untuk membuat store. Kita juga menggabungkan slice products ke dalam store.
+
+3. Tampilkan state <br/>
+   Selanjutnya, kita harus membuat sebuah component untuk menampilkan data yang telah diambil dari API (di contoh showProduct [src/components/showProduct.js]).Gunakan useDispatch dan useSelector untuk mengambil data dari state dan lakukan dispatch ke async thunk `getProducts` (yang kita buat di bagian slice tadi). Kita juga harus menambahkan useEffect untuk melakukan dispatch ke async thunk setelah component ini di-mount. Sampai di sini kita sudah bisa melihat hasilnya menggunakan `Extension Redux DevTools`.
+
+   ```
+   import React, { useEffect } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import { getProducts } from "../utils/redux/features/productSlice";
+
+   const ShowProduct = () => {
+     const dispatch = useDispatch();
+
+     useEffect(() => {
+       dispatch(getProducts());
+     }, [dispatch]);
+
+     return (
+       <div>
+         <div className="box mt-5"></div>
+       </div>
+     );
+   };
+
+   export default ShowProduct;
+   ```
+
+   Selanjutnya untuk menampilkan state ke dalam component kita harus mengambil statenya di dalam store menggunakan selector. Jadi kita harus membuat selector untuk mengambil data dari API (di contoh data products), status, dan error message menggunakan useSelector dan productSelectors yang kita buat di bagian slice [src/utils/redux/features/productSlice.js]. Kita menggunakan status dan error dari state untuk menampilkan pesan loading atau error jika fetching data gagal. Jika statusnya "succeeded", maka kita akan menampilkan data dari state yang telah diambil dari API.
+
+   ```
+   import React, { useEffect } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import {
+     getProducts,
+     productSelectors,
+   } from "../utils/redux/features/productSlice";
+
+   const ShowProduct = () => {
+     const dispatch = useDispatch();
+     //----------------------------------------------------------------------------
+     const products = useSelector(productSelectors.selectAll);
+     const productsStatus = useSelector((state) => state.products.status);
+     const productsError = useSelector((state) => state.products.error);
+     //----------------------------------------------------------------------------
+
+     useEffect(() => {
+       dispatch(getProducts());
+     }, [dispatch]);
+
+     //----------------------------------------------------------------------------
+     if (productsStatus === "loading") {
+       return <div> Loading..............</div>;
+     }
+
+     if (productsStatus === "failed") {
+       return <div>Error: {productsError}</div>;
+     }
+     //----------------------------------------------------------------------------
+
+     return (
+       <div className="box mt-5">
+         <table className="table is-striped is-fullwidth">
+           <thead>
+             <tr>
+               <th>No</th>
+               <th>Title</th>
+               <th>Price</th>
+               <th>Actions</th>
+             </tr>
+           </thead>
+           <tbody>
+      //----------------------------------------------------------------------------
+             {products.map((product, index) => (
+               <tr key={product.id}>
+                 <td>{index + 1}</td>
+                 <td>{product.title}</td>
+                 <td>{product.price}</td>
+                 <td>
+                   <button className="button is-info is-mall">Edit</button>
+                   <button className="button is-danger is-mall">Delete</button>
+                 </td>
+               </tr>
+             ))}
+      //----------------------------------------------------------------------------
+           </tbody>
+         </table>
+       </div>
+     );
+   };
+
+   export default ShowProduct;
+   ```
+
+   Dalam contoh di atas, kita menggunakan useSelector untuk mengambil state dari Redux dan menampilkannya dalam tag `<tr>` dan `<td>`. Kita juga menambahkan kondisi untuk menampilkan pesan loading dan error di dalam komponen.
 
 ## Referensi
 
