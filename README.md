@@ -46,6 +46,8 @@ Untuk alur belajar react kita bia mengikuti roadmap [ini](https://roadmap.sh/rea
     __|README.md
     ```
 
+    folder utils digunakan untuk menyimpan file yang berisi function yang digunakan sebagai alat bantu atau utilitas yang dapat digunakan di seluruh bagian kode dalam proyek yang sama, contohnya untuk menampung code - code redux atau context.
+
 - Selain itu terdapat beberapa hal yang harus diperhatikan:
 
   - untuk nama components/class dibuat dengan pascal case, contohnya HomePage
@@ -817,7 +819,7 @@ Berikut langkah - langkah untuk setting fake api menggunakan json-server [[4]](h
   ```
   npm i json-server
   ```
-- Buat file json dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
+- Buat file json di dalam folder baru (sebaiknya diberi nama db) dan isikan data yang kita perlukan. yang nantinya akan kita gunakan untuk menyimpan data kita (sebaiknya namai filenya dengan db.json). Berikut contoh isi datanya:
 
   ```
   {
@@ -1250,7 +1252,17 @@ Sebaiknya redux ini digunakan jika:
 - Pengelolaan state harus dilakukan di satu tempat
 - Mengelola state di top-level component sudah tidak lagi relevan
 
-Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts)
+Istilah - istilah yang ada di dalam React:
+
+- Store: Store adalah tempat di mana state (keadaan) aplikasi disimpan. Store ini bersifat immutable (tidak dapat diubah), artinya state hanya dapat diubah melalui action.
+- Action: Action adalah objek yang digunakan untuk mengirim perintah ke store untuk mengubah state. Action harus memiliki properti "type" yang menjelaskan tipe perubahan yang akan dilakukan, dan dapat memiliki properti lain yang dibutuhkan.
+- Reducer: Reducer adalah sebuah fungsi yang menerima dua parameter yaitu state dan action, dan menghasilkan state baru yang telah diperbarui. Reducer harus bersifat pure (murni), artinya tidak boleh mengubah parameter yang diterimanya, dan harus selalu menghasilkan hasil yang sama jika diberikan parameter yang sama.
+- Dispatch adalah function yang digunakan untuk memperbarui state di dalam store. Jadi dispatch ini digunakan untuk mengirimkan action ke store. Setelah action terkirim ke store, reducer akan memeriksa tipe action dan mengubah state di dalam store sesuai dengan informasi yang ada pada objek action. Setelah state di dalam store berhasil diperbarui, Redux akan memberi tahu semua komponen yang terhubung ke store Redux sehingga tampilan dari aplikasi dapat diperbarui sesuai dengan state yang baru.
+- Selector: Selector adalah sebuah sebuah hook yang digunakan untuk memilih dan mengambil state yang tersimpan di store agar bisa digunakan oleh komponen react untuk di tampilkan ke dalam UI. Selector dapat digunakan untuk memisahkan state menjadi beberapa bagian kecil, yang kemudian dapat diakses dan digunakan oleh komponen React.
+- Middleware: Middleware adalah fungsi yang berjalan di antara dispatch dan reducer. Middleware dapat digunakan untuk melakukan tugas tertentu, seperti logging, atau memodifikasi action sebelum action tersebut dijalankan oleh reducer.
+- Provider: Provider adalah komponen React yang digunakan untuk memberikan store ke seluruh komponen dalam aplikasi. Provider akan menempatkan store di dalam context React, sehingga komponen dalam aplikasi dapat mengakses store melalui context.
+
+Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts).
 
 ### Prepare & Get request
 
@@ -2805,9 +2817,515 @@ export const updateContact = (data) => {
   export default AddContact;
   ```
 
+## Redux Toolkit
+
+Redux Toolkit merupakan package yang dikembangkan dan menjadi cara standar baru untuk membuat kode redux dan mengani tiga masalah utama di dalam redux:
+
+- Konfigurasi Redux Store yang terlalu rumit
+- Harus menambahkn banyak package untuk membuat Redux melakukan sesuatu yang berguna
+- Redux membutuhkan terlalu banyak boilerplate code
+
+### Prepare
+
+Untuk bisa menggunakan redux kita harus menginstallnya dulu, kita bisa install redux dan install react (create-react-app) secara bersamaan menggunakan command berikut:
+
+```
+npx create-react-app . --template redux
+```
+
+- Hapus folder counter pada folder features, app.css, (app.test.js), (serviceworker), index.css dan logo.
+- Masuk ke file store.js (src/app/store.js) hapus reducer counter. Sehingga tampilan codenya akan jadi seperti ini:
+
+  ```
+  import { configureStore } from "@reduxjs/toolkit";
+
+  export const store = configureStore({
+    reducer: {},
+  });
+  ```
+
+- Bersihkan file index.js dan app.js (sesuaikan contennya). Sehingga tampilan code index.js akan jadi seperti ini:
+
+  ```
+  import React from "react";
+  import { createRoot } from "react-dom/client";
+  import { Provider } from "react-redux";
+  import { store } from "./app/store";
+  import App from "./App";
+  import reportWebVitals from "./reportWebVitals";
+
+  const container = document.getElementById("root");
+  const root = createRoot(container);
+
+  root.render(
+    <React.StrictMode>
+      <Provider store={store}>
+        <App />
+      </Provider>
+    </React.StrictMode>
+  );
+
+  reportWebVitals();
+  ```
+
+  Dan tampilan code di file app.js akan jadi seperti ini:
+
+  ```
+  import React from "react";
+
+  function App() {
+    return (
+      <div>
+        <h1>Hello world</h1>
+      </div>
+    );
+  }
+
+  export default App;
+  ```
+
+- Install frame work CSS untuk mempermudah styling, di contoh kali ini kita menggunakan `bulma`:
+
+  - Install bulma dengan command:
+
+    ```
+    npm i bulma
+    ```
+
+  - Integrasikan bulma ke project kita dengan cara import bulma ke file `index.js`
+
+    ```
+    import React from "react";
+    import { createRoot } from "react-dom/client";
+    import { Provider } from "react-redux";
+    import { store } from "./app/store";
+    import App from "./App";
+    import reportWebVitals from "./reportWebVitals";
+    //----------------------------------------------------------
+    import "bulma/css/bulma.css";
+    //----------------------------------------------------------
+
+    const container = document.getElementById("root");
+    const root = createRoot(container);
+
+    root.render(
+      <React.StrictMode>
+        <Provider store={store}>
+          <App />
+        </Provider>
+      </React.StrictMode>
+    );
+
+    reportWebVitals();
+    ```
+
+  - Untuk memeriksa keberhasilan integrasi bulma css yang kita lakukan, tambahkan class `container` di file `App.js` jika ukuran dan bentuk tulisan `Hello world` berubah berarti berhasil.
+
+    ```
+    import React from "react";
+
+    function App() {
+      return (
+    //--------------------------------------------------
+        <div className="container">
+    //--------------------------------------------------
+          <h1>Hello world</h1>
+        </div>
+      );
+    }
+
+    export default App;
+    ```
+
+### Buat Slice
+
+Slice adalah sebuah object yang memiliki tiga bagian utama, yaitu initial state, function reducer dan nama dari slice sebagai identifikasi [[6]](https://devsaurus.com/add-redux#step-by-step). Slice dibuat di folder `features` (src/features). Kali ini kita akan membuat slice untuk fitur product di dalam file `productSlice.js` di dalam folder `features` tadi, Di dalam file tersebut yang kita lakukan[[6]](https://devsaurus.com/add-redux#step-by-step):
+
+- Import function createSlice yang berfungsi untuk membuat slice
+- Membuat initialState untuk data notes
+- Menambahkan field reducers untuk menampung semua function reducer yang akan dibuat nanti
+
+  Berikut source code di file `productSlice.js`:
+
+  ```
+  import { createSlice } from "@reduxjs/toolkit";
+
+  const productSlice = createSlice({
+    name: "product",
+    initialState: {
+      title: "",
+      price: "",
+    },
+    reducers: {
+      update: (state, action) => {
+        state.title = action.payload.title;
+        state.price = action.payload.price;
+      },
+    },
+  });
+
+  export const { update } = productSlice.actions;
+  export default productSlice.reducer;
+  ```
+
+Semua reducer yang ada di dalam slice harus ditambahkan ke Redux store.
+Payload merupakan data yang kita kirimkan ke action.
+
+### Buat Store
+
+Di bagian store (src/utils/redux/store/store.js) tambahkan reducer untuk fitur yang kita buat (di contoh ini product) di bagian slice tadi (product slice) yang tersimpan di file `productSlice.js` (src/utils/redux/fitures/productSlice.js)
+
+```
+import { configureStore } from "@reduxjs/toolkit";
+//----------------------------------------------------------
+import productReducer from "../features/productSlice";
+//----------------------------------------------------------
+
+export const store = configureStore({
+  //----------------------------------------------------------
+  reducer: { product: productReducer },
+  //----------------------------------------------------------
+});
+```
+
+### Menampilkan State
+
+Selanjutnya kita bisa menampilkan state di dalam store ke dalam UI, state yang akan ditampilkan harus dipanggil menggunakan hook `useSelector`.
+
+```
+import React from "react";
+//---------------------------------------------------------------------
+import { useSelector } from "react-redux";
+//---------------------------------------------------------------------
+
+const ShowProduct = () => {
+  //---------------------------------------------------------------------
+  const { title, price } = useSelector((state) => state.product);
+  //---------------------------------------------------------------------
+  return (
+    <div className="box mt-5">
+      //---------------------------------------------------------------------
+      <h4 className="title is-4">Title: {title}</h4>
+      <h4 className="title is-4"> Price: {price} </h4>
+      //---------------------------------------------------------------------
+    </div>
+  );
+};
+
+export default ShowProduct;
+```
+
+### Update State
+
+Untuk mengupdate state di dalam store kita harus menggunakan `dispatch`. Function `dispatch` digunakan untuk melakukan perubahan pada state yang ada di dalam store. Fungsi ini menerima sebuah objek action sebagai argumen, dan mengirim objek action tersebut ke reducer. Reducer adalah sebuah fungsi yang mengambil state dan objek action sebagai argumen, dan mengembalikan state yang baru berdasarkan objek aksi tersebut.
+
+Setelah reducer mengembalikan state yang baru, store akan menyimpan state tersebut dan mengirimkan perubahan tersebut ke semua komponen yang terhubung dengan store. Komponen-komponen tersebut akan mengambil data dari store yang baru dan memperbarui tampilan sesuai dengan state yang baru.
+
+```
+import React, { useState } from "react";
+//-----------------------------------------------------------------
+import { useDispatch } from "react-redux";
+import { update } from "../utils/redux/features/productSlice";
+//-----------------------------------------------------------------
+
+const AddProducts = () => {
+  //-----------------------------------------------------------------
+  const [title, setTitle] = useState("");
+  const [price, setPrice] = useState("");
+  const dispatch = useDispatch();
+
+  const updateProduct = (e) => {
+    e.preventDefault();
+    dispatch(update({ title, price }));
+  };
+  //-----------------------------------------------------------------
+
+  return (
+    <div>
+      <form onSubmit={updateProduct} className="box mt-5">
+        <div className="field">
+          <label className="label">Title</label>
+          <div className="control">
+            <input
+              type="text"
+              placeholder="Title"
+              className="input"
+        //-----------------------------------------------------------------
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+        //-----------------------------------------------------------------
+            />
+          </div>
+          <div className="field">
+            <label className="label">Price</label>
+            <div className="control">
+              <input
+                type="text"
+                placeholder="Price"
+                className="input"
+        //-----------------------------------------------------------------
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+        //-----------------------------------------------------------------
+              />
+            </div>
+          </div>
+          <div className="field">
+            <button className="button is-success">Submit</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default AddProducts;
+```
+
+Pada contoh di atas kita melakukan update state title dan price. Di mana function `update` di file `productSlice.js` (src/utils/redux/features/productSlice.js) bertindak sebagai action. Berikut code di file `productSlice.js`
+
+```
+import { createSlice } from "@reduxjs/toolkit";
+
+const productSlice = createSlice({
+  name: "product",
+  initialState: {
+    title: "",
+    price: "",
+  },
+  reducers: {
+    update: (state, action) => {
+      state.title = action.payload.title;
+      state.price = action.payload.price;
+    },
+  },
+});
+
+export const { update } = productSlice.actions;
+export default productSlice.reducer;
+```
+
+### Fetching API Menggunakan Redux Toolkit
+
+#### Get Request
+
+Kita bisa melakukan fetching API menggunakan `createAsyncThunk` dan `createEntityAdapter`:
+
+- `createAsyncThunk` <br/>
+  adalah utilitas yang disediakan oleh Redux Toolkit untuk memudahkan pengambilan data dari sumber eksternal seperti API. Dengan `createAsyncThunk`, kita dapat membuat async thunk yang mengambil data dari API dengan mudah, dan memperbarui status dalam state Redux saat data sudah selesai diambil.
+
+  `createAsyncThunk` menghasilkan sebuah async thunk yang dapat digunakan untuk mengambil data dari sumber eksternal dan menyimpannya pada state Redux. Dalam proses pengambilan data, `createAsyncThunk` juga memperbarui status dalam state Redux sehingga kita dapat menampilkan pesan loading atau error kepada user.
+
+  `createAsyncThunk` membutuhkan dua parameter utama: nama async thunk dan callback function yang berisi kode untuk mengambil data dari sumber eksternal. Callback function ini harus mengembalikan sebuah promise yang berisi data yang diambil.
+
+  Dalam penggunaannya, `createAsyncThunk` biasanya digunakan bersama dengan createSlice dan adaptor seperti createEntityAdapter pada Redux Toolkit untuk mempermudah pengambilan dan pengelolaan data dari sumber eksternal. Dengan `createAsyncThunk`, pengambilan dan pengelolaan data pada aplikasi React JS menjadi lebih mudah dan efisien.
+
+- `createEntityAdapter` <br/>
+  adalah utilitas yang disediakan oleh Redux Toolkit untuk memudahkan pengolahan data dari sumber eksternal seperti API. Dengan `createEntityAdapter`, kita dapat dengan mudah menambah, menghapus, dan memperbarui data dalam bentuk objek tanpa harus menuliskan kode boilerplate yang banyak.
+
+  <p style="font-size: 12px"> <b>Note</b>: Kode boilerplate adalah kode yang banyak diulang dan memiliki pola yang sama dalam berbagai bagian dari sebuah aplikasi.</p>
+
+  `createEntityAdapter` menghasilkan sebuah adaptor yang berisi beberapa method untuk mengelola data dalam bentuk objek. Adaptor ini dapat digunakan untuk membuat sebuah slice pada Redux store. Adaptor ini mengikuti pola "normalisasi data" di mana data diatur dalam bentuk objek dan dirujuk oleh ID unik yang bisa dipakai untuk membantu mengelola hubungan antar data.
+
+  Adaptor `createEntityAdapter` memberikan beberapa method yang bisa digunakan seperti addOne, addMany, updateOne, updateMany, removeOne, removeMany, dan getSelectors. Dengan method-method tersebut, kita dapat melakukan operasi CRUD (Create, Read, Update, dan Delete) dengan mudah pada data yang disimpan dalam bentuk objek.
+
+  Dalam penggunaannya, `createEntityAdapter` biasanya digunakan bersama dengan async thunk pada Redux Toolkit untuk memudahkan pengambilan data dari API dan penyimpanan data dalam bentuk objek dalam store Redux. Dengan menggunakan `createEntityAdapter`, pengelolaan data pada store menjadi lebih mudah dan efisien.
+
+Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux Toolkit di React JS menggunakan createAsyncThunk dan createEntityAdapter:
+
+1. Set action, reducer, dan state terkait dengan operasi fetching API tersebut Di bagian Slice (di contoh di file `productSlice.js` [src/utils/redux/features/productSlice.js]):
+
+   1. Import `createAsyncThunk`, `createEntityAdapter`, dan dependency lain yang dibutuhkan
+   2. Buat createAsyncThunk untuk fetching API get request <br/>
+      Dalam contoh ini kita membuat action creator `getProducts` menggunakan createAsyncThunk. `getProducts` bertugas untuk melakukan fetching data dari API menggunakan axios. Setelah berhasil mendapatkan data dari API, `getProducts` akan mereturn data tersebut.
+   3. Buat instance dari `createEntityAdapter()` untuk mengelola data get request API <br/>
+      Di sini, kita menggunakan `createEntityAdapter` untuk membuat adapter yang memungkinkan kita untuk mengelola data dari API. Adapter ini memungkinkan kita untuk melakukan operasi CRUD pada collection data yang disimpan di dalam state Redux.
+   4. Buat initialState menggunakan `productEntity.getInitialState()` <br/>
+      Di sini, kita menggunakan method getInitialState() dari adapter untuk menginisialisasi state dengan nilai awal. State ini memuat property status dan error yang digunakan untuk mengelola status request API.
+   5. Buat slice menggunakan `createSlice()` <br/>
+      Di sini, kita menggunakan createSlice untuk membuat slice yang memuat reducer dan action creator. Pada extraReducers, kita menggunakan .addCase untuk menangani action creator yang dihasilkan dari createAsyncThunk. Jika action creator berada pada state pending, loading akan disimpan pada state. Jika action creator berada pada state fulfilled, data yang didapat dari API akan disimpan pada state menggunakan productAdapter.setAll(). Jika action creator berada pada state rejected, error message akan disimpan pada state.
+
+      extraReducers adalah argumen yang diterima oleh createSlice di Redux Toolkit yang memungkinkan kita menambahkan kasus reducer tambahan yang tidak terkait dengan action creator yang dihasilkan oleh createSlice. Dalam contoh fetch API dengan createAsyncThunk yang sudah dijelaskan sebelumnya, kita menggunakan extraReducers untuk menambahkan tiga kasus reducer untuk menangani status request API, yaitu pending, fulfilled, dan rejected
+
+   6. Export adapter dan selector <br/>
+      Terakhir, kita hanya perlu mengeksport reducer dari slice dan selector yang digunakan untuk memilih seluruh data post dari collection products pada state. Kita bisa menggunakan selector ini di dalam komponen React untuk memuat data dari state.
+
+   Berikut tampilan code di file `productSlice.js`:
+
+   ```
+   //------------------------------------i-------------------------------------------------
+   import {createAsyncThunk, createEntityAdapter, createSlice,} from "@reduxjs/toolkit";
+   import axios from "axios";
+   //--------------------------------------------------------------------------------------
+
+   //------------------------------------ii-------------------------------------------------
+   // Buat thunk untuk mengambil data
+   export const getProducts = createAsyncThunk(
+     "products/getProducts",
+     async () => {
+       const response = await axios.get(" http://localhost:2023/products");
+       return response.data;
+     }
+   );
+   //--------------------------------------------------------------------------------------
+
+   //------------------------------------iii-------------------------------------------------
+   // Buat adapter untuk menyimpan data dalam array entities
+   const productsAdapter = createEntityAdapter({
+     selectId: (product) => product.id,
+   });
+   //--------------------------------------------------------------------------------------
+
+   //-------------------------------------iv--------------------------------------------------
+   // Buat initial state untuk mengisi nilai awal state
+   const initialState = productsAdapter.getInitialState({
+     status: "idle",
+     error: null,
+   });
+   //----------------------------------------------------------------------------------------
+
+   //-------------------------------------v--------------------------------------------------
+   // Buat slice untuk mengelola state
+   const productSlice = createSlice({
+     name: "products",
+     initialState,
+     reducers: {},
+     extraReducers: (builder) => {
+       builder
+         .addCase(getProducts.pending, (state) => {
+           state.status = "loading";
+         })
+         .addCase(getProducts.fulfilled, (state, action) => {
+           state.status = "succeeded";
+           productsAdapter.setAll(state, action.payload);
+         })
+         .addCase(getProducts.rejected, (state, action) => {
+           state.status = "failed";
+           state.error = action.error.message;
+         });
+     },
+   });
+   //----------------------------------------------------------------------------------------
+
+   //-------------------------------------vi--------------------------------------------------
+   export default productSlice.reducer;
+   export const { selectAll: selectAllProducts } = productsAdapter.getSelectors(
+     (state) => state.products
+   );
+   //-----------------------------------------------------------------------------------------
+   ```
+
+2. Selanjutny, kita harus menggabungkan slice yang telah dibuat ke dalam store di file `store.js` [src/utils/redux/store/store.js]
+
+   ```
+   import { configureStore } from "@reduxjs/toolkit";
+   import productReducer from "../features/productSlice";
+
+   export const store = configureStore({
+     reducer: { products: productReducer },
+   });
+   ```
+
+   Dalam contoh di atas, kita menggunakan configureStore dari Redux Toolkit untuk membuat store. Kita juga menggabungkan slice products ke dalam store.
+
+3. Tampilkan state <br/>
+   Selanjutnya, kita harus membuat sebuah component untuk menampilkan data yang telah diambil dari API (di contoh showProduct [src/components/showProduct.js]).Gunakan useDispatch dan useSelector untuk mengambil data dari state dan lakukan dispatch ke async thunk `getProducts` (yang kita buat di bagian slice tadi). Kita juga harus menambahkan useEffect untuk melakukan dispatch ke async thunk setelah component ini di-mount. Sampai di sini kita sudah bisa melihat hasilnya menggunakan `Extension Redux DevTools`.
+
+   ```
+   import React, { useEffect } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import { getProducts } from "../utils/redux/features/productSlice";
+
+   const ShowProduct = () => {
+     const dispatch = useDispatch();
+
+     useEffect(() => {
+       dispatch(getProducts());
+     }, [dispatch]);
+
+     return (
+       <div>
+         <div className="box mt-5"></div>
+       </div>
+     );
+   };
+
+   export default ShowProduct;
+   ```
+
+   Selanjutnya untuk menampilkan state ke dalam component kita harus mengambil statenya di dalam store menggunakan selector. Jadi kita harus membuat selector untuk mengambil data dari API (di contoh data products), status, dan error message menggunakan useSelector dan productSelectors yang kita buat di bagian slice [src/utils/redux/features/productSlice.js]. Kita menggunakan status dan error dari state untuk menampilkan pesan loading atau error jika fetching data gagal. Jika statusnya "succeeded", maka kita akan menampilkan data dari state yang telah diambil dari API.
+
+   ```
+   import React, { useEffect } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import {
+     getProducts,
+     productSelectors,
+   } from "../utils/redux/features/productSlice";
+
+   const ShowProduct = () => {
+     const dispatch = useDispatch();
+     //----------------------------------------------------------------------------
+     const products = useSelector(productSelectors.selectAll);
+     const productsStatus = useSelector((state) => state.products.status);
+     const productsError = useSelector((state) => state.products.error);
+     //----------------------------------------------------------------------------
+
+     useEffect(() => {
+       dispatch(getProducts());
+     }, [dispatch]);
+
+     //----------------------------------------------------------------------------
+     if (productsStatus === "loading") {
+       return <div> Loading..............</div>;
+     }
+
+     if (productsStatus === "failed") {
+       return <div>Error: {productsError}</div>;
+     }
+     //----------------------------------------------------------------------------
+
+     return (
+       <div className="box mt-5">
+         <table className="table is-striped is-fullwidth">
+           <thead>
+             <tr>
+               <th>No</th>
+               <th>Title</th>
+               <th>Price</th>
+               <th>Actions</th>
+             </tr>
+           </thead>
+           <tbody>
+      //----------------------------------------------------------------------------
+             {products.map((product, index) => (
+               <tr key={product.id}>
+                 <td>{index + 1}</td>
+                 <td>{product.title}</td>
+                 <td>{product.price}</td>
+                 <td>
+                   <button className="button is-info is-mall">Edit</button>
+                   <button className="button is-danger is-mall">Delete</button>
+                 </td>
+               </tr>
+             ))}
+      //----------------------------------------------------------------------------
+           </tbody>
+         </table>
+       </div>
+     );
+   };
+
+   export default ShowProduct;
+   ```
+
+   Dalam contoh di atas, kita menggunakan useSelector untuk mengambil state dari Redux dan menampilkannya dalam tag `<tr>` dan `<td>`. Kita juga menambahkan kondisi untuk menampilkan pesan loading dan error di dalam komponen.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
 - [[2] github.com/argianardi/ReactRouterV6](https://github.com/argianardi/ReactRouterV6)
 - [[3] youtube.com/WahidevAcademy](https://www.youtube.com/@WahidevAcademy)
-- [[4] youtube.com/@siciliancode3599](https://www.youtube.com/@siciliancode3599)
+- [[4] youtube.com/siciliancode3599](https://www.youtube.com/@siciliancode3599)
+- [[5] youtube.com/mfikricom](https://www.youtube.com/watch?v=S_zkP5prhaM)
+- [[6] devsaurus.com/](https://devsaurus.com/)
