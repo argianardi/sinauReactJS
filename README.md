@@ -3158,12 +3158,15 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    import axios from "axios";
    //--------------------------------------------------------------------------------------
 
+   //Base URL API
+   const apiUrl = "http://localhost:2023/products"
+
    //------------------------------------ii-------------------------------------------------
    // Buat thunk untuk mengambil data
    export const getProducts = createAsyncThunk(
      "products/getProducts",
      async () => {
-       const response = await axios.get(" http://localhost:2023/products");
+       const response = await axios.get(apiUrl);
        return response.data;
      }
    );
@@ -3320,6 +3323,177 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    ```
 
    Dalam contoh di atas, kita menggunakan useSelector untuk mengambil state dari Redux dan menampilkannya dalam tag `<tr>` dan `<td>`. Kita juga menambahkan kondisi untuk menampilkan pesan loading dan error di dalam komponen.
+
+##### Post Request
+
+1. Seting thunk async dan reducer untuk post request
+
+   ```
+   import { createAsyncThunk, createEntityAdapter, createSlice, } from "@reduxjs/toolkit";
+   import axios from "axios";
+
+   // Base URL API
+   const apiUrl = " http://localhost:2023/products";
+
+   // Buat thunk async untuk get request
+   export const getProducts = createAsyncThunk(
+     "products/getProducts",
+     async () => {
+       const response = await axios.get(apiUrl);
+       return response.data;
+     }
+   );
+
+   //------------------------------------------------------------------------------------
+   // Buat thunk async untuk post request
+   export const addNewProduct = createAsyncThunk(
+     "products/addNewProduct",
+     async ({ title, price }) => {
+       const response = await axios.post(apiUrl, {
+         title,
+         price,
+       });
+       return response.data;
+     }
+   );
+   //------------------------------------------------------------------------------------
+
+   // Buat adapter untuk menyimpan data dalam array entities
+   const productsAdapter = createEntityAdapter({
+     selectId: (product) => product.id,
+   });
+
+   // Buat initial state untuk mengisi nilai awal state
+   const initialState = productsAdapter.getInitialState({
+     status: "idle",
+     error: null,
+   });
+
+   // Buat slice untuk mengelola state
+   const productSlice = createSlice({
+     name: "products",
+     initialState,
+     reducers: {},
+     extraReducers: (builder) => {
+       // reducer untuk get request
+       builder
+         .addCase(getProducts.pending, (state) => {
+           state.status = "loading";
+         })
+         .addCase(getProducts.fulfilled, (state, action) => {
+           state.status = "succeeded";
+           productsAdapter.setAll(state, action.payload);
+         })
+         .addCase(getProducts.rejected, (state, action) => {
+           state.status = "failed";
+           state.error = action.error.message;
+         });
+
+    //------------------------------------------------------------------------------------
+       // reducer untuk post request
+       builder
+         .addCase(addNewProduct.pending, (state) => {
+           state.status = "loading";
+         })
+         .addCase(addNewProduct.fulfilled, (state, action) => {
+           state.status = "succeeded";
+           productsAdapter.addOne(state, action.payload);
+         })
+         .addCase(addNewProduct.rejected, (state, action) => {
+           state.status = "failed";
+           state.error = action.error.message;
+         });
+    //------------------------------------------------------------------------------------
+     },
+   });
+
+   // Export reducer dan adapter
+   export default productSlice.reducer;
+   export const productSelectors = productsAdapter.getSelectors(
+     (state) => state.products
+   );
+   ```
+
+   `addNewProduct` adalah nama action creator yang akan kita gunakan di dalam komponen kita. Parameter pertama adalah string yang mendefinisikan nama action tersebut. Parameter kedua adalah sebuah `async` function yang melakukan request ke API.
+
+2. Buat UI form untuk mengirim data ke server <br/>
+   Kita buat UI untuk mengirimkan data ke server di component `AddProducts` [src/components/AddProduct.js]. Di sini kita akan membuat fungsi untuk meng-handle event ketika user mengirim data form. Kita akan menggunakan `useDispatch` untuk mengirimkan data ke Redux store melalui action creator yang sudah kita buat sebelumnya, yaitu `addNewProduct`. Kita juga bisa menggunakan useSelector untuk mengambil state status dan error message dari proses post request yang berjalan dan menambahkan kondisi untuk menampilkan pesan loading dan error di dalam komponen.
+
+   ```
+   import React, { useState } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import { useNavigate } from "react-router-dom";
+   import { addNewProduct } from "../utils/redux/features/productSlice";
+
+   const AddProducts = () => {
+     const [title, setTitle] = useState("");
+     const [price, setPrice] = useState("");
+     //---------------------------------------------------------------------------------------
+     const dispatch = useDispatch();
+     const navigate = useNavigate();
+     const productsStatus = useSelector((state) => state.products.status);
+     const productsError = useSelector((state) => state.products.error);
+
+     const addProduct = async (e) => {
+       e.preventDefault();
+       await dispatch(addNewProduct({ title, price }));
+       navigate("/");
+     };
+     //---------------------------------------------------------------------------------------
+
+     //---------------------------------------------------------------------------------------
+     if (productsStatus === "loading") {
+       return <div> Loading..............</div>;
+     }
+
+     if (productsStatus === "failed") {
+       return <div>Error: {productsError}</div>;
+     }
+     //---------------------------------------------------------------------------------------
+
+     return (
+       <div>
+     //---------------------------------------------------------------------------------------
+         <form onSubmit={addProduct} className="box mt-5">
+     //---------------------------------------------------------------------------------------
+           <div className="field">
+             <label className="label">Title</label>
+             <div className="control">
+     //---------------------------------------------------------------------------------------
+               <input
+                 type="text"
+                 placeholder="Title"
+                 className="input"
+                 value={title}
+                 onChange={(e) => setTitle(e.target.value)}
+               />
+     //---------------------------------------------------------------------------------------
+             </div>
+             <div className="field">
+               <label className="label">Price</label>
+               <div className="control">
+     //---------------------------------------------------------------------------------------
+                 <input
+                   type="text"
+                   placeholder="Price"
+                   className="input"
+                   value={price}
+                   onChange={(e) => setPrice(e.target.value)}
+                 />
+     //---------------------------------------------------------------------------------------
+               </div>
+             </div>
+             <div className="field">
+               <button className="button is-success">Submit</button>
+             </div>
+           </div>
+         </form>
+       </div>
+     );
+   };
+
+   export default AddProducts;
+   ```
 
 ## Referensi
 
