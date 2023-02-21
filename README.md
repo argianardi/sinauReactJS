@@ -3140,7 +3140,7 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
       Dalam contoh ini kita membuat action creator `getProducts` menggunakan createAsyncThunk. `getProducts` bertugas untuk melakukan fetching data dari API menggunakan axios. Setelah berhasil mendapatkan data dari API, `getProducts` akan mereturn data tersebut.
    3. Buat instance dari `createEntityAdapter()` untuk mengelola data get request API <br/>
       Di sini, kita menggunakan `createEntityAdapter` untuk membuat adapter yang memungkinkan kita untuk mengelola data dari API. Adapter ini memungkinkan kita untuk melakukan operasi CRUD pada collection data yang disimpan di dalam state Redux.
-   4. Buat initialState menggunakan `productEntity.getInitialState()` <br/>
+   4. Buat initialState menggunakan `productEntity.getInitialState()` khusus untuk get request<br/>
       Di sini, kita menggunakan method getInitialState() dari adapter untuk menginisialisasi state dengan nilai awal. State ini memuat property status dan error yang digunakan untuk mengelola status request API.
    5. Buat slice menggunakan `createSlice()` <br/>
       Di sini, kita menggunakan createSlice untuk membuat slice yang memuat reducer dan action creator. Pada extraReducers, kita menggunakan .addCase untuk menangani action creator yang dihasilkan dari createAsyncThunk. Jika action creator berada pada state pending, loading akan disimpan pada state. Jika action creator berada pada state fulfilled, data yang didapat dari API akan disimpan pada state menggunakan productAdapter.setAll(). Jika action creator berada pada state rejected, error message akan disimpan pada state.
@@ -3182,8 +3182,9 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    //-------------------------------------iv--------------------------------------------------
    // Buat initial state untuk mengisi nilai awal state
    const initialState = productsAdapter.getInitialState({
-     status: "idle",
-     error: null,
+    // inisital state get Products
+    getProductsStatus: "idle",
+    getProductsError: null,
    });
    //----------------------------------------------------------------------------------------
 
@@ -3194,18 +3195,19 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
      initialState,
      reducers: {},
      extraReducers: (builder) => {
-       builder
-         .addCase(getProducts.pending, (state) => {
-           state.status = "loading";
-         })
-         .addCase(getProducts.fulfilled, (state, action) => {
-           state.status = "succeeded";
-           productsAdapter.setAll(state, action.payload);
-         })
-         .addCase(getProducts.rejected, (state, action) => {
-           state.status = "failed";
-           state.error = action.error.message;
-         });
+       // reducer untuk get products
+      builder
+        .addCase(getProducts.pending, (state) => {
+          state.getProductsStatus = "loading";
+        })
+        .addCase(getProducts.fulfilled, (state, action) => {
+          state.getProductsStatus = "succeeded";
+          productsAdapter.setAll(state, action.payload);
+        })
+        .addCase(getProducts.rejected, (state, action) => {
+          state.getProductsStatus = "failed";
+          state.getProductsError = action.error.message;
+        });
      },
    });
    //----------------------------------------------------------------------------------------
@@ -3270,8 +3272,8 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
      const dispatch = useDispatch();
      //----------------------------------------------------------------------------
      const products = useSelector(productSelectors.selectAll);
-     const productsStatus = useSelector((state) => state.products.status);
-     const productsError = useSelector((state) => state.products.error);
+     const getProductsStatus = useSelector((state) => state.products.getProductsStatus);
+     const getProductsError = useSelector((state) => state.products.getProductsError);
      //----------------------------------------------------------------------------
 
      useEffect(() => {
@@ -3279,12 +3281,12 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
      }, [dispatch]);
 
      //----------------------------------------------------------------------------
-     if (productsStatus === "loading") {
-       return <div> Loading..............</div>;
+     if (getProductsStatus === "loading") {
+        return <div> Loading..............</div>;
      }
 
-     if (productsStatus === "failed") {
-       return <div>Error: {productsError}</div>;
+     if (getProductsStatus === "failed") {
+       return <div>Error: {getProductsError}</div>;
      }
      //----------------------------------------------------------------------------
 
@@ -3324,9 +3326,9 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 
    Dalam contoh di atas, kita menggunakan useSelector untuk mengambil state dari Redux dan menampilkannya dalam tag `<tr>` dan `<td>`. Kita juga menambahkan kondisi untuk menampilkan pesan loading dan error di dalam komponen.
 
-##### Post Request
+#### Post Request
 
-1. Seting thunk async dan reducer untuk post request
+1. Buat thunk async, initial state dan reducer untuk post request
 
    ```
    import { createAsyncThunk, createEntityAdapter, createSlice, } from "@reduxjs/toolkit";
@@ -3365,8 +3367,15 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 
    // Buat initial state untuk mengisi nilai awal state
    const initialState = productsAdapter.getInitialState({
-     status: "idle",
-     error: null,
+      // inisital state get Products
+      getProductsStatus: "idle",
+      getProductsError: null,
+
+      //--------------------------------------------------------------------------------
+      // inisital state post Products
+      addProductStatus: "idle",
+      addProductError: null,
+      //--------------------------------------------------------------------------------
    });
 
    // Buat slice untuk mengelola state
@@ -3375,34 +3384,34 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
      initialState,
      reducers: {},
      extraReducers: (builder) => {
-       // reducer untuk get request
-       builder
-         .addCase(getProducts.pending, (state) => {
-           state.status = "loading";
-         })
-         .addCase(getProducts.fulfilled, (state, action) => {
-           state.status = "succeeded";
-           productsAdapter.setAll(state, action.payload);
-         })
-         .addCase(getProducts.rejected, (state, action) => {
-           state.status = "failed";
-           state.error = action.error.message;
-         });
+        // reducer untuk get products
+        builder
+          .addCase(getProducts.pending, (state) => {
+            state.getProductsStatus = "loading";
+          })
+          .addCase(getProducts.fulfilled, (state, action) => {
+            state.getProductsStatus = "succeeded";
+            productsAdapter.setAll(state, action.payload);
+          })
+          .addCase(getProducts.rejected, (state, action) => {
+            state.getProductsStatus = "failed";
+            state.getProductsError = action.error.message;
+          });
 
     //------------------------------------------------------------------------------------
        // reducer untuk post request
        builder
-         .addCase(addNewProduct.pending, (state) => {
-           state.status = "loading";
-         })
-         .addCase(addNewProduct.fulfilled, (state, action) => {
-           state.status = "succeeded";
-           productsAdapter.addOne(state, action.payload);
-         })
-         .addCase(addNewProduct.rejected, (state, action) => {
-           state.status = "failed";
-           state.error = action.error.message;
-         });
+        .addCase(addNewProduct.pending, (state) => {
+          state.addProductStatus = "loading";
+        })
+        .addCase(addNewProduct.fulfilled, (state, action) => {
+          state.addProductStatus = "succeeded";
+          productsAdapter.addOne(state, action.payload);
+        })
+        .addCase(addNewProduct.rejected, (state, action) => {
+          state.addProductStatus = "failed";
+          state.addProductError = action.error.message;
+        });
     //------------------------------------------------------------------------------------
      },
    });
@@ -3431,8 +3440,8 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
      //---------------------------------------------------------------------------------------
      const dispatch = useDispatch();
      const navigate = useNavigate();
-     const productsStatus = useSelector((state) => state.products.status);
-     const productsError = useSelector((state) => state.products.error);
+     const addProductStatus = useSelector((state) => state.products.addProductStatus);
+     const addProductError = useSelector((state) => state.products.addProductError);
 
      const addProduct = async (e) => {
        e.preventDefault();
@@ -3442,12 +3451,12 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
      //---------------------------------------------------------------------------------------
 
      //---------------------------------------------------------------------------------------
-     if (productsStatus === "loading") {
-       return <div> Loading..............</div>;
+     if (addProductStatus === "loading") {
+        return <div> Loading..............</div>;
      }
 
-     if (productsStatus === "failed") {
-       return <div>Error: {productsError}</div>;
+     if (addProductStatus === "failed") {
+        return <div>Error: {addProductError}</div>;
      }
      //---------------------------------------------------------------------------------------
 
@@ -3493,6 +3502,225 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    };
 
    export default AddProducts;
+   ```
+
+#### Delete Request
+
+1. Di bagian slice (di contoh terletak di file `productSlice.js`[src/utils/features/productSlice.js]) buat thunk async, initial state dan reducer untuk delete request.
+
+   ```
+   import {createAsyncThunk, createEntityAdapter, createSlice,} from "@reduxjs/toolkit";
+   import axios from "axios";
+
+   // Base URL API
+   const apiUrl = " http://localhost:2023/products";
+
+   // Buat thunk async untuk get request
+   export const getProducts = createAsyncThunk(
+     "products/getProducts",
+     async () => {
+       const response = await axios.get(apiUrl);
+       return response.data;
+     }
+   );
+
+   // Buat thunk async untuk post request
+   export const addNewProduct = createAsyncThunk(
+     "products/addNewProduct",
+     async ({ title, price }) => {
+       const response = await axios.post(apiUrl, {
+         title,
+         price,
+       });
+       return response.data;
+     }
+   );
+
+   //------------------------------------------------------------------------------
+   // Buat thunk async untuk delete request
+   export const deleteProduct = createAsyncThunk(
+     "products/deleteProduct",
+     async (id) => {
+       await axios.delete(`${apiUrl}/${id}`);
+       return id;
+     }
+   );
+   //------------------------------------------------------------------------------
+
+   // Buat adapter untuk menyimpan data dalam array entities
+   const productsAdapter = createEntityAdapter({
+     selectId: (product) => product.id,
+   });
+
+   // Buat initial state untuk mengisi nilai awal state
+   const initialState = productsAdapter.getInitialState({
+     // inisital state get Products
+     getProductsStatus: "idle",
+     getProductsError: null,
+
+     // inisital state post Products
+     addProductStatus: "idle",
+     addProductError: null,
+
+     //------------------------------------------------------------------------------
+     // inisital state delete Products
+     deleteProductStatus: "idle",
+     deleteProductError: null,
+     //------------------------------------------------------------------------------
+   });
+
+   // Buat slice untuk mengelola state
+   const productSlice = createSlice({
+     name: "products",
+     initialState,
+     reducers: {},
+     extraReducers: (builder) => {
+       // reducer untuk get products
+       builder
+         .addCase(getProducts.pending, (state) => {
+           state.getProductsStatus = "loading";
+         })
+         .addCase(getProducts.fulfilled, (state, action) => {
+           state.getProductsStatus = "succeeded";
+           productsAdapter.setAll(state, action.payload);
+         })
+         .addCase(getProducts.rejected, (state, action) => {
+           state.getProductsStatus = "failed";
+           state.getProductsError = action.error.message;
+         });
+
+       // reducer untuk add product
+       builder
+         .addCase(addNewProduct.pending, (state) => {
+           state.addProductStatus = "loading";
+         })
+         .addCase(addNewProduct.fulfilled, (state, action) => {
+           state.addProductStatus = "succeeded";
+           productsAdapter.addOne(state, action.payload);
+         })
+         .addCase(addNewProduct.rejected, (state, action) => {
+           state.addProductStatus = "failed";
+           state.addProductError = action.error.message;
+         });
+
+        //------------------------------------------------------------------------------
+       // reducer untuk delete request
+       builder
+         .addCase(deleteProduct.pending, (state) => {
+           state.deleteProductStatus = "loading";
+         })
+         .addCase(deleteProduct.fulfilled, (state, action) => {
+           state.deleteProductStatus = "succeeded";
+           productsAdapter.removeOne(state, action.payload);
+         })
+         .addCase(deleteProduct.rejected, (state, action) => {
+           state.deleteProductStatus = "failed";
+           state.deleteProductError = action.error.message;
+         });
+      //------------------------------------------------------------------------------
+     },
+   });
+
+   // Export reducer dan adapter
+   export default productSlice.reducer;
+   export const productSelectors = productsAdapter.getSelectors(
+     (state) => state.products
+   );
+   ```
+
+2. Di component jalankan fungsi untuk menghapus data <br/>
+   Di dalam UI Component ini (di contoh component `ShowProduct`[src/components/ShowProduct.js]) lakukan:
+
+   1. Ambil state status dan error message dari proses delete data
+   2. Buat event onClik di dalam button `Edit` untuk menjalankan request api delete yang dijalankan menggunakan dispatch untuk menghapus data dari API dan store Redux.
+   3. Buat conditional rendering berdasarkan status dari proses delete data yaitu untuk status loading dan error
+
+   ```
+   import React, { useEffect } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import { Link } from "react-router-dom";
+   import { deleteProduct, getProducts, productSelectors,} from "../utils/redux/features/productSlice";
+
+   const ShowProduct = () => {
+     const dispatch = useDispatch();
+     const products = useSelector(productSelectors.selectAll);
+     const getProductsStatus = useSelector((state) => state.products.getProductsStatus);
+     const getProductsError = useSelector((state) => state.products.getProductsError);
+     //-----------------------------------------i------------------------------------------
+     // state status dan error message delete request
+     const deleteProductStatus = useSelector((state) => state.products.deleteProductStatus);
+     const deleteProductError = useSelector((state) => state.products.deleteProductError);
+     //------------------------------------------------------------------------------------
+
+     useEffect(() => {
+       dispatch(getProducts());
+     }, [dispatch]);
+
+     if (getProductsStatus === "loading") {
+       return <div> Loading..............</div>;
+     }
+
+     if (getProductsStatus === "failed") {
+       return <div>Error: {getProductsError}</div>;
+     }
+
+     return (
+       <div className="box mt-5">
+         <Link to="add" className="button is-success">
+           Add New
+         </Link>
+         <table className="table is-striped is-fullwidth">
+           <thead>
+             <tr>
+               <th>No</th>
+               <th>Title</th>
+               <th>Price</th>
+               <th>Actions</th>
+             </tr>
+           </thead>
+           <tbody>
+             {products.map((product, index) => (
+               <tr key={product.id}>
+                 <td>{index + 1}</td>
+                 <td>{product.title}</td>
+                 <td>{product.price}</td>
+                 <td>
+                   <Link
+                     to={`edit/${product.id}`}
+                     className="button is-info is-mall"
+                   >
+                     Edit
+                   </Link>
+               //-----------------------------------------ii----------------------------------
+               // event onClick untuk delete request
+                   <button
+                     onClick={() => dispatch(deleteProduct(product.id))}
+                     className="button is-danger is-mall"
+                   >
+               //-----------------------------------------------------------------------------
+               //-----------------------------------------iii----------------------------------
+               // conditional rendering untuk status delete request loading
+                     {deleteProductStatus === "loading"
+                       ? "Deleting...."
+                       : "Delete"}
+               //-----------------------------------------------------------------------------
+                   </button>
+                 </td>
+               </tr>
+             ))}
+           </tbody>
+         </table>
+         //-----------------------------------------iii----------------------------------
+         // conditional rendering untuk status delete request failed / error
+         {deleteProductStatus === "failed" && (
+           <div> Error deleting product: {deleteProductError} </div>
+         )}
+         //------------------------------------------------------------------------------
+       </div>
+     );
+   };
+
+   export default ShowProduct;
    ```
 
 ## Referensi
