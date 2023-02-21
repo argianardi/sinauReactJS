@@ -3723,6 +3723,274 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    export default ShowProduct;
    ```
 
+#### Put Request
+
+1. Buat thunk async, initial state dan reducer untuk put request
+
+   ```
+   import {
+     createAsyncThunk,
+     createEntityAdapter,
+     createSlice,
+   } from "@reduxjs/toolkit";
+   import axios from "axios";
+
+   // Base URL API
+   const apiUrl = " http://localhost:2023/products";
+
+   // Buat thunk async untuk get request
+   export const getProducts = createAsyncThunk(
+     "products/getProducts",
+     async () => {
+       const response = await axios.get(apiUrl);
+       return response.data;
+     }
+   );
+
+   // Buat thunk async untuk post request
+   export const addNewProduct = createAsyncThunk(
+     "products/addNewProduct",
+     async ({ title, price }) => {
+       const response = await axios.post(apiUrl, {
+         title,
+         price,
+       });
+       return response.data;
+     }
+   );
+
+   // Buat thunk async untuk delete request
+   export const deleteProduct = createAsyncThunk(
+     "products/deleteProduct",
+     async (id) => {
+       await axios.delete(`${apiUrl}/${id}`);
+       return id;
+     }
+   );
+
+   //-------------------------------------------------------------------------------------------
+   // Buat thunk async untuk put request
+   export const editProduct = createAsyncThunk(
+     "products/editProduct",
+     async ({ id, title, price }) => {
+       const response = await axios.put(`${apiUrl}/${id}`, {
+         title,
+         price,
+       });
+       return response.data;
+     }
+   );
+   //-------------------------------------------------------------------------------------------
+
+   // Buat adapter untuk menyimpan data dalam array entities
+   const productsAdapter = createEntityAdapter({
+     selectId: (product) => product.id,
+   });
+
+   // Buat initial state untuk mengisi nilai awal state
+   const initialState = productsAdapter.getInitialState({
+     // inisital state get Products
+     getProductsStatus: "idle",
+     getProductsError: null,
+
+     // inisital state post Products
+     addProductStatus: "idle",
+     addProductError: null,
+
+     // inisital state delete Products
+     deleteProductStatus: "idle",
+     deleteProductError: null,
+
+     //-------------------------------------------------------------------------------------------
+     // initial state put product
+     editProductStatus: "idle",
+     editProductError: null,
+     //-------------------------------------------------------------------------------------------
+   });
+
+   // Buat slice untuk mengelola state
+   const productSlice = createSlice({
+     name: "products",
+     initialState,
+     reducers: {},
+     extraReducers: (builder) => {
+       // reducer untuk get products
+       builder
+         .addCase(getProducts.pending, (state) => {
+           state.getProductsStatus = "loading";
+         })
+         .addCase(getProducts.fulfilled, (state, action) => {
+           state.getProductsStatus = "succeeded";
+           productsAdapter.setAll(state, action.payload);
+         })
+         .addCase(getProducts.rejected, (state, action) => {
+           state.getProductsStatus = "failed";
+           state.getProductsError = action.error.message;
+         });
+
+       // reducer untuk add product
+       builder
+         .addCase(addNewProduct.pending, (state) => {
+           state.addProductStatus = "loading";
+         })
+         .addCase(addNewProduct.fulfilled, (state, action) => {
+           state.addProductStatus = "succeeded";
+           productsAdapter.addOne(state, action.payload);
+         })
+         .addCase(addNewProduct.rejected, (state, action) => {
+           state.addProductStatus = "failed";
+           state.addProductError = action.error.message;
+         });
+
+       // reducer untuk delete request
+       builder
+         .addCase(deleteProduct.pending, (state) => {
+           state.deleteProductStatus = "loading";
+         })
+         .addCase(deleteProduct.fulfilled, (state, action) => {
+           state.deleteProductStatus = "succeeded";
+           productsAdapter.removeOne(state, action.payload);
+         })
+         .addCase(deleteProduct.rejected, (state, action) => {
+           state.deleteProductStatus = "failed";
+           state.deleteProductError = action.error.message;
+         });
+
+       //-------------------------------------------------------------------------------------------
+       // reducer untuk put request
+       builder
+         .addCase(editProduct.pending, (state, action) => {
+           state.editProductStatus = "loading";
+         })
+         .addCase(editProduct.fulfilled, (state, action) => {
+           state.editProductStatus = "succeeded";
+           productsAdapter.updateOne(state, {
+             id: action.payload.id,
+             updates: action.payload,
+           });
+         })
+         .addCase(editProduct.rejected, (state, action) => {
+           state.editProductStatus = "failed";
+           state.editProductError = action.error.message;
+         });
+       //-------------------------------------------------------------------------------------------
+     },
+   });
+
+   // Export reducer dan adapter
+   export default productSlice.reducer;
+   export const productSelectors = productsAdapter.getSelectors(
+     (state) => state.products
+   );
+   ```
+
+2. Di component jalankan fungsi untuk edit data <br/>
+   Di dalam UI Component ini (di contoh component `EditProduct`[src/components/EditProduct.js]) lakukan:
+
+   1. Ambil satu data (di contoh data product) yang akan diedit <br>
+      Datanya ini diambil menggunakan selector (productSelector) dan function get api (getProducts) yang didispatch di useEffect berdasarkan idnya yang diambil menggunakan `useParam()`
+   2. Ambil data product (title dan price) untuk dimasukkan ke dalam state title dan price yang dilakaukan di dalam useEfect
+   3. Sampai disini hasilnya ketika kita berada di halaman yang menampilkan list data Product (component ShowProduct[src/components/ShowProduct.js]) dan kita klik button edit maka kita langsung didirect ke halaman edit product dan form title dan price sudah terisi dengan data title dan price dari product yang kita klik tadi.
+   4. Ambil state status dan error message dari proses delete data
+   5. Buat function handleEdit yang akan menjalankan request put api menggunakan dispatch. jadikan function handleEdit tersebut sebagai value untuk event onSubmit di dalam tag `<form>`.
+   6. Buat conditional rendering berdasarkan status dari proses edit data yaitu untuk status loading dan error
+
+   ```
+   import React, { useEffect, useState } from "react";
+   import { useDispatch, useSelector } from "react-redux";
+   import { useNavigate, useParams } from "react-router-dom";
+   import {
+     editProduct,
+     getProducts,
+     productSelectors,
+   } from "../utils/redux/features/productSlice";
+
+   const EditProducts = () => {
+     const [title, setTitle] = useState("");
+     const [price, setPrice] = useState("");
+     const dispatch = useDispatch();
+     const navigate = useNavigate();
+     //------------------------------------------------i------------------------------------------
+     const { id } = useParams();
+     const product = useSelector((state) => productSelectors.selectById(state, id));
+     //-------------------------------------------------------------------------------------------
+
+     //--------------------------------------------iv----------------------------------------------
+     const editProductStatus = useSelector((state) => state.products.editProductStatus);
+     const editProductError = useSelector((state) => state.products.editProductError);
+     //-------------------------------------------------------------------------------------------
+
+     //------------------------------------------------i------------------------------------------
+     useEffect(() => {
+       dispatch(getProducts());
+     }, [dispatch]);
+     //-------------------------------------------------------------------------------------------
+
+
+    //------------------------------------------------ii------------------------------------------
+     useEffect(() => {
+       if (product) {
+         setTitle(product.title);
+         setPrice(product.price);
+       }
+     }, [product]);
+    //-------------------------------------------------------------------------------------------
+
+    //------------------------------------------------v------------------------------------------
+     const handleEdit = async (e) => {
+       e.preventDefault();
+       await dispatch(editProduct({ id, title, price }));
+       if (!editProductError) {
+         navigate("/");
+       }
+     };
+
+     return (
+       <div>
+         <form onSubmit={handleEdit} className="box mt-5">
+    //-------------------------------------------------------------------------------------------
+           <div className="field">
+             <label className="label">Title</label>
+             <div className="control">
+               <input
+                 type="text"
+                 placeholder="Title"
+                 className="input"
+                 value={title}
+                 onChange={(e) => setTitle(e.target.value)}
+               />
+             </div>
+             <div className="field">
+               <label className="label">Price</label>
+               <div className="control">
+                 <input
+                   type="text"
+                   placeholder="Price"
+                   className="input"
+                   value={price}
+                   onChange={(e) => setPrice(e.target.value)}
+                 />
+               </div>
+             </div>
+             <div className="field">
+       //------------------------------------------------vi------------------------------------------
+               <button className="button is-success">
+                 {editProductStatus === "loading" ? "Submiting..." : "Submit"}
+               </button>
+             </div>
+           </div>
+         </form>
+         {editProductStatus === "failed" && (
+           <div> Error updeting product: {editProductError} </div>
+         )}
+      //----------------------------------------------------------------------------------------------
+       </div>
+     );
+   };
+
+   export default EditProducts;
+   ```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
