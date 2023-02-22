@@ -2825,12 +2825,20 @@ Redux Toolkit merupakan package yang dikembangkan dan menjadi cara standar baru 
 - Harus menambahkn banyak package untuk membuat Redux melakukan sesuatu yang berguna
 - Redux membutuhkan terlalu banyak boilerplate code
 
+Untuk pembahasan redux toolkit kali ini kita akan menggunakan contoh project [CRUD data product](https://github.com/argianardi/reduxToolkit) yang terinspirasi dari tutorial penerapan redux toolkit di youtube channel [M Fikri](https://www.youtube.com/watch?v=S_zkP5prhaM)
+
 ### Prepare
 
-Untuk bisa menggunakan redux kita harus menginstallnya dulu, kita bisa install redux dan install react (create-react-app) secara bersamaan menggunakan command berikut:
+Untuk bisa menggunakan redux kita harus menginstallnya dulu, kita bisa install redux dan install react (create-react-app) secara bersamaan menggunakan command berikut [[7]](https://redux.js.org/introduction/installation):
 
 ```
 npx create-react-app . --template redux
+```
+
+Atau jika ingin terpisah dengan installasi react kita juga bisa gunakan command [[7]](https://redux.js.org/introduction/installation):
+
+```
+npm install @reduxjs/toolkit
 ```
 
 - Hapus folder counter pada folder features, app.css, (app.test.js), (serviceworker), index.css dan logo.
@@ -3999,3 +4007,4 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 - [[4] youtube.com/siciliancode3599](https://www.youtube.com/@siciliancode3599)
 - [[5] youtube.com/mfikricom](https://www.youtube.com/watch?v=S_zkP5prhaM)
 - [[6] devsaurus.com/](https://devsaurus.com/)
+- [[7] redux.js.org/](https://redux.js.org/)
