@@ -3999,6 +3999,55 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    export default EditProducts;
    ```
 
+## Tailwind CSS
+
+Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya:
+
+- Di dalam terminal, command:
+
+  ```
+  npm install -D tailwindcss
+  ```
+
+- Masih di terminal, command:
+  ```
+  npx tailwindcss init
+  ```
+- Buka file src/index.css dan tambahkan tailwind directives berikut:
+
+  ```
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+  ```
+
+- Tambahkan path ke semua template file di file `tailwind.config.js` seperti ini:
+
+  ```
+  /** @type {import('tailwindcss').Config} */
+  module.exports = {
+    content: [
+      "./src/**/*.{js,jsx,ts,tsx}",
+    ],
+    theme: {
+      extend: {},
+    },
+    plugins: [],
+  }
+  ```
+
+- Test tailwind, buka file src/App.js ganti dengan code berikut:
+
+  ```
+  export default function App() {
+    return (
+      <h1 className="text-3xl font-bold underline">
+        Hello world!
+      </h1>
+    )
+  }
+  ```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
