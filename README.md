@@ -4048,6 +4048,38 @@ Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakuk
   }
   ```
 
+## Deploy Project Menggunakan Vercel
+
+### Deploy melalui website vercel
+
+Berikut ini adalah langkah-langkah untuk melakukan deploy project React menggunakan Vercel melalui website Vercel:
+
+- Pastikan bahwa project React kamu sudah siap untuk di-deploy. Jika kamu menggunakan Create React App, pastikan kamu sudah menjalankan perintah npm run build atau yarn build terlebih dahulu untuk membuat production build.
+
+- Buka website Vercel (https://vercel.com/) dan buat akun baru jika belum memiliki akun.
+- Setelah login, klik tombol "New Project" di bagian kanan atas halaman Vercel.
+- Pilih opsi "Import Git Repository" untuk meng-import repository Git kamu.
+- Masukkan alamat repository Git kamu dan tekan tombol "Continue".
+- Tunggu beberapa saat hingga Vercel menyelesaikan proses import dan analisis project kamu. Kemudian klik tombol "Deploy" untuk melakukan deploy pertama kali.
+- Tunggu beberapa saat hingga Vercel menyelesaikan proses build dan deploy. Setelah itu, kamu dapat mengakses project kamu dengan mengklik tombol "Visit" yang terletak di samping nama project kamu.
+- Kamu juga dapat mengatur konfigurasi deployment dan domain pada halaman "Settings" di dashboard project kamu.
+- Setelah kamu melakukan perubahan di repository Git kamu, Vercel secara otomatis akan melakukan build dan deploy ulang. Kamu dapat melihat riwayat build dan deploy pada halaman "Deployments" di dashboard project kamu.
+
+### Deploy melalui ClI (vercel --prod)
+
+- Clone repository di komputer lokal.
+- Jalankan perintah `npm run build` untuk membuild aplikasi.
+- Install Vercel CLI dengan perintah `npm install -g vercel`.
+- Jalankan perintah `vercel login` untuk login ke akun Vercel.
+- Jalankan perintah `vercel --prod` untuk melakukan deploy ke Vercel.
+- Kemudian akan muncul pertanyaan `Set up and deploy <path file project di lokal>?` jawab dengan command `Y`
+- Lalu muncul pertanyaan lagi `Which scope do you want to deploy to?` <br>
+  Maksudnya untuk menentukan akun Vercel mana yang akan digunakan untuk deployment di environment production. Jawab menggunakan nama akun vercel kita
+- Selanjutnya akan muncul pertanyaan `Link to existing project?` <br>
+  Maksud dari pertanyaan tersebut adalah permintaan untuk mengaitkan (link) aplikasi yang akan di-deploy dengan sebuah proyek (project) yang sebelumnya sudah ada di Vercel, Jika memang sebelumnya project kita sudah didaftarkan di vercel jawab pertanyaan tersebut dengan `Y` jika belum didaftarkan jawab dengan `N`.
+- Terakhir akan muncul pertanyaan `What's the name of your existing project?` <br>
+  Jawab dengan nama yang kita berikan untuk project kita di dashboard vercel.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
