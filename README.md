@@ -4048,6 +4048,24 @@ Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakuk
   }
   ```
 
+## Deploy Project Menggunakan Vercel
+
+### Deploy melalui website vercel
+
+Berikut ini adalah langkah-langkah untuk melakukan deploy project React menggunakan Vercel melalui website Vercel:
+
+- Pastikan bahwa project React kamu sudah siap untuk di-deploy. Jika kamu menggunakan Create React App, pastikan kamu sudah menjalankan perintah npm run build atau yarn build terlebih dahulu untuk membuat production build.
+
+- Buka website Vercel (https://vercel.com/) dan buat akun baru jika belum memiliki akun.
+- Setelah login, klik tombol "New Project" di bagian kanan atas halaman Vercel.
+- Pilih opsi "Import Git Repository" untuk meng-import repository Git kamu.
+- Masukkan alamat repository Git kamu dan tekan tombol "Continue".
+- Tunggu beberapa saat hingga Vercel menyelesaikan proses import dan analisis project kamu. Kemudian klik tombol "Deploy" untuk melakukan deploy pertama kali.
+- Tunggu beberapa saat hingga Vercel menyelesaikan proses build dan deploy. Setelah itu, kamu dapat mengakses project kamu dengan mengklik tombol "Visit" yang terletak di samping nama project kamu.
+- Kamu juga dapat mengatur konfigurasi deployment dan domain pada halaman "Settings" di dashboard project kamu.
+- Setelah kamu melakukan perubahan di repository Git kamu, Vercel secara otomatis akan melakukan build dan deploy ulang. Kamu dapat melihat riwayat build dan deploy pada halaman "Deployments" di dashboard project kamu.
+
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
