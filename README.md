@@ -4065,6 +4065,20 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - Kamu juga dapat mengatur konfigurasi deployment dan domain pada halaman "Settings" di dashboard project kamu.
 - Setelah kamu melakukan perubahan di repository Git kamu, Vercel secara otomatis akan melakukan build dan deploy ulang. Kamu dapat melihat riwayat build dan deploy pada halaman "Deployments" di dashboard project kamu.
 
+### Deploy melalui ClI (vercel --prod)
+
+- Clone repository di komputer lokal.
+- Jalankan perintah `npm run build` untuk membuild aplikasi.
+- Install Vercel CLI dengan perintah `npm install -g vercel`.
+- Jalankan perintah `vercel login` untuk login ke akun Vercel.
+- Jalankan perintah `vercel --prod` untuk melakukan deploy ke Vercel.
+- Kemudian akan muncul pertanyaan `Set up and deploy <path file project di lokal>?` jawab dengan command `Y`
+- Lalu muncul pertanyaan lagi `Which scope do you want to deploy to?` <br>
+  Maksudnya untuk menentukan akun Vercel mana yang akan digunakan untuk deployment di environment production. Jawab menggunakan nama akun vercel kita
+- Selanjutnya akan muncul pertanyaan `Link to existing project?` <br>
+  Maksud dari pertanyaan tersebut adalah permintaan untuk mengaitkan (link) aplikasi yang akan di-deploy dengan sebuah proyek (project) yang sebelumnya sudah ada di Vercel, Jika memang sebelumnya project kita sudah didaftarkan di vercel jawab pertanyaan tersebut dengan `Y` jika belum didaftarkan jawab dengan `N`.
+- Terakhir akan muncul pertanyaan `What's the name of your existing project?` <br>
+  Jawab dengan nama yang kita berikan untuk project kita di dashboard vercel.
 
 ## Referensi
 
