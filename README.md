@@ -305,6 +305,52 @@ width: 287, height: 386 }} >
 
 Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
 
+## Penggunaan Atribute target="\_blank" di tag `<a>`
+
+Agar tidak terkena warning saat menggunan atribute `target ="_blank"` di tag `<a>` kita harus menambahkan atribute `rel="noopener noreferrer"`. Berikut contoh penggunaannya di coding:
+
+```
+import React from "react";
+import {
+  AiFillLinkedin,
+  AiFillMail,
+} from "react-icons/ai";
+
+const Footer = () => {
+  return (
+    <div className="w-full bg-bodyColor">
+      <p className="text-sm text-gray-400 text-center">
+        Created by a coding enthusiast, fueled by coffee. Find me at:
+      </p>
+      <div className="flex justify-center gap-2 mt-3">
+        <a
+          href="https://github.com/argianardi"
+          target="_blank"
+    //-----------------------------------------------------------------------
+          rel="noopener noreferrer"
+    //-----------------------------------------------------------------------
+          className="footerIcon"
+        >
+          <AiOutlineGithub />
+        </a>
+        <a
+          href="mailto:argianardi14@gmail.com"
+          target="_blank"
+    //-----------------------------------------------------------------------
+          rel="noopener noreferrer"
+    //-----------------------------------------------------------------------
+          className="footerIcon"
+        >
+          <AiFillMail />
+        </a>
+      </div>
+    </div>
+  );
+};
+
+export default Footer;
+```
+
 ## Conditional Rendering
 
 Di React, tidak ada sintaks khusus untuk penulisan conditional, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional.
@@ -382,7 +428,7 @@ export default TodoList;
 
 Pada code diatas saat state `mark` bernilai true maka border tag `<li>` akan berubah berwarna orange-500 tetapi jika state `mark` bernilai false border tag `<li>` akan berwarna green-500
 
-## Lists Rendering
+## List Rendering
 
 Kita dapat menggunakan fitur JavaScript seperti for loop dan fungsi array map() untuk merender list komponen. Misalnya, kita memiliki serangkaian produk:
 
