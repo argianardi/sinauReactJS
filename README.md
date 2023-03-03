@@ -307,8 +307,11 @@ Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
 
 ## Conditional Rendering
 
-Di React, tidak ada sintaks khusus untuk penulisan conditional. Sebagai gantinya, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional
-Kita bisa memanfaatkan conditional logi untuk merender sebuah component. Misalnya pada saat user sudah login maka di dalam halaman akan ditampilkan component `AdminPanel` sedangkan jika user belum login maka di halaman akan tampil component `LoginForm`. Penerapannya di coding akan jadi seperti ini [[1]](https://beta.reactjs.org/learn).
+Di React, tidak ada sintaks khusus untuk penulisan conditional, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional.
+
+### Penerapan Conditional Rendering untuk Login
+
+Kita bisa memanfaatkan conditional login untuk merender sebuah component. Misalnya pada saat user sudah login maka di dalam halaman akan ditampilkan component `AdminPanel` sedangkan jika user belum login maka di halaman akan tampil component `LoginForm`. Penerapannya di coding akan jadi seperti ini [[1]](https://beta.reactjs.org/learn).
 
 ```
 let content;
@@ -343,6 +346,41 @@ jika conditional hanya memiliki satu cabang kita dapat menggunakan syntax `logic
   {isLoggedIn && <AdminPanel />}
 </div>
 ```
+
+### Penerapan Conditional Rendering Untuk Utiliti Class di Element HTML
+
+Berikut contoh penerpan conditional rendiring untuk utiliti class di element html, untuk komponen `TodoList` di project [Taskify]():
+
+```
+import React, { useState } from "react";
+import { MdDelete } from "react-icons/md";
+
+const TodoList = () => {
+  const [mark, setMark] = useState(false);
+
+  return (
+    <li
+      onClick={() => setMark(!mark)}
+//----------------------------------------------------------------------------------------------------------------
+      className={`${
+        mark
+          ? "border-orange-500"
+          : "border-green-500"
+      } w-full font-titleFont font-medium text-base border-[1px] border-l-[6px] p-2 cursor-pointer  flex items-center justify-between`}
+//----------------------------------------------------------------------------------------------------------------
+    >
+      Todo Item{" "}
+      <span className="text-xl text-gray-300 hover:text-red-500 duration-300 cursor-pointer">
+        <MdDelete />
+      </span>
+    </li>
+  );
+};
+
+export default TodoList;
+```
+
+Pada code diatas saat state `mark` bernilai true maka border tag `<li>` akan berubah berwarna orange-500 tetapi jika state `mark` bernilai false border tag `<li>` akan berwarna green-500
 
 ## Lists Rendering
 
@@ -4001,7 +4039,7 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 
 ## Tailwind CSS
 
-Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya:
+Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya [[8]](https://tailwindcss.com/docs/guides/create-react-app):
 
 - Di dalam terminal, command:
 
@@ -4089,3 +4127,4 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - [[5] youtube.com/mfikricom](https://www.youtube.com/watch?v=S_zkP5prhaM)
 - [[6] devsaurus.com/](https://devsaurus.com/)
 - [[7] redux.js.org/](https://redux.js.org/)
+- [[8] https://tailwindcss.com/](https://tailwindcss.com/)
