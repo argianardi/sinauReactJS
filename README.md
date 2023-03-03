@@ -1292,18 +1292,27 @@ Sebaiknya redux ini digunakan jika:
 
 Istilah - istilah yang ada di dalam React:
 
-- Store: Store adalah tempat di mana state (keadaan) aplikasi disimpan. Store ini bersifat immutable (tidak dapat diubah), artinya state hanya dapat diubah melalui action.
-- Action: Action adalah objek yang digunakan untuk mengirim perintah ke store untuk mengubah state. Action harus memiliki properti "type" yang menjelaskan tipe perubahan yang akan dilakukan, dan dapat memiliki properti lain yang dibutuhkan.
-- Reducer: Reducer adalah sebuah fungsi yang menerima dua parameter yaitu state dan action, dan menghasilkan state baru yang telah diperbarui. Reducer harus bersifat pure (murni), artinya tidak boleh mengubah parameter yang diterimanya, dan harus selalu menghasilkan hasil yang sama jika diberikan parameter yang sama.
-- Dispatch adalah function yang digunakan untuk memperbarui state di dalam store. Jadi dispatch ini digunakan untuk mengirimkan action ke store. Setelah action terkirim ke store, reducer akan memeriksa tipe action dan mengubah state di dalam store sesuai dengan informasi yang ada pada objek action. Setelah state di dalam store berhasil diperbarui, Redux akan memberi tahu semua komponen yang terhubung ke store Redux sehingga tampilan dari aplikasi dapat diperbarui sesuai dengan state yang baru.
-- Selector: Selector adalah sebuah sebuah hook yang digunakan untuk memilih dan mengambil state yang tersimpan di store agar bisa digunakan oleh komponen react untuk di tampilkan ke dalam UI. Selector dapat digunakan untuk memisahkan state menjadi beberapa bagian kecil, yang kemudian dapat diakses dan digunakan oleh komponen React.
-- Middleware: Middleware adalah fungsi yang berjalan di antara dispatch dan reducer. Middleware dapat digunakan untuk melakukan tugas tertentu, seperti logging, atau memodifikasi action sebelum action tersebut dijalankan oleh reducer.
-- Provider: Provider adalah komponen React yang digunakan untuk memberikan store ke seluruh komponen dalam aplikasi. Provider akan menempatkan store di dalam context React, sehingga komponen dalam aplikasi dapat mengakses store melalui context.
-
-Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts).
+- Store <br>
+  Store adalah tempat di mana state (keadaan) aplikasi disimpan. Store ini bersifat immutable (tidak dapat diubah), artinya state hanya dapat diubah melalui action.
+- Action <br>
+  Action adalah objek yang digunakan untuk mengirim perintah ke store untuk mengubah state. Action harus memiliki properti "type" yang menjelaskan tipe perubahan yang akan dilakukan, dan dapat memiliki properti lain yang dibutuhkan.
+- Reducer <br>
+  Reducer adalah sebuah fungsi yang menerima dua parameter yaitu state dan action, dan menghasilkan state baru yang telah diperbarui. Reducer harus bersifat pure (murni), artinya tidak boleh mengubah parameter yang diterimanya, dan harus selalu menghasilkan hasil yang sama jika diberikan parameter yang sama.
+- Dispatch <br>
+  Merupakan function yang digunakan untuk memperbarui state di dalam store. Jadi dispatch ini digunakan untuk mengirimkan action ke store. Setelah action terkirim ke store, reducer akan memeriksa tipe action dan mengubah state di dalam store sesuai dengan informasi yang ada pada objek action. Setelah state di dalam store berhasil diperbarui, Redux akan memberi tahu semua komponen yang terhubung ke store Redux sehingga tampilan dari aplikasi dapat diperbarui sesuai dengan state yang baru.
+- Selector <br>
+  Selector adalah sebuah sebuah hook yang digunakan untuk memilih dan mengambil state yang tersimpan di store agar bisa digunakan oleh komponen react untuk di tampilkan ke dalam UI. Selector dapat digunakan untuk memisahkan state menjadi beberapa bagian kecil, yang kemudian dapat diakses dan digunakan oleh komponen React.
+- Middleware <br>
+  Middleware adalah fungsi yang berjalan di antara dispatch dan reducer. Middleware dapat digunakan untuk melakukan tugas tertentu, seperti logging, atau memodifikasi action sebelum action tersebut dijalankan oleh reducer.
+- Provider <br>
+  Provider adalah komponen React yang digunakan untuk memberikan store ke seluruh komponen dalam aplikasi. Provider akan menempatkan store di dalam context React, sehingga komponen dalam aplikasi dapat mengakses store melalui context.
+- Payload <br>
+  Payload pada Redux Toolkit digunakan untuk mengirimkan data dari sebuah action creator ke reducer. Dalam Redux Toolkit, pengiriman data menggunakan format yang disebut "action payload". Payload adalah sebuah objek JavaScript yang berisi data yang diperlukan oleh reducer untuk memperbarui state aplikasi.
+  Dalam penggunaannya, saat membuat sebuah action creator dengan Redux Toolkit, kita dapat menentukan payload-nya dengan menambahkan parameter kedua pada fungsi createAction
 
 ### Prepare & Get request
 
+Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts).
 Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
 
 ```
