@@ -4092,6 +4092,10 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    export default EditProducts;
    ```
 
+## Redux Persist
+
+Redux-persist adalah sebuah library Redux yang digunakan untuk memungkinkan penyimpanan data Redux di localStorage atau sessionStorage browser. Dengan redux-persist, data Redux yang disimpan dapat dipertahankan bahkan setelah halaman web ditutup atau browser ditutup. Redux-persist memungkinkan aplikasi web untuk memulihkan state yang tersimpan ketika aplikasi dibuka kembali, sehingga pengguna tidak perlu memulai dari awal setiap kali membuka aplikasi. Ini memudahkan pengembangan aplikasi yang memerlukan otentikasi pengguna atau menyimpan preferensi pengguna di browser.
+
 ## Tailwind CSS
 
 Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya [[8]](https://tailwindcss.com/docs/guides/create-react-app):
