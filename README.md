@@ -4252,7 +4252,7 @@ Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakuk
 
 ### Deploy melalui website vercel
 
-Berikut ini adalah langkah-langkah untuk melakukan deploy project React menggunakan Vercel melalui website Vercel:
+Berikut ini adalah langkah-langkah untuk melakukan deploy project React menggunakan Vercel melalui website Vercel[[9]](https://www.youtube.com/watch?v=GqAVT84-XwY):
 
 - Pastikan bahwa project React kamu sudah siap untuk di-deploy. Jika kamu menggunakan Create React App, pastikan kamu sudah menjalankan perintah npm run build atau yarn build terlebih dahulu untuk membuat production build.
 
@@ -4290,3 +4290,4 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - [[6] devsaurus.com/](https://devsaurus.com/)
 - [[7] redux.js.org/](https://redux.js.org/)
 - [[8] https://tailwindcss.com/](https://tailwindcss.com/)
+- [[9] yutube.com/@reactjsBD](https://www.youtube.com/@reactjsBD)
