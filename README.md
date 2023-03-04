@@ -305,10 +305,59 @@ width: 287, height: 386 }} >
 
 Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
 
+## Penggunaan Atribute target="\_blank" di tag `<a>`
+
+Agar tidak terkena warning saat menggunan atribute `target ="_blank"` di tag `<a>` kita harus menambahkan atribute `rel="noopener noreferrer"`. Berikut contoh penggunaannya di coding:
+
+```
+import React from "react";
+import {
+  AiFillLinkedin,
+  AiFillMail,
+} from "react-icons/ai";
+
+const Footer = () => {
+  return (
+    <div className="w-full bg-bodyColor">
+      <p className="text-sm text-gray-400 text-center">
+        Created by a coding enthusiast, fueled by coffee. Find me at:
+      </p>
+      <div className="flex justify-center gap-2 mt-3">
+        <a
+          href="https://github.com/argianardi"
+          target="_blank"
+    //-----------------------------------------------------------------------
+          rel="noopener noreferrer"
+    //-----------------------------------------------------------------------
+          className="footerIcon"
+        >
+          <AiOutlineGithub />
+        </a>
+        <a
+          href="mailto:argianardi14@gmail.com"
+          target="_blank"
+    //-----------------------------------------------------------------------
+          rel="noopener noreferrer"
+    //-----------------------------------------------------------------------
+          className="footerIcon"
+        >
+          <AiFillMail />
+        </a>
+      </div>
+    </div>
+  );
+};
+
+export default Footer;
+```
+
 ## Conditional Rendering
 
-Di React, tidak ada sintaks khusus untuk penulisan conditional. Sebagai gantinya, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional
-Kita bisa memanfaatkan conditional logi untuk merender sebuah component. Misalnya pada saat user sudah login maka di dalam halaman akan ditampilkan component `AdminPanel` sedangkan jika user belum login maka di halaman akan tampil component `LoginForm`. Penerapannya di coding akan jadi seperti ini [[1]](https://beta.reactjs.org/learn).
+Di React, tidak ada sintaks khusus untuk penulisan conditional, kita dapat menggunakan teknik yang sama seperti kode JavaScript biasa. Misalnya, menggunakan logika if untuk menyertakan JSX secara kondisional.
+
+### Penerapan Conditional Rendering untuk Login
+
+Kita bisa memanfaatkan conditional login untuk merender sebuah component. Misalnya pada saat user sudah login maka di dalam halaman akan ditampilkan component `AdminPanel` sedangkan jika user belum login maka di halaman akan tampil component `LoginForm`. Penerapannya di coding akan jadi seperti ini [[1]](https://beta.reactjs.org/learn).
 
 ```
 let content;
@@ -344,7 +393,42 @@ jika conditional hanya memiliki satu cabang kita dapat menggunakan syntax `logic
 </div>
 ```
 
-## Lists Rendering
+### Penerapan Conditional Rendering Untuk Utiliti Class di Element HTML
+
+Berikut contoh penerpan conditional rendiring untuk utiliti class di element html, untuk komponen `TodoList` di project [Taskify]():
+
+```
+import React, { useState } from "react";
+import { MdDelete } from "react-icons/md";
+
+const TodoList = () => {
+  const [mark, setMark] = useState(false);
+
+  return (
+    <li
+      onClick={() => setMark(!mark)}
+//----------------------------------------------------------------------------------------------------------------
+      className={`${
+        mark
+          ? "border-orange-500"
+          : "border-green-500"
+      } w-full font-titleFont font-medium text-base border-[1px] border-l-[6px] p-2 cursor-pointer  flex items-center justify-between`}
+//----------------------------------------------------------------------------------------------------------------
+    >
+      Todo Item{" "}
+      <span className="text-xl text-gray-300 hover:text-red-500 duration-300 cursor-pointer">
+        <MdDelete />
+      </span>
+    </li>
+  );
+};
+
+export default TodoList;
+```
+
+Pada code diatas saat state `mark` bernilai true maka border tag `<li>` akan berubah berwarna orange-500 tetapi jika state `mark` bernilai false border tag `<li>` akan berwarna green-500
+
+## List Rendering
 
 Kita dapat menggunakan fitur JavaScript seperti for loop dan fungsi array map() untuk merender list komponen. Misalnya, kita memiliki serangkaian produk:
 
@@ -1254,18 +1338,27 @@ Sebaiknya redux ini digunakan jika:
 
 Istilah - istilah yang ada di dalam React:
 
-- Store: Store adalah tempat di mana state (keadaan) aplikasi disimpan. Store ini bersifat immutable (tidak dapat diubah), artinya state hanya dapat diubah melalui action.
-- Action: Action adalah objek yang digunakan untuk mengirim perintah ke store untuk mengubah state. Action harus memiliki properti "type" yang menjelaskan tipe perubahan yang akan dilakukan, dan dapat memiliki properti lain yang dibutuhkan.
-- Reducer: Reducer adalah sebuah fungsi yang menerima dua parameter yaitu state dan action, dan menghasilkan state baru yang telah diperbarui. Reducer harus bersifat pure (murni), artinya tidak boleh mengubah parameter yang diterimanya, dan harus selalu menghasilkan hasil yang sama jika diberikan parameter yang sama.
-- Dispatch adalah function yang digunakan untuk memperbarui state di dalam store. Jadi dispatch ini digunakan untuk mengirimkan action ke store. Setelah action terkirim ke store, reducer akan memeriksa tipe action dan mengubah state di dalam store sesuai dengan informasi yang ada pada objek action. Setelah state di dalam store berhasil diperbarui, Redux akan memberi tahu semua komponen yang terhubung ke store Redux sehingga tampilan dari aplikasi dapat diperbarui sesuai dengan state yang baru.
-- Selector: Selector adalah sebuah sebuah hook yang digunakan untuk memilih dan mengambil state yang tersimpan di store agar bisa digunakan oleh komponen react untuk di tampilkan ke dalam UI. Selector dapat digunakan untuk memisahkan state menjadi beberapa bagian kecil, yang kemudian dapat diakses dan digunakan oleh komponen React.
-- Middleware: Middleware adalah fungsi yang berjalan di antara dispatch dan reducer. Middleware dapat digunakan untuk melakukan tugas tertentu, seperti logging, atau memodifikasi action sebelum action tersebut dijalankan oleh reducer.
-- Provider: Provider adalah komponen React yang digunakan untuk memberikan store ke seluruh komponen dalam aplikasi. Provider akan menempatkan store di dalam context React, sehingga komponen dalam aplikasi dapat mengakses store melalui context.
-
-Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts).
+- Store <br>
+  Store adalah tempat di mana state (keadaan) aplikasi disimpan. Store ini bersifat immutable (tidak dapat diubah), artinya state hanya dapat diubah melalui action.
+- Action <br>
+  Action adalah objek yang digunakan untuk mengirim perintah ke store untuk mengubah state. Action harus memiliki properti "type" yang menjelaskan tipe perubahan yang akan dilakukan, dan dapat memiliki properti lain yang dibutuhkan.
+- Reducer <br>
+  Reducer adalah sebuah fungsi yang menerima dua parameter yaitu state dan action, dan menghasilkan state baru yang telah diperbarui. Reducer harus bersifat pure (murni), artinya tidak boleh mengubah parameter yang diterimanya, dan harus selalu menghasilkan hasil yang sama jika diberikan parameter yang sama.
+- Dispatch <br>
+  Merupakan function yang digunakan untuk memperbarui state di dalam store. Jadi dispatch ini digunakan untuk mengirimkan action ke store. Setelah action terkirim ke store, reducer akan memeriksa tipe action dan mengubah state di dalam store sesuai dengan informasi yang ada pada objek action. Setelah state di dalam store berhasil diperbarui, Redux akan memberi tahu semua komponen yang terhubung ke store Redux sehingga tampilan dari aplikasi dapat diperbarui sesuai dengan state yang baru.
+- Selector <br>
+  Selector adalah sebuah sebuah hook yang digunakan untuk memilih dan mengambil state yang tersimpan di store agar bisa digunakan oleh komponen react untuk di tampilkan ke dalam UI. Selector dapat digunakan untuk memisahkan state menjadi beberapa bagian kecil, yang kemudian dapat diakses dan digunakan oleh komponen React.
+- Middleware <br>
+  Middleware adalah fungsi yang berjalan di antara dispatch dan reducer. Middleware dapat digunakan untuk melakukan tugas tertentu, seperti logging, atau memodifikasi action sebelum action tersebut dijalankan oleh reducer.
+- Provider <br>
+  Provider adalah komponen React yang digunakan untuk memberikan store ke seluruh komponen dalam aplikasi. Provider akan menempatkan store di dalam context React, sehingga komponen dalam aplikasi dapat mengakses store melalui context.
+- Payload <br>
+  Payload pada Redux Toolkit digunakan untuk mengirimkan data dari sebuah action creator ke reducer. Dalam Redux Toolkit, pengiriman data menggunakan format yang disebut "action payload". Payload adalah sebuah objek JavaScript yang berisi data yang diperlukan oleh reducer untuk memperbarui state aplikasi.
+  Dalam penggunaannya, saat membuat sebuah action creator dengan Redux Toolkit, kita dapat menentukan payload-nya dengan menambahkan parameter kedua pada fungsi createAction
 
 ### Prepare & Get request
 
+Kali ini kita akan membahas redux menggunakan contoh project [saveContacts](https://github.com/argianardi/saveContacts).
 Untuk persiapan menggunakan redux di contoh ini kita harus menginstall axios, redux, react-redux dan redux-thunk dengan command [[1]](https://www.youtube.com/watch?v=NBY70QmxSUE&list=PLIan8aHxsPj082k6ZLyqJPCJESBG-C_Lw&index=1):
 
 ```
@@ -4001,7 +4094,7 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 
 ## Tailwind CSS
 
-Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya:
+Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya [[8]](https://tailwindcss.com/docs/guides/create-react-app):
 
 - Di dalam terminal, command:
 
@@ -4089,3 +4182,4 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - [[5] youtube.com/mfikricom](https://www.youtube.com/watch?v=S_zkP5prhaM)
 - [[6] devsaurus.com/](https://devsaurus.com/)
 - [[7] redux.js.org/](https://redux.js.org/)
+- [[8] https://tailwindcss.com/](https://tailwindcss.com/)
