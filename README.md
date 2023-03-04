@@ -4096,6 +4096,109 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 
 Redux-persist adalah sebuah library Redux yang digunakan untuk memungkinkan penyimpanan data Redux di localStorage atau sessionStorage browser. Dengan redux-persist, data Redux yang disimpan dapat dipertahankan bahkan setelah halaman web ditutup atau browser ditutup. Redux-persist memungkinkan aplikasi web untuk memulihkan state yang tersimpan ketika aplikasi dibuka kembali, sehingga pengguna tidak perlu memulai dari awal setiap kali membuka aplikasi. Ini memudahkan pengembangan aplikasi yang memerlukan otentikasi pengguna atau menyimpan preferensi pengguna di browser.
 
+Berikut cara penggunaan redux-persist:
+
+1. Install Redux Persist menggunakan npm atau yarn dengan command:
+   `npm install redux-persist` atau `yarn add redux-persist`
+2. Buat sebuah instance dari persistReducer di file store.js, yaitu file tempat kita menyimpan store Redux:
+
+   ```
+   import { configureStore } from "@reduxjs/toolkit";
+   import todoReducer from "../features/todoSlice";
+   import {
+     persistStore,
+     persistReducer,
+     FLUSH,
+     REHYDRATE,
+     PAUSE,
+     PERSIST,
+     PURGE,
+     REGISTER,
+   } from "redux-persist";
+   import storage from "redux-persist/lib/storage";
+
+   const persistConfig = {
+     key: "root",
+     version: 1,
+     storage,
+   };
+
+   const persistedReducer = persistReducer(persistConfig, todoReducer);
+
+   export const store = configureStore({
+     reducer: { todos: persistedReducer },
+     middleware: (getDefaultMiddleware) =>
+       getDefaultMiddleware({
+         serializableCheck: {
+           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+         },
+       }),
+   });
+
+   export let persistor = persistStore(store);
+   ```
+
+   Perhatikan bahwa di dalam file store.js, kita harus meng-import fungsi-fungsi dari library Redux Persist seperti persistStore, persistReducer, dan storage. Kita juga harus membuat sebuah konfigurasi untuk Redux Persist dan menggabungkan root reducer dengan persistReducer.
+
+   <b>Note:</b>
+
+   - persistStore: Fungsi yang digunakan untuk membuat store yang telah diperbarui dengan setiap perubahan data di storage persisten.
+   - persistReducer: Fungsi yang digunakan untuk membuat reducer persisten yang dapat memanipulasi state pada storage persisten.
+   - FLUSH: Konstanta aksi yang dikirim ke store untuk membersihkan antrian aksi.
+   - REHYDRATE: Konstanta aksi yang dikirim ke store untuk memuat kembali data dari storage persisten ke store.
+   - PAUSE: Konstanta aksi yang dikirim ke store untuk menonaktifkan penyimpanan persisten.
+   - PERSIST: Konstanta aksi yang dikirim ke store untuk mengaktifkan penyimpanan persisten.
+   - PURGE: Konstanta aksi yang dikirim ke store untuk menghapus semua data yang disimpan di storage persisten.
+   - REGISTER: Konstanta aksi yang dikirim ke store untuk mendaftarkan action dengan middleware redux persist.
+   - persistConfig adalah konfigurasi yang digunakan untuk mengatur bagaimana data disimpan dan diambil dari penyimpanan persisten (misalnya Local Storage atau AsyncStorage pada React Native) oleh Redux Persist. Beberapa opsi yang dapat dikonfigurasi di dalam persistConfig antara lain:
+
+     - key: Nama kunci untuk menyimpan data di penyimpanan persisten. Harus unik untuk setiap aplikasi Redux Persist.
+       storage: Penyimpanan persisten yang akan digunakan (misalnya localStorage atau AsyncStorage).
+     - whitelist: Daftar reducer yang akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
+     - blacklist: Daftar reducer yang tidak akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
+       transforms: Mengubah data sebelum disimpan dan setelah diambil dari penyimpanan persisten.
+     - timeout: Waktu dalam milidetik untuk menunggu sebelum melempar kesalahan jika operasi penyimpanan persisten gagal.
+
+     Dengan konfigurasi persistConfig, Redux Persist dapat dengan mudah diintegrasikan ke dalam aplikasi Redux untuk menyimpan dan mengambil data dari penyimpanan persisten.
+
+3. Wrap aplikasi kamu dengan PersistGate di file index.js yaitu file tempat kita me-render aplikasi:
+
+   ```
+   import React from "react";
+   import ReactDOM from "react-dom/client";
+   import "./styles/index.css";
+   import App from "./App";
+   import reportWebVitals from "./reportWebVitals";
+   import { Provider } from "react-redux";
+   import { store, persistor } from "./utils/redux/store/store";
+   import { PersistGate } from "redux-persist/integration/react";
+
+   const root = ReactDOM.createRoot(document.getElementById("root"));
+   root.render(
+     <React.StrictMode>
+       <Provider store={store}>
+         <PersistGate loading={"loading"} persistor={persistor}>
+           <App />
+         </PersistGate>
+       </Provider>
+     </React.StrictMode>
+   );
+
+   reportWebVitals();
+   ```
+
+   Perhatikan bahwa kita harus meng-import PersistGate dari redux-persist/integration/react, dan menggabungkan store Redux dan persistor yang sudah kamu buat di file store.js.
+
+   <b>Note: </b>
+
+   - PersistGate adalah sebuah komponen yang bertanggung jawab untuk menunda render komponen-komponen yang membutuhkan data yang diambil dari penyimpanan sampai data tersedia. Saat aplikasi dimuat, PersistGate menunjukkan loading indicator dan hanya merender child component ketika penyimpanan siap digunakan.
+
+   - persistStore adalah fungsi yang digunakan untuk menginisialisasi penyimpanan persisten di Redux. Fungsi ini mengambil parameter store Redux dan objek konfigurasi, dan mengembalikan promis yang diselesaikan ketika penyimpanan selesai diinisialisasi. Ini memastikan bahwa seluruh state aplikasi tersimpan di penyimpanan persisten sehingga dapat digunakan di masa depan.
+   - Prop `loading` pada tag `<PersistGate>` digunakan untuk menampilkan suatu komponen loading ketika state redux belum berhasil di-rehydrate atau belum siap digunakan. Secara default, nilai prop `loading` adalah null.
+   - Prop `persistor` pada tag PersistGate digunakan untuk menyediakan `persistor` yang akan digunakan untuk memuat state dari storage ke dalam store redux. Prop `persistor` harus diisi dengan nilai yang dikembalikan oleh fungsi persistStore(store)
+
+Dengan mengikuti langkah-langkah di atas, kita sudah bisa menggunakan Redux Persist di aplikasi Redux kamu. Sekarang setiap perubahan di store Redux akan otomatis tersimpan ke local storage browser, dan ketika aplikasi dibuka kembali, state dari store Redux akan di-rehydrate dari local storage tersebut.
+
 ## Tailwind CSS
 
 Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya [[8]](https://tailwindcss.com/docs/guides/create-react-app):
