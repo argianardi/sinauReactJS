@@ -1330,6 +1330,13 @@ Pada dasarnya, terdapat tiga fungsionalitas utama yang ditambahkan oleh redux ke
 
 Satu-satunya cara untuk mengubah state di dalam store adalah dengan memanggil method bernama dispatch yang berisi action, kemudian Redux akan mengeksekusi reducer yang sesuai. Dan Selector merupakan function yang digunakan untuk mendapatkan data dari state yang ada di dalam store.
 
+Berikut alur kerja dari redux
+
+- Pertama akan ada triger dari UI
+- Kemudian akan ke action
+- Dari action reducer akan mengubah state yang sesuai dengan type dari action tadi
+- Terahir kita ke UI lagi untuk menampilkan state yang datanya telah diupdate
+
 Sebaiknya redux ini digunakan jika:
 
 - Banyak data yang berubah dari waktu ke waktu
