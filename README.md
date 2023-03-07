@@ -4287,6 +4287,31 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - Terakhir akan muncul pertanyaan `What's the name of your existing project?` <br>
   Jawab dengan nama yang kita berikan untuk project kita di dashboard vercel.
 
+## Material Tailwind
+
+Material Tailwind adalah salah satu framework CSS yang berisi kumpulan komponen desain visual yang siap digunakan untuk membangun tampilan UI pada aplikasi web. Material Tailwind didasarkan pada desain Material Design dari Google, yang menekankan pada sederhana, minimalis, dan fungsionalitas. Material Tailwind memanfaatkan framework CSS Tailwind CSS, sehingga memudahkan dalam penyesuaian tampilan dan gaya dengan cepat dan mudah. Dengan menggunakan Material Tailwind, Developer aplikasi web dapat menghemat waktu dan tetap bisa membuat tampilan UI yang menarik dan responsif. <br>
+
+Berikut cara penggunaannya di CRA:
+
+- Instal material tailwind dengan command:
+  ```
+  npm i @material-tailwind/react
+  ```
+- TailwindCSS Configurations
+  Buka file `tailwind.config.js` membungkus konfigurasi tailwind css dengan fungsi withMT() dari @material-tailwind/react/utils.
+
+  ```
+  const withMT = require("@material-tailwind/react/utils/withMT");
+
+  module.exports = withMT({
+    content: ["./src/**/*.{js,jsx,ts,tsx}"],
+    theme: {
+      extend: {},
+    },
+    plugins: [],
+  });
+  ```
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
