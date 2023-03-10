@@ -4101,9 +4101,9 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
 
 ## Redux Persist
 
-Redux-persist adalah sebuah library Redux yang digunakan untuk memungkinkan penyimpanan data Redux di localStorage atau sessionStorage browser. Dengan redux-persist, data Redux yang disimpan dapat dipertahankan bahkan setelah halaman web ditutup atau browser ditutup. Redux-persist memungkinkan aplikasi web untuk memulihkan state yang tersimpan ketika aplikasi dibuka kembali, sehingga pengguna tidak perlu memulai dari awal setiap kali membuka aplikasi. Ini memudahkan pengembangan aplikasi yang memerlukan otentikasi pengguna atau menyimpan preferensi pengguna di browser.
+Redux-persist adalah sebuah library Redux yang digunakan untuk memungkinkan penyimpanan data Redux di localStorage atau sessionStorage browser. Dengan redux-persist, data Redux yang disimpan dapat dipertahankan bahkan setelah halaman web ditutup atau browser ditutup. Redux-persist memungkinkan aplikasi web untuk memulihkan state yang tersimpan ketika aplikasi dibuka kembali, sehingga pengguna tidak perlu memulai dari awal setiap kali membuka aplikasi. Ini memudahkan pengembangan aplikasi yang memerlukan otentikasi pengguna atau menyimpan preferensi pengguna di browser. Redux persist dibahas lebih lengkap di dokumentasi resminya [disini](https://github.com/rt2zz/redux-persist)
 
-Berikut cara penggunaan redux-persist:
+Untuk konfigurasinya kita hanya perlu setting di bagian <b> store dan di file index.js</b>. Berikut cara penggunaan redux-persist:
 
 1. Install Redux Persist menggunakan npm atau yarn dengan command:
    `npm install redux-persist` atau `yarn add redux-persist`
@@ -4111,64 +4111,77 @@ Berikut cara penggunaan redux-persist:
 
    ```
    import { configureStore } from "@reduxjs/toolkit";
-   import todoReducer from "../features/todoSlice";
-   import {
-     persistStore,
-     persistReducer,
-     FLUSH,
-     REHYDRATE,
-     PAUSE,
-     PERSIST,
-     PURGE,
-     REGISTER,
-   } from "redux-persist";
+   import { persistStore, persistReducer } from "redux-persist";
    import storage from "redux-persist/lib/storage";
 
-   const persistConfig = {
-     key: "root",
+   import counterReducer from "./counterSlice";
+   import todoReducer from "./todoSlice";
+
+   // konfigurasi Redux Persist untuk state todo
+   const todoPersistConfig = {
+     key: "todo",
      version: 1,
      storage,
    };
 
-   const persistedReducer = persistReducer(persistConfig, todoReducer);
+   // membuat reducer untuk state todo yang telah di-persist
+   const persistedTodoReducer = persistReducer(todoPersistConfig, todoReducer);
 
+   // konfigurasi store Redux
    export const store = configureStore({
-     reducer: { todos: persistedReducer },
-     middleware: (getDefaultMiddleware) =>
-       getDefaultMiddleware({
-         serializableCheck: {
-           ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-         },
-       }),
+     reducer: {
+       counter: counterReducer,
+       todo: persistedTodoReducer, // reducer todo yang telah di-persist
+     },
    });
 
-   export let persistor = persistStore(store);
+   // membuat persistor untuk state todo
+   export const persistor = persistStore(store);
+
    ```
 
-   Perhatikan bahwa di dalam file store.js, kita harus meng-import fungsi-fungsi dari library Redux Persist seperti persistStore, persistReducer, dan storage. Kita juga harus membuat sebuah konfigurasi untuk Redux Persist dan menggabungkan root reducer dengan persistReducer.
+Pada code store di atas terdapat dua state yaitu state dari `counterReducer` dan `todoReducer`, tetapi hanya state dari `todoReducer` yang di-persist. Jadi kita kita hanya perlu membuat konfigurasi Redux Persist khusus untuk state dari `todoReducer`, Berikut langkah - langkahnya:
 
-   <b>Note:</b>
+- Konfigurasi redux persist untuk state `todo`
 
-   - persistStore: Fungsi yang digunakan untuk membuat store yang telah diperbarui dengan setiap perubahan data di storage persisten.
-   - persistReducer: Fungsi yang digunakan untuk membuat reducer persisten yang dapat memanipulasi state pada storage persisten.
-   - FLUSH: Konstanta aksi yang dikirim ke store untuk membersihkan antrian aksi.
-   - REHYDRATE: Konstanta aksi yang dikirim ke store untuk memuat kembali data dari storage persisten ke store.
-   - PAUSE: Konstanta aksi yang dikirim ke store untuk menonaktifkan penyimpanan persisten.
-   - PERSIST: Konstanta aksi yang dikirim ke store untuk mengaktifkan penyimpanan persisten.
-   - PURGE: Konstanta aksi yang dikirim ke store untuk menghapus semua data yang disimpan di storage persisten.
-   - REGISTER: Konstanta aksi yang dikirim ke store untuk mendaftarkan action dengan middleware redux persist.
-   - persistConfig adalah konfigurasi yang digunakan untuk mengatur bagaimana data disimpan dan diambil dari penyimpanan persisten (misalnya Local Storage atau AsyncStorage pada React Native) oleh Redux Persist. Beberapa opsi yang dapat dikonfigurasi di dalam persistConfig antara lain:
+  - Pada `key: "todo"` <br>
+    Atribut key digunakan untuk menentukan key (kunci) unik dari state yang akan dipersist. Atribut ini digunakan oleh Redux Persist untuk mengidentifikasi state mana yang akan dipersist di dalam storage. Value dari key ini sebaiknya dibuat unique (hanya digunakan untuk aplikasi yang sedang kita develop saja)
+  - `version: 1` <br>
+    Atribut version digunakan untuk menentukan versi dari state yang akan dipersist. Version adalah nomor versi dari state Redux. Jika kita melakukan perubahan pada struktur state Redux di masa depan, kita dapat meningkatkan nomor versi sehingga Redux Persist dapat melakukan konversi otomatis pada saat memulihkan state..
+  - storage <br>
+    Atribut storage digunakan untuk menentukan jenis storage yang akan digunakan untuk menyimpan data yang telah dipersist. Pada contoh di atas, storage yang digunakan adalah localStorage yang telah diimpor dari redux-persist/lib/storage.
 
-     - key: Nama kunci untuk menyimpan data di penyimpanan persisten. Harus unik untuk setiap aplikasi Redux Persist.
-       storage: Penyimpanan persisten yang akan digunakan (misalnya localStorage atau AsyncStorage).
-     - whitelist: Daftar reducer yang akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
-     - blacklist: Daftar reducer yang tidak akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
-       transforms: Mengubah data sebelum disimpan dan setelah diambil dari penyimpanan persisten.
-     - timeout: Waktu dalam milidetik untuk menunggu sebelum melempar kesalahan jika operasi penyimpanan persisten gagal.
+- Buat reducer baru menggunakan persistReducer <br>
+  Buat reducer baru menggunakan persistReducer dengan mengirimkan konfigurasi yang telah dibuat sebelumnya. Reducer baru ini akan digunakan sebagai reducer untuk state dari todoReducer pada konfigurasi store Redux.
 
-     Dengan konfigurasi persistConfig, Redux Persist dapat dengan mudah diintegrasikan ke dalam aplikasi Redux untuk menyimpan dan mengambil data dari penyimpanan persisten.
+- Konfigurasi store Redux <br>
+  Kita menggunakan configureStore dari @reduxjs/toolkit untuk membuat store Redux dengan reducer yang terdiri dari 2 reducer, yaitu counterReducer dan persistedTodoReducer yang merupakan hasil dari penggunaan persistReducer pada reducer todoReducer. State dari counterReducer tidak di-persist, sedangkan state dari todoReducer akan di-persist ke dalam localStorage.
 
-3. Wrap aplikasi kamu dengan PersistGate di file index.js yaitu file tempat kita me-render aplikasi:
+- Buat persistor dengan menggunakan persistStore dari redux-persist <br>
+  Buat persistor dengan menggunakan persistStore dari redux-persist yang mengirimkan store Redux yang telah dibuat sebelumnya untuk melakukan proses persisting pada state dari todoReducer.
+
+<b>Note:</b>
+
+- persistStore: Fungsi yang digunakan untuk membuat store yang telah diperbarui dengan setiap perubahan data di storage persisten.
+- persistReducer: Fungsi yang digunakan untuk membuat reducer persisten yang dapat memanipulasi state pada storage persisten.
+- FLUSH: Konstanta aksi yang dikirim ke store untuk membersihkan antrian aksi.
+- REHYDRATE: Konstanta aksi yang dikirim ke store untuk memuat kembali data dari storage persisten ke store.
+- PAUSE: Konstanta aksi yang dikirim ke store untuk menonaktifkan penyimpanan persisten.
+- PERSIST: Konstanta aksi yang dikirim ke store untuk mengaktifkan penyimpanan persisten.
+- PURGE: Konstanta aksi yang dikirim ke store untuk menghapus semua data yang disimpan di storage persisten.
+- REGISTER: Konstanta aksi yang dikirim ke store untuk mendaftarkan action dengan middleware redux persist.
+- persistConfig adalah konfigurasi yang digunakan untuk mengatur bagaimana data disimpan dan diambil dari penyimpanan persisten (misalnya Local Storage atau AsyncStorage pada React Native) oleh Redux Persist. Beberapa opsi yang dapat dikonfigurasi di dalam persistConfig antara lain:
+
+  - key: Nama kunci untuk menyimpan data di penyimpanan persisten. Harus unik untuk setiap aplikasi Redux Persist.
+    storage: Penyimpanan persisten yang akan digunakan (misalnya localStorage atau AsyncStorage).
+  - whitelist: Daftar reducer yang akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
+  - blacklist: Daftar reducer yang tidak akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
+    transforms: Mengubah data sebelum disimpan dan setelah diambil dari penyimpanan persisten.
+  - timeout: Waktu dalam milidetik untuk menunggu sebelum melempar kesalahan jika operasi penyimpanan persisten gagal.
+
+  Dengan konfigurasi persistConfig, Redux Persist dapat dengan mudah diintegrasikan ke dalam aplikasi Redux untuk menyimpan dan mengambil data dari penyimpanan persisten.
+
+3. Wrap aplikasi kita dengan PersistGate di file index.js yaitu file tempat kita me-render aplikasi:
 
    ```
    import React from "react";
@@ -4311,6 +4324,29 @@ Berikut cara penggunaannya di CRA:
     plugins: [],
   });
   ```
+
+- Testing
+  Selanjutnya kita bisa cek apakah proses konfigurasi material tailwind kita sudah berhasil atau belum di file `App.js` menggunakan komponen button seperti berikut:
+
+  ```
+  import { Button } from "@material-tailwind/react";
+  import React from "react";
+
+  function App() {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-red-700 underline">
+          Hello world!
+        </h1>
+        <Button>Button</Button>
+      </div>
+    );
+  }
+
+  export default App;
+  ```
+
+  Jika di dalam browser kita tampil tulisan Hello world! berwarna merah dan underline serta muncul button maka konfigurasi material tailwind kita berhasil.
 
 ## Referensi
 
