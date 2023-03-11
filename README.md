@@ -4113,7 +4113,16 @@ Untuk konfigurasinya kita hanya perlu setting di bagian <b> store dan di file in
    import { configureStore } from "@reduxjs/toolkit";
    import { persistStore, persistReducer } from "redux-persist";
    import storage from "redux-persist/lib/storage";
-
+   import {
+      FLUSH,
+      PAUSE,
+      PERSIST,
+      persistReducer,
+      persistStore,
+      PURGE,
+      REGISTER,
+      REHYDRATE,
+    } from "redux-persist";
    import counterReducer from "./counterSlice";
    import todoReducer from "./todoSlice";
 
@@ -4133,31 +4142,48 @@ Untuk konfigurasinya kita hanya perlu setting di bagian <b> store dan di file in
        counter: counterReducer,
        todo: persistedTodoReducer, // reducer todo yang telah di-persist
      },
+     middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
    });
 
    // membuat persistor untuk state todo
    export const persistor = persistStore(store);
-
    ```
 
 Pada code store di atas terdapat dua state yaitu state dari `counterReducer` dan `todoReducer`, tetapi hanya state dari `todoReducer` yang di-persist. Jadi kita kita hanya perlu membuat konfigurasi Redux Persist khusus untuk state dari `todoReducer`, Berikut langkah - langkahnya:
 
-- Konfigurasi redux persist untuk state `todo`
+- <b>Konfigurasi redux persist untuk state `todo`</b>
 
   - Pada `key: "todo"` <br>
     Atribut key digunakan untuk menentukan key (kunci) unik dari state yang akan dipersist. Atribut ini digunakan oleh Redux Persist untuk mengidentifikasi state mana yang akan dipersist di dalam storage. Value dari key ini sebaiknya dibuat unique (hanya digunakan untuk aplikasi yang sedang kita develop saja)
   - `version: 1` <br>
     Atribut version digunakan untuk menentukan versi dari state yang akan dipersist. Version adalah nomor versi dari state Redux. Jika kita melakukan perubahan pada struktur state Redux di masa depan, kita dapat meningkatkan nomor versi sehingga Redux Persist dapat melakukan konversi otomatis pada saat memulihkan state..
-  - storage <br>
+  - `storage` <br>
     Atribut storage digunakan untuk menentukan jenis storage yang akan digunakan untuk menyimpan data yang telah dipersist. Pada contoh di atas, storage yang digunakan adalah localStorage yang telah diimpor dari redux-persist/lib/storage.
 
-- Buat reducer baru menggunakan persistReducer <br>
+- <b>Buat reducer baru menggunakan persistReducer </b><br>
   Buat reducer baru menggunakan persistReducer dengan mengirimkan konfigurasi yang telah dibuat sebelumnya. Reducer baru ini akan digunakan sebagai reducer untuk state dari todoReducer pada konfigurasi store Redux.
 
-- Konfigurasi store Redux <br>
-  Kita menggunakan configureStore dari @reduxjs/toolkit untuk membuat store Redux dengan reducer yang terdiri dari 2 reducer, yaitu counterReducer dan persistedTodoReducer yang merupakan hasil dari penggunaan persistReducer pada reducer todoReducer. State dari counterReducer tidak di-persist, sedangkan state dari todoReducer akan di-persist ke dalam localStorage.
+- <b>Konfigurasi store Redux</b> <br>
+  Pada code tersebut, store dibuat dengan menggunakan fungsi `configureStore` dari Redux Toolkit untuk membuat store Redux dengan reducer yang terdiri dari 2 reducer, yaitu `counterReducer` dan persistedTodoReducer yang merupakan hasil dari penggunaan persistReducer pada reducer todoReducer. State dari `counterReducer` tidak di-persist, sedangkan state dari todoReducer akan di-persist ke dalam localStorage. Konfigurasi store ini terdiri dari Reducer dan middleware:
 
-- Buat persistor dengan menggunakan persistStore dari redux-persist <br>
+  - <b>Reducer</b><br>
+    - counterReducer : Reducer untuk mengatur state counter pada aplikasi
+    - persistedTodoReducer : Reducer untuk mengatur state todo pada aplikasi yang sudah di-persist menggunakan Redux Persist
+  - <b>Middleware</b><br>
+    - getDefaultMiddleware : Middleware untuk mengatur serialisasi dan deserialisasi aksi pada Redux
+    - serializableCheck : Middleware untuk memeriksa apakah aksi-aksi yang dipicu pada Redux bisa diserialisasi dengan aman atau tidak.
+    - ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER] : Konfigurasi middleware untuk mengabaikan aksi-aksi tertentu ketika melakukan serialisasi dan deserialisasi pada Redux.
+
+<small> <i>Note:</i> <br>
+Serialisasi adalah proses mengonversi objek atau struktur data ke dalam bentuk yang dapat ditransmisikan atau disimpan, seperti string atau byte stream, sedangkan deserialisasi adalah proses kebalikan dari serialisasi, yaitu mengonversi data yang telah diserialisasi menjadi bentuk awal yang dapat digunakan kembali.
+</small>
+
+- <b>Buat persistor dengan menggunakan persistStore dari redux-persist</b> <br>
   Buat persistor dengan menggunakan persistStore dari redux-persist yang mengirimkan store Redux yang telah dibuat sebelumnya untuk melakukan proses persisting pada state dari todoReducer.
 
 <b>Note:</b>
