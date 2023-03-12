@@ -1330,6 +1330,13 @@ Pada dasarnya, terdapat tiga fungsionalitas utama yang ditambahkan oleh redux ke
 
 Satu-satunya cara untuk mengubah state di dalam store adalah dengan memanggil method bernama dispatch yang berisi action, kemudian Redux akan mengeksekusi reducer yang sesuai. Dan Selector merupakan function yang digunakan untuk mendapatkan data dari state yang ada di dalam store.
 
+Berikut alur kerja dari redux
+
+- Pertama akan ada triger dari UI
+- Kemudian akan ke action
+- Dari action reducer akan mengubah state yang sesuai dengan type dari action tadi
+- Terahir kita ke UI lagi untuk menampilkan state yang datanya telah diupdate
+
 Sebaiknya redux ini digunakan jika:
 
 - Banyak data yang berubah dari waktu ke waktu
@@ -4092,6 +4099,152 @@ Berikut ini adalah langkah - langkah get request API dengan menggunakan Redux To
    export default EditProducts;
    ```
 
+## Redux Persist
+
+Redux-persist adalah sebuah library Redux yang digunakan untuk memungkinkan penyimpanan data Redux di localStorage atau sessionStorage browser. Dengan redux-persist, data Redux yang disimpan dapat dipertahankan bahkan setelah halaman web ditutup atau browser ditutup. Redux-persist memungkinkan aplikasi web untuk memulihkan state yang tersimpan ketika aplikasi dibuka kembali, sehingga pengguna tidak perlu memulai dari awal setiap kali membuka aplikasi. Ini memudahkan pengembangan aplikasi yang memerlukan otentikasi pengguna atau menyimpan preferensi pengguna di browser. Redux persist dibahas lebih lengkap di dokumentasi resminya [disini](https://github.com/rt2zz/redux-persist)
+
+Untuk konfigurasinya kita hanya perlu setting di bagian <b> store dan di file index.js</b>. Berikut cara penggunaan redux-persist:
+
+1. Install Redux Persist menggunakan npm atau yarn dengan command:
+   `npm install redux-persist` atau `yarn add redux-persist`
+2. Buat sebuah instance dari persistReducer di file store.js, yaitu file tempat kita menyimpan store Redux:
+
+   ```
+   import { configureStore } from "@reduxjs/toolkit";
+   import { persistStore, persistReducer } from "redux-persist";
+   import storage from "redux-persist/lib/storage";
+   import {
+      FLUSH,
+      PAUSE,
+      PERSIST,
+      persistReducer,
+      persistStore,
+      PURGE,
+      REGISTER,
+      REHYDRATE,
+    } from "redux-persist";
+   import counterReducer from "./counterSlice";
+   import todoReducer from "./todoSlice";
+
+   // konfigurasi Redux Persist untuk state todo
+   const todoPersistConfig = {
+     key: "todo",
+     version: 1,
+     storage,
+   };
+
+   // membuat reducer untuk state todo yang telah di-persist
+   const persistedTodoReducer = persistReducer(todoPersistConfig, todoReducer);
+
+   // konfigurasi store Redux
+   export const store = configureStore({
+     reducer: {
+       counter: counterReducer,
+       todo: persistedTodoReducer, // reducer todo yang telah di-persist
+     },
+     middleware: (getDefaultMiddleware) =>
+      getDefaultMiddleware({
+        serializableCheck: {
+          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+        },
+      }),
+   });
+
+   // membuat persistor untuk state todo
+   export const persistor = persistStore(store);
+   ```
+
+Pada code store di atas terdapat dua state yaitu state dari `counterReducer` dan `todoReducer`, tetapi hanya state dari `todoReducer` yang di-persist. Jadi kita kita hanya perlu membuat konfigurasi Redux Persist khusus untuk state dari `todoReducer`, Berikut langkah - langkahnya:
+
+- <b>Konfigurasi redux persist untuk state `todo`</b>
+
+  - Pada `key: "todo"` <br>
+    Atribut key digunakan untuk menentukan key (kunci) unik dari state yang akan dipersist. Atribut ini digunakan oleh Redux Persist untuk mengidentifikasi state mana yang akan dipersist di dalam storage. Value dari key ini sebaiknya dibuat unique (hanya digunakan untuk aplikasi yang sedang kita develop saja)
+  - `version: 1` <br>
+    Atribut version digunakan untuk menentukan versi dari state yang akan dipersist. Version adalah nomor versi dari state Redux. Jika kita melakukan perubahan pada struktur state Redux di masa depan, kita dapat meningkatkan nomor versi sehingga Redux Persist dapat melakukan konversi otomatis pada saat memulihkan state..
+  - `storage` <br>
+    Atribut storage digunakan untuk menentukan jenis storage yang akan digunakan untuk menyimpan data yang telah dipersist. Pada contoh di atas, storage yang digunakan adalah localStorage yang telah diimpor dari redux-persist/lib/storage.
+
+- <b>Buat reducer baru menggunakan persistReducer </b><br>
+  Buat reducer baru menggunakan persistReducer dengan mengirimkan konfigurasi yang telah dibuat sebelumnya. Reducer baru ini akan digunakan sebagai reducer untuk state dari todoReducer pada konfigurasi store Redux.
+
+- <b>Konfigurasi store Redux</b> <br>
+  Pada code tersebut, store dibuat dengan menggunakan fungsi `configureStore` dari Redux Toolkit untuk membuat store Redux dengan reducer yang terdiri dari 2 reducer, yaitu `counterReducer` dan persistedTodoReducer yang merupakan hasil dari penggunaan persistReducer pada reducer todoReducer. State dari `counterReducer` tidak di-persist, sedangkan state dari todoReducer akan di-persist ke dalam localStorage. Konfigurasi store ini terdiri dari Reducer dan middleware:
+
+  - <b>Reducer</b><br>
+    - counterReducer : Reducer untuk mengatur state counter pada aplikasi
+    - persistedTodoReducer : Reducer untuk mengatur state todo pada aplikasi yang sudah di-persist menggunakan Redux Persist
+  - <b>Middleware</b><br>
+    - getDefaultMiddleware : Middleware untuk mengatur serialisasi dan deserialisasi aksi pada Redux
+    - serializableCheck : Middleware untuk memeriksa apakah aksi-aksi yang dipicu pada Redux bisa diserialisasi dengan aman atau tidak.
+    - ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER] : Konfigurasi middleware untuk mengabaikan aksi-aksi tertentu ketika melakukan serialisasi dan deserialisasi pada Redux.
+
+<small> <i>Note:</i> <br>
+Serialisasi adalah proses mengonversi objek atau struktur data ke dalam bentuk yang dapat ditransmisikan atau disimpan, seperti string atau byte stream, sedangkan deserialisasi adalah proses kebalikan dari serialisasi, yaitu mengonversi data yang telah diserialisasi menjadi bentuk awal yang dapat digunakan kembali.
+</small>
+
+- <b>Buat persistor dengan menggunakan persistStore dari redux-persist</b> <br>
+  Buat persistor dengan menggunakan persistStore dari redux-persist yang mengirimkan store Redux yang telah dibuat sebelumnya untuk melakukan proses persisting pada state dari todoReducer.
+
+<b>Note:</b>
+
+- persistStore: Fungsi yang digunakan untuk membuat store yang telah diperbarui dengan setiap perubahan data di storage persisten.
+- persistReducer: Fungsi yang digunakan untuk membuat reducer persisten yang dapat memanipulasi state pada storage persisten.
+- FLUSH: Konstanta aksi yang dikirim ke store untuk membersihkan antrian aksi.
+- REHYDRATE: Konstanta aksi yang dikirim ke store untuk memuat kembali data dari storage persisten ke store.
+- PAUSE: Konstanta aksi yang dikirim ke store untuk menonaktifkan penyimpanan persisten.
+- PERSIST: Konstanta aksi yang dikirim ke store untuk mengaktifkan penyimpanan persisten.
+- PURGE: Konstanta aksi yang dikirim ke store untuk menghapus semua data yang disimpan di storage persisten.
+- REGISTER: Konstanta aksi yang dikirim ke store untuk mendaftarkan action dengan middleware redux persist.
+- persistConfig adalah konfigurasi yang digunakan untuk mengatur bagaimana data disimpan dan diambil dari penyimpanan persisten (misalnya Local Storage atau AsyncStorage pada React Native) oleh Redux Persist. Beberapa opsi yang dapat dikonfigurasi di dalam persistConfig antara lain:
+
+  - key: Nama kunci untuk menyimpan data di penyimpanan persisten. Harus unik untuk setiap aplikasi Redux Persist.
+    storage: Penyimpanan persisten yang akan digunakan (misalnya localStorage atau AsyncStorage).
+  - whitelist: Daftar reducer yang akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
+  - blacklist: Daftar reducer yang tidak akan disimpan di penyimpanan persisten. Jika tidak dikonfigurasi, semua reducer akan disimpan.
+    transforms: Mengubah data sebelum disimpan dan setelah diambil dari penyimpanan persisten.
+  - timeout: Waktu dalam milidetik untuk menunggu sebelum melempar kesalahan jika operasi penyimpanan persisten gagal.
+
+  Dengan konfigurasi persistConfig, Redux Persist dapat dengan mudah diintegrasikan ke dalam aplikasi Redux untuk menyimpan dan mengambil data dari penyimpanan persisten.
+
+3. Wrap aplikasi kita dengan PersistGate di file index.js yaitu file tempat kita me-render aplikasi:
+
+   ```
+   import React from "react";
+   import ReactDOM from "react-dom/client";
+   import "./styles/index.css";
+   import App from "./App";
+   import reportWebVitals from "./reportWebVitals";
+   import { Provider } from "react-redux";
+   import { store, persistor } from "./utils/redux/store/store";
+   import { PersistGate } from "redux-persist/integration/react";
+
+   const root = ReactDOM.createRoot(document.getElementById("root"));
+   root.render(
+     <React.StrictMode>
+       <Provider store={store}>
+         <PersistGate loading={"loading"} persistor={persistor}>
+           <App />
+         </PersistGate>
+       </Provider>
+     </React.StrictMode>
+   );
+
+   reportWebVitals();
+   ```
+
+   Perhatikan bahwa kita harus meng-import PersistGate dari redux-persist/integration/react, dan menggabungkan store Redux dan persistor yang sudah kamu buat di file store.js.
+
+   <b>Note: </b>
+
+   - PersistGate adalah sebuah komponen yang bertanggung jawab untuk menunda render komponen-komponen yang membutuhkan data yang diambil dari penyimpanan sampai data tersedia. Saat aplikasi dimuat, PersistGate menunjukkan loading indicator dan hanya merender child component ketika penyimpanan siap digunakan.
+
+   - persistStore adalah fungsi yang digunakan untuk menginisialisasi penyimpanan persisten di Redux. Fungsi ini mengambil parameter store Redux dan objek konfigurasi, dan mengembalikan promis yang diselesaikan ketika penyimpanan selesai diinisialisasi. Ini memastikan bahwa seluruh state aplikasi tersimpan di penyimpanan persisten sehingga dapat digunakan di masa depan.
+   - Prop `loading` pada tag `<PersistGate>` digunakan untuk menampilkan suatu komponen loading ketika state redux belum berhasil di-rehydrate atau belum siap digunakan. Secara default, nilai prop `loading` adalah null.
+   - Prop `persistor` pada tag PersistGate digunakan untuk menyediakan `persistor` yang akan digunakan untuk memuat state dari storage ke dalam store redux. Prop `persistor` harus diisi dengan nilai yang dikembalikan oleh fungsi persistStore(store)
+
+Dengan mengikuti langkah-langkah di atas, kita sudah bisa menggunakan Redux Persist di aplikasi Redux kamu. Sekarang setiap perubahan di store Redux akan otomatis tersimpan ke local storage browser, dan ketika aplikasi dibuka kembali, state dari store Redux akan di-rehydrate dari local storage tersebut.
+
 ## Tailwind CSS
 
 Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakukan inisialisasi apliksi kita menggunakan reactJS, berikut caranya [[8]](https://tailwindcss.com/docs/guides/create-react-app):
@@ -4145,7 +4298,7 @@ Disini kita akan bahas cara install tailwind CSS di reactJS setelah kita melakuk
 
 ### Deploy melalui website vercel
 
-Berikut ini adalah langkah-langkah untuk melakukan deploy project React menggunakan Vercel melalui website Vercel:
+Berikut ini adalah langkah-langkah untuk melakukan deploy project React menggunakan Vercel melalui website Vercel[[9]](https://www.youtube.com/watch?v=GqAVT84-XwY):
 
 - Pastikan bahwa project React kamu sudah siap untuk di-deploy. Jika kamu menggunakan Create React App, pastikan kamu sudah menjalankan perintah npm run build atau yarn build terlebih dahulu untuk membuat production build.
 
@@ -4173,6 +4326,54 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - Terakhir akan muncul pertanyaan `What's the name of your existing project?` <br>
   Jawab dengan nama yang kita berikan untuk project kita di dashboard vercel.
 
+## Material Tailwind
+
+Material Tailwind adalah salah satu framework CSS yang berisi kumpulan komponen desain visual yang siap digunakan untuk membangun tampilan UI pada aplikasi web. Material Tailwind didasarkan pada desain Material Design dari Google, yang menekankan pada sederhana, minimalis, dan fungsionalitas. Material Tailwind memanfaatkan framework CSS Tailwind CSS, sehingga memudahkan dalam penyesuaian tampilan dan gaya dengan cepat dan mudah. Dengan menggunakan Material Tailwind, Developer aplikasi web dapat menghemat waktu dan tetap bisa membuat tampilan UI yang menarik dan responsif. <br>
+
+Berikut cara penggunaannya di CRA:
+
+- Instal material tailwind dengan command:
+  ```
+  npm i @material-tailwind/react
+  ```
+- TailwindCSS Configurations
+  Buka file `tailwind.config.js` membungkus konfigurasi tailwind css dengan fungsi withMT() dari @material-tailwind/react/utils.
+
+  ```
+  const withMT = require("@material-tailwind/react/utils/withMT");
+
+  module.exports = withMT({
+    content: ["./src/**/*.{js,jsx,ts,tsx}"],
+    theme: {
+      extend: {},
+    },
+    plugins: [],
+  });
+  ```
+
+- Testing
+  Selanjutnya kita bisa cek apakah proses konfigurasi material tailwind kita sudah berhasil atau belum di file `App.js` menggunakan komponen button seperti berikut:
+
+  ```
+  import { Button } from "@material-tailwind/react";
+  import React from "react";
+
+  function App() {
+    return (
+      <div>
+        <h1 className="text-3xl font-bold text-red-700 underline">
+          Hello world!
+        </h1>
+        <Button>Button</Button>
+      </div>
+    );
+  }
+
+  export default App;
+  ```
+
+  Jika di dalam browser kita tampil tulisan Hello world! berwarna merah dan underline serta muncul button maka konfigurasi material tailwind kita berhasil.
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
@@ -4183,3 +4384,4 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - [[6] devsaurus.com/](https://devsaurus.com/)
 - [[7] redux.js.org/](https://redux.js.org/)
 - [[8] https://tailwindcss.com/](https://tailwindcss.com/)
+- [[9] yutube.com/@reactjsBD](https://www.youtube.com/@reactjsBD)
