@@ -305,6 +305,20 @@ width: 287, height: 386 }} >
 
 Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
 
+### Atribute Loading
+
+Atribut loading pada tag `<img>` digunakan untuk mengontrol perilaku browser ketika memuat gambar. Ada 3 value yang dapat diberikan pada atribut loading, yaitu:
+
+- "eager": Gambar akan langsung dimuat saat halaman dimuat. Cocok untuk gambar yang penting dan kecil ukurannya.
+- "lazy": Gambar akan dimuat hanya ketika gambar tersebut mendekati viewport atau bagian halaman yang sedang ditampilkan. Cocok untuk gambar yang besar ukurannya dan tidak terlalu penting.
+- "auto": Nilai default pada atribut loading, browser akan menentukan sendiri apakah gambar akan langsung dimuat atau dimuat secara lazy.
+
+Berikut contoh penggunaannya:
+
+```
+<img src="gambar.jpg" loading="lazy" alt="gambar">
+```
+
 ## Penggunaan Atribute target="\_blank" di tag `<a>`
 
 Agar tidak terkena warning saat menggunan atribute `target ="_blank"` di tag `<a>` kita harus menambahkan atribute `rel="noopener noreferrer"`. Berikut contoh penggunaannya di coding:
