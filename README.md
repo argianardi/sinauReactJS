@@ -4388,6 +4388,32 @@ Berikut cara penggunaannya di CRA:
 
   Jika di dalam browser kita tampil tulisan Hello world! berwarna merah dan underline serta muncul button maka konfigurasi material tailwind kita berhasil.
 
+## Smantic Commit Messages
+
+Berikut adalah rekomendasi keterangan commit sesuai semantik beserta keywords yang sesuai [[10]](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716):
+
+- Fix: Digunakan untuk perbaikan bug atau kesalahan pada kode.
+  Contoh: Fix typo in header component (#123)
+  Keywords: bug, fix, issue, resolve
+- Feat: Digunakan untuk menambahkan fitur baru pada aplikasi atau kode.
+  Contoh: Add login functionality to app (#456)
+  Keywords: feature, enhancement, add
+- Style: Digunakan untuk perubahan pada tampilan atau styling dari kode tanpa merubah fungsionalitas.
+  Contoh: Change color of navbar to blue (#789)
+  Keywords: style, design, cosmetic
+- Refactor: Digunakan untuk perubahan pada kode yang dilakukan untuk meningkatkan kualitas dan memperbaiki struktur kode tanpa mengubah fungsionalitas.
+  Contoh: Refactor code to use arrow functions (#234)
+  Keywords: refactor, improvement, optimize
+- Chore: Digunakan untuk perubahan pada kode yang tidak terkait dengan fungsionalitas, seperti pengaturan konfigurasi atau update dependensi.
+  Contoh: Update dependencies to latest version (#567)
+  Keywords: chore, maintenance, update
+- Test: Digunakan untuk perubahan pada kode yang berkaitan dengan pengujian atau testing.
+  Contoh: Add unit test for login component (#890)
+  Keywords: test, testing, unit test
+- Docs: Digunakan untuk perubahan pada dokumentasi seperti README atau dokumentasi kode.
+  Contoh: Update README with instructions for installation (#1234)
+  Keywords: docs, documentation, readme
+
 ## Referensi
 
 - [[1] beta.reactjs.org](https://beta.reactjs.org)
@@ -4399,3 +4425,4 @@ Berikut cara penggunaannya di CRA:
 - [[7] redux.js.org/](https://redux.js.org/)
 - [[8] https://tailwindcss.com/](https://tailwindcss.com/)
 - [[9] yutube.com/@reactjsBD](https://www.youtube.com/@reactjsBD)
+- [[10] https://gist.github.com/joshbuchea/](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716)
