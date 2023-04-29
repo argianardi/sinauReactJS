@@ -909,6 +909,67 @@ export default Home;
 
 Hasilnya, setiap kita ketikkan text di dalam component input itu, maka `console.log('Always rendered.')` akan selalu dijalankan. Hal ini bisa menyebabkan crash atau memory leak.
 
+## Warnig 'Missing Dependency' saat menggunakan useEffect
+
+Saat kita menjalankan code ini:
+
+```
+// get products by category
+  const getProductsByCategory = async () => {
+    await productAPI
+      .get(`/category/${product.category}`)
+      .then((res) => {
+        setProductsByCategory(res.data.products);
+      })
+      .catch((err) => {
+        setProductsByCategoryError(err.message);
+        console.log(err.message);
+      })
+      .finally(() => {
+        setProductsByCategoryLoading(false);
+      });
+  };
+
+  useEffect(() => {
+    getProductsByCategory();
+  }, [product.category]);
+```
+
+Maksud dari code di atas adalah ketika komponen di-mount, maka fungsi `getProductsByCategory()` akan dijalankan dan melakukan request ke API untuk mendapatkan produk berdasarkan kategori tertentu dan Fungsi `getProductsByCategory() ` hanya dijalankan kembali jika product.category berubah. Tetapi kita akan mendapatkan warning `missing dependency` seperti ini:
+
+```
+Line 68:6:   React Hook useEffect has a missing dependency: 'getProductsByCategory'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+```
+
+Untuk mengatasi solusi tersebut kita bisa memasukkan `getProductsByCategory` ke dalam array dependency di useEffect dan menambahkan useCallback, seperti ini:
+
+```
+const getProductsByCategory = useCallback(async () => {
+    await productAPI
+      .get(`/category/${product.category}`)
+      .then((res) => {
+        setProductsByCategory(res.data.products);
+      })
+      .catch((err) => {
+        setProductsByCategoryError(err.message);
+        console.log(err.message);
+      })
+      .finally(() => {
+        setProductsByCategoryLoading(false);
+      });
+  }, [product.category]);
+
+  useEffect(() => {
+    getProductsByCategory();
+  }, [getProductsByCategory]);
+```
+
+Code di atas adalah contoh penggunaan useCallback dan useEffect pada React Hooks:
+
+- Fungsi useCallback digunakan untuk menghindari eksekusi fungsi yang sama secara berulang setiap kali komponen dirender ulang. Dalam hal ini, fungsi `getProductByCategory` hanya akan dieksekusi ketika product.category berubah.
+- Fungsi useEffect digunakan untuk menjalankan side effect pada komponen React, seperti mengambil data dari server atau melakukan manipulasi DOM. Dalam contoh ini, side effect-nya adalah memanggil fungsi `getProductByCategory` setiap kali product.category berubah.
+- Dengan menggunakan useCallback dan useEffect bersama-sama, kita dapat menghindari eksekusi fungsi yang sama secara berulang ketika komponen dirender ulang dan memastikan bahwa side effect terjadi hanya ketika dependensi yang dibutuhkan berubah.
+
 ## Setting json-server (fake api)
 
 Berikut langkah - langkah untuk setting fake api menggunakan json-server [[4]](https://www.youtube.com/watch?v=P58T93q9QrE&list=PLW-kCRbRHdAGefLJN0PbmcGz5zp6Kt0Ut&index=12&t=4s):
@@ -4387,6 +4448,39 @@ Berikut cara penggunaannya di CRA:
   ```
 
   Jika di dalam browser kita tampil tulisan Hello world! berwarna merah dan underline serta muncul button maka konfigurasi material tailwind kita berhasil.
+
+## Kumpulan Fitur
+
+### Fitur copy teks ke clipboard
+
+Untuk membuat fitur copy teks ke clipbord kita dapat menggunakan clipboard API dari Web APIs javascript. Berikut langkah - langkahnya:
+
+- Buat state pada komponen yang ingin di-copy ke clipboard
+
+```
+const [password, setPassword] = useState(null);
+
+```
+
+- Buat sebuah button atau elemen yang dapat di-click, dan tambahkan event onClick untuk memanggil fungsi untuk men-copy state ke clipboard
+
+```
+<button onClick={handleCopyClick}>
+  <AiOutlineCopy />
+</button>
+```
+
+- Buat fungsi handleCopyClick untuk menyalin isi state ke clipboard dengan menggunakan `navigator.clipboard.writeText`
+
+```
+ const handleCopyClick = () => {
+    if (password) {
+      navigator.clipboard.writeText(password);
+    }
+  };
+```
+
+Maksud dari `navigator.clipboard.writeText(password)` adalah menyalin teks yang disimpan dalam variabel `password` ke clipboard pengguna. Fungsi `writeText()` dari `clipboard` API digunakan untuk menyalin teks ke clipboard. `navigator` adalah objek global pada browser yang berisi informasi tentang browser dan lingkungan pengguna. Sedangkan `clipboard` adalah bagian dari `navigator` yang memberikan akses ke clipboard pengguna.
 
 ## Smantic Commit Messages
 
