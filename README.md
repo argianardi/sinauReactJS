@@ -4591,7 +4591,48 @@ const [password, setPassword] = useState(null);
   };
 ```
 
-Maksud dari `navigator.clipboard.writeText(password)` adalah menyalin teks yang disimpan dalam variabel `password` ke clipboard pengguna. Fungsi `writeText()` dari `clipboard` API digunakan untuk menyalin teks ke clipboard. `navigator` adalah objek global pada browser yang berisi informasi tentang browser dan lingkungan pengguna. Sedangkan `clipboard` adalah bagian dari `navigator` yang memberikan akses ke clipboard pengguna.
+Maksud dari `navigator.clipboard.writeText(password)` adalah menyalin teks yang disimpan dalam variabel `password` ke clipboard user. Fungsi `writeText()` dari `clipboard` API digunakan untuk menyalin teks ke clipboard. `navigator` adalah objek global pada browser yang berisi informasi tentang browser dan lingkungan pengguna. Sedangkan `clipboard` adalah bagian dari `navigator` yang memberikan akses ke clipboard user.
+
+### Fitur Ganti Content(icon) Button Dalam Beberapa Detik
+
+Untuk membuat fitur ini kita bisa menggunakan `state` dan `setTimeout` untuk membuat icon berubah selama 3 detik sebelum kembali ke icon awal. Berikut adalah contoh implementasinya:
+
+```
+import React, { useState } from "react";
+import { AiOutlineCopy, AiOutlineCheck } from "react-icons/ai";
+
+function ExampleComponent() {
+  const [copied, setCopied] = useState(false);
+  const [password, setPassword] = useState("password123");
+
+const handleCopyClick = () => {
+    if (password) {
+      navigator.clipboard.writeText(password);
+      setCopied(true);
+      setTimeout(() => {
+        setCopied(false);
+      }, 3000);
+    }
+  };
+
+  return (
+    <div>
+      {password && (
+        <div className="bg-baltic-sea text-white px-4 py-2 break-all flex justify-between items-center w-[20rem] mb-4 ">
+          <div className="text-xl">{password}</div>
+          <button onClick={handleCopyClick}>
+            {copied ? <AiOutlineCheck /> : <AiOutlineCopy />}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default ExampleComponent;
+```
+
+Code di atas menunjukkan sebuah button yang memiliki 2 icon, yaitu `AiOutlineCopy` dan `AiOutlineCheck`. Ketika button di klik, maka akan meng-copy password dan set state copied menjadi true selama 3 detik sebelum kembali ke icon awal. Icon pada button akan berubah sesuai dengan state copied.
 
 ### Fitur Active Link
 
