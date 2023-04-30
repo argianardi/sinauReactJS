@@ -1,3 +1,143 @@
+<!-- ## Key Word -->
+
+- [Persiapan Project](#persiapan-project)
+- <details open>
+    <summary><a href="#props">Props</a></summary>
+    <ul>
+      <li><a href="#props-1">Props</a></li>
+      <li><a href="#default-props">Default Props</a></li>
+    </ul>
+  </details>
+- <details open>
+    <summary><a href="#state-dan-usestate">State dan useState</a></summary>
+    <ul>
+      <li><a href="#state">state</a></li>
+      <li><details open>
+        <summary><a href="#usestate">useState</a></summary>
+        <ul>
+          <li><a href="#usestate-untuk-object">useState Untuk Object</a></li>
+          <li><a href="#usestate-untuk-nesting-object">useState Untuk Nesting Object</a></li>
+        </ul>
+      </details></li>
+    </ul>
+  </details>
+- <details open>
+      <summary><a href="#image">Image</a></summary>
+      <ul>
+        <li><a href="#dari-local">Dari Local</a></li>
+        <li><a href="#dari-url">Dari URL (server lain)</a></li>
+        <li><a href="#atribute-loading">Atribute Loading</li>
+      </ul>
+    </details>
+- [Inline Style](#inline-style)
+- [Atribute Blank di tag <a>](#atribute-target-blank-di-tag-a)
+- <details open>
+      <summary><a href="#conditional-rendering">Conditional Rendering</a></summary>
+      <ul>
+        <li><a href="#penerapan-conditional-rendering-untuk-login">Penerapan Conditional Rendering Untuk Login</a></li>
+        <li><a href="#penerapan-conditional-rendering-untuk-utiliti-class-di-element-html"> Penerapan Conditional Rendering Untuk Utility Class Di Element HTML</li>
+      </ul>
+    </details>
+- [List Rendering](#list-rendering)
+- [Event Handler](#event-handler)
+- <details open>
+      <summary><a href="#react-router">React Router</a></summary>
+      <ul>
+        <li><a href="#install-react-router">Install React Router</a></li>
+        <li>
+         <a href="#konfigurasi-router">Konfigurasi React Router</a>
+        </li>
+        <li>
+         <a href="#link">Link</a>
+        </li>
+        <li>
+         <a href="#useparams">useParams</a>
+        </li>
+        <li>
+         <a href="#usenavigate">useNavigate</a>
+        </li>
+      </ul>
+    </details>
+- [useEffect](#useeffect)
+- [Warnig Missing Dependency Saat Menggunakan Useeffect](#warnig-missing-dependency-saat-menggunakan-useeffect)
+- [Setting Jason Server Fake Api](#setting-json-server-fake-api)
+- <details open>
+      <summary><a href="#crud-postgetputdelete-request">CRUD API Request</a></summary>
+      <ul>
+        <li><a href="#get-request">Get Request</a></li>
+        <li>
+         <a href="#post-request">Post Request</a>
+        </li>
+        <li>
+         <a href="#delete-request">Delete Request</a>
+        </li>
+        <li>
+         <a href="#put-request">PUT Request</a>
+        </li>
+      </ul>
+    </details>
+- <details open>
+      <summary><a href="#redux">Redux</a></summary>
+      <ul>
+        <li><a href="#prepare--get-request">Prepare And Get Request</a></li>
+        <li>
+         <a href="#post-request-1">Post Request</a>
+        </li>
+        <li>
+         <a href="#delete-request-1">Delete Request</a>
+        </li>
+        <li>
+         <a href="#update-data">Update Data</a>
+        </li>
+      </ul>
+    </details>
+- <details open>
+    <summary><a href="#redux-toolkit">Redux Toolkit</a></summary>
+    <ul>
+      <li><a href="#prepare">Prepare</a></li>
+      <li><a href="#buat-slice">Buat Slice</a></li>
+      <li><a href="#buat-store">Buat Store</a></li>
+      <li><a href="#menampilkan-state">Menampilkan State</a></li>
+      <li><a href="#update-state">Update State</a></li>
+      <li><details open>
+        <summary><a href="#fetching-api-menggunakan-redux-toolkit">Fetching API Menggunakan Redux Toolkit</a></summary>
+        <ul>
+          <li><a href="#get-request-1">Get Request</a></li>
+          <li><a href="#post-request-2">Post Request</a></li>
+          <li><a href="#delete-request-2">Delete Request</a></li>
+          <li><a href="#put-request-1">PUT Request</a></li>
+        </ul>
+      </details></li>
+    </ul>
+  </details>
+- [Redux Persist](#redux-persist)
+- [Tailwind CSS](#tailwind-css)
+- <details open>
+      <summary><a href="#deploy-project-menggunakan-vercel">Deploy Project Menggunakan Vercel</a></summary>
+      <ul>
+        <li>
+         <a href="#deploy-melalui-website-vercel">Deploy Melalui Website Vercel</a>
+        </li>
+        <li>
+         <a href="#deploy-melalui-cli-vercel---prod">Deploy Melalui CLI Vercel</a>
+        </li>
+      </ul>
+    </details>
+- [Material Tailwind](#material-tailwind)
+- <details open>
+      <summary><a href="#kumpulan-fitur">Kumpulan Fitur</a></summary>
+      <ul>
+        <li>
+         <a href="#fitur-copy-teks-ke-clipboard">Fitur Copy Teks Ke Clipboard</a>
+        </li>
+        <li>
+         <a href="#fitur-active-link">Fitur Active Link</a>
+        </li>
+      </ul>
+    </details>
+- [Semantic Commit Messages](#smantic-commit-messages)
+- [Referensi](#referensi)
+
 ## Roadmap
 
 Untuk alur belajar react kita bia mengikuti roadmap [ini](https://roadmap.sh/react).
@@ -8,7 +148,7 @@ Untuk alur belajar react kita bia mengikuti roadmap [ini](https://roadmap.sh/rea
   Untuk install react js buat folder baru dengan nama aplikasi yang akan kita buat, kemudian buka folder tersebut dengan cli atau vs code langsung dan command:
 
   ```
-      npx create-react-app .
+  npx create-react-app .
   ```
 
 - Rapikan file dan folder bawaan react. Berikut langkah – langkah untuk merapikan file dan folder kita:
@@ -293,18 +433,6 @@ Berdasarkan sumber sourcenya terdapat dua cara untuk menampilkan image.
 <img src={"https://source.unsplash.com/600x400"} alt="img" />
 ```
 
-## Inline Style
-
-Untuk menambahkan inline style css dapat dilakukan dengan cara berikut:
-
-```
-<div className="rounded-xl overflow-hidden card-shadow relative" style={{
-width: 287, height: 386 }} >
-</div>
-```
-
-Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
-
 ### Atribute Loading
 
 Atribut loading pada tag `<img>` digunakan untuk mengontrol perilaku browser ketika memuat gambar. Ada 3 value yang dapat diberikan pada atribut loading, yaitu:
@@ -319,7 +447,19 @@ Berikut contoh penggunaannya:
 <img src="gambar.jpg" loading="lazy" alt="gambar">
 ```
 
-## Penggunaan Atribute target="\_blank" di tag `<a>`
+## Inline Style
+
+Untuk menambahkan inline style css dapat dilakukan dengan cara berikut:
+
+```
+<div className="rounded-xl overflow-hidden card-shadow relative" style={{
+width: 287, height: 386 }} >
+</div>
+```
+
+Pada ukuran width dan height, satuannya otomatis dibuat dalam bentuk px.
+
+## Atribute target blank di tag `<a>`
 
 Agar tidak terkena warning saat menggunan atribute `target ="_blank"` di tag `<a>` kita harus menambahkan atribute `rel="noopener noreferrer"`. Berikut contoh penggunaannya di coding:
 
@@ -1122,70 +1262,6 @@ const Home = () => {
 export default Home;
 ```
 
-### Delete Request
-
-Untuk melakukan post request kita membuatuhkan parameter berupa id dari item yang akan kita hapus. Di dalam function delete request kita harus menambahkan functin get request agar kita mendapatkan data terbaru setelah kita menghapus item. Dan terakhir kita harus menambahkan function delete request ke even handler onClick di button.
-
-```
-import React, { useEffect, useState } from "react";
-import ContactList from "./ContactList";
-import Api from "../api/contactApi";
-
-const Home = () => {
-  const [contacts, setContacts] = useState([]);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    getContacts();
-  }, []);
-
-  const getContacts = async () => {
-    await Api.get("/contacts")
-      .then((res) => {
-        setContacts(res.data);
-      })
-      .catch((err) => {
-        setError(err.message);
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
-
-//-------------------------------------------------------------------------
-  const handleDelete = async (id) => {
-    await Api.delete(`/contacts/${id}`).then((res) => {
-      getContacts();
-    });
-  };
-//-------------------------------------------------------------------------
-
-  return (
-    <div>
-      <div className="home">
-        {loading && <div>loading..........</div>}
-        <h3>Contact List</h3>
-        {error && <div>{error}</div>}
-
-        {contacts.map((contact) => (
-          <ContactList
-            key={contact.id}
-            name={contact.name}
-            number={contact.number}
-      //-------------------------------------------------------------------------
-            onDelete={() => handleDelete(contact.id)}
-      //-------------------------------------------------------------------------
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
-
-export default Home;
-```
-
 ### Post Request
 
 Untuk membuat post kita harus menyiapkan function yang berfungsi untuk melakukan post request yang nantinya dijadikan value untuk event onSubmit di tag form, di dalamnya terdapat:
@@ -1261,6 +1337,70 @@ const Create = () => {
 };
 
 export default Create;
+```
+
+### Delete Request
+
+Untuk melakukan post request kita membuatuhkan parameter berupa id dari item yang akan kita hapus. Di dalam function delete request kita harus menambahkan functin get request agar kita mendapatkan data terbaru setelah kita menghapus item. Dan terakhir kita harus menambahkan function delete request ke even handler onClick di button.
+
+```
+import React, { useEffect, useState } from "react";
+import ContactList from "./ContactList";
+import Api from "../api/contactApi";
+
+const Home = () => {
+  const [contacts, setContacts] = useState([]);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getContacts();
+  }, []);
+
+  const getContacts = async () => {
+    await Api.get("/contacts")
+      .then((res) => {
+        setContacts(res.data);
+      })
+      .catch((err) => {
+        setError(err.message);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+//-------------------------------------------------------------------------
+  const handleDelete = async (id) => {
+    await Api.delete(`/contacts/${id}`).then((res) => {
+      getContacts();
+    });
+  };
+//-------------------------------------------------------------------------
+
+  return (
+    <div>
+      <div className="home">
+        {loading && <div>loading..........</div>}
+        <h3>Contact List</h3>
+        {error && <div>{error}</div>}
+
+        {contacts.map((contact) => (
+          <ContactList
+            key={contact.id}
+            name={contact.name}
+            number={contact.number}
+      //-------------------------------------------------------------------------
+            onDelete={() => handleDelete(contact.id)}
+      //-------------------------------------------------------------------------
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Home;
 ```
 
 ### Put Request
@@ -1363,35 +1503,6 @@ const Create = () => {
 
 export default Create;
 ```
-
-## Active Link
-
-Active Link ini digunakan di dalam component navbar untuk membuat salah satu menu navigasinya memiliki style yang berbeda (bisanya warnanya lebih gelap atau lebih terang atu bisa juga di beri underline) yang menandakan bahwa menu tersebut sedang active, yang berarti bahwa kita sedang berada di page tempat path menu navigasi tersebut. Untuk bisa menggunakannya kita harus import NavLink dari react-router-dom.
-
-```
-import React from "react";
-import { NavLink } from "react-router-dom";
-
-const Navbar = () => {
-  return (
-    <nav>
-      <h1>Phone Contact</h1>
-      <div className="nav-menu">
-        <NavLink to="/" activeclassname="active">
-          Home
-        </NavLink>
-        <NavLink to="create" activeclassname="active">
-          New Contact
-        </NavLink>
-      </div>
-    </nav>
-  );
-};
-
-export default Navbar;
-```
-
-Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassname"active"` artinya saat kita berada di page dengan path `/`, class `active` tersebut akan dijalankan. Di mana class `active` inilah yang akan membuat style pada menu navbar dengan path `/` ini akan berbeda. class `active` tersebut bisa kita set sendiri.
 
 ## Redux
 
@@ -4386,7 +4497,7 @@ Berikut ini adalah langkah-langkah untuk melakukan deploy project React mengguna
 - Kamu juga dapat mengatur konfigurasi deployment dan domain pada halaman "Settings" di dashboard project kamu.
 - Setelah kamu melakukan perubahan di repository Git kamu, Vercel secara otomatis akan melakukan build dan deploy ulang. Kamu dapat melihat riwayat build dan deploy pada halaman "Deployments" di dashboard project kamu.
 
-### Deploy melalui ClI (vercel --prod)
+### Deploy melalui CLI (vercel --prod)
 
 - Clone repository di komputer lokal.
 - Jalankan perintah `npm run build` untuk membuild aplikasi.
@@ -4481,6 +4592,35 @@ const [password, setPassword] = useState(null);
 ```
 
 Maksud dari `navigator.clipboard.writeText(password)` adalah menyalin teks yang disimpan dalam variabel `password` ke clipboard pengguna. Fungsi `writeText()` dari `clipboard` API digunakan untuk menyalin teks ke clipboard. `navigator` adalah objek global pada browser yang berisi informasi tentang browser dan lingkungan pengguna. Sedangkan `clipboard` adalah bagian dari `navigator` yang memberikan akses ke clipboard pengguna.
+
+### Fitur Active Link
+
+Active Link ini digunakan di dalam component navbar untuk membuat salah satu menu navigasinya memiliki style yang berbeda (bisanya warnanya lebih gelap atau lebih terang atu bisa juga di beri underline) yang menandakan bahwa menu tersebut sedang active, yang berarti bahwa kita sedang berada di page tempat path menu navigasi tersebut. Untuk bisa menggunakannya kita harus import NavLink dari react-router-dom.
+
+```
+import React from "react";
+import { NavLink } from "react-router-dom";
+
+const Navbar = () => {
+  return (
+    <nav>
+      <h1>Phone Contact</h1>
+      <div className="nav-menu">
+        <NavLink to="/" activeclassname="active">
+          Home
+        </NavLink>
+        <NavLink to="create" activeclassname="active">
+          New Contact
+        </NavLink>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
+```
+
+Pada menu tag `<NavLink to="/" activeclassname="active">` terdapat `activeclassname"active"` artinya saat kita berada di page dengan path `/`, class `active` tersebut akan dijalankan. Di mana class `active` inilah yang akan membuat style pada menu navbar dengan path `/` ini akan berbeda. class `active` tersebut bisa kita set sendiri.
 
 ## Smantic Commit Messages
 
