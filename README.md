@@ -4690,75 +4690,111 @@ Ada empat tag kunci yang digunakan dalam React Beautiful DND untuk mengatur inte
   Tag `<Draggable />` mendefinisikan elemen yang dapat di-drag. Ini berarti kita dapat menentukan bagian-bagian aplikasi yang pengguna bisa menarik dan memindahkan ke zona-zona yang ditentukan oleh tag `<Droppable />`. Dalam tag ini, kita harus menetapkan properti draggableId, yang digunakan untuk mengidentifikasi elemen yang di-drag, serta index yang menentukan posisi elemen dalam daftar elemen yang bisa di-drag. Tag `<Draggable />` bekerja di dalam <DragDropContext />, dan elemen-elemen ini yang akan dipindahkan oleh pengguna saat drag-and-drop dilakukan.
 - `resetServerContext()` <br/>
 
-#### Tag Droppable
+### Implementasi react-beautiful-dnd di Aplikasi Kanban Board
 
-Di dalam aplikasi ini kita import dan gunakan tag Droppable di komponen Column, yang selanjutnya komponen Column ini akan dipanggil di komponen KanbanBoard
+Untuk mempelajari lebih lanjut tentang react-beautiful-dnd kita langsung praktekkan di aplikasi kanban board, menggunakan react js yang diintgrasi menggunakan [vite](https://vitejs.dev/guide/), stiling menggunakan tailwind css, dan tentu saja menggunakan [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd/tree/master). Untuk sorce code tersimpan [disini](https://github.com/argianardi/sinauReactBeautifulDND/tree/main) dan dmo apliksinya bisa dilihat [disini](https://ninjaway.vercel.app)
+
+#### Buat Droppable Area
+
+Droppable Area adalah zona/area yang dapat menerima elemen atau item yang sedang di-drag oleh user atau bisa dibilang tempat/area tujuan untuk elemen yang didrag/dipindahkan oleh user. Area ini dibuat menggunakan tag Droppable (dibungkus menggunakan tag Droppable).
+
+Di dalam aplikasi ini kita import dan gunakan tag Droppable di komponen Column, yang selanjutnya komponen Column ini akan dipanggil di komponen KanbanBoard. Selanjutnya komponen KanbanBoard ini dipanggil di Komponen App.
 
 ```
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
-import { styled } from 'styled-components';
-
-const Container = styled.div`
-  background-color: #f4f5f7;
-  border-radius: 2.5px;
-  width: 300px;
-  height: 475px;
-  overflow-y: scroll;
-  -ms-overflow-style: none;
-  border: 1px solid gray;
-`;
-
-const Title = styled.h3`
-  padding: 8px;
-  background-color: pink;
-  text-align: center;
-`;
-
-const TaskList = styled.div`
-  padding: 3px;
-  transition: background-color 0.2s ease;
-  background-color: #f4f5f7;
-  flex-grow: 1;
-  min-height: 100px;
-`;
+import Task from './Task';
 
 const Column = ({ title, tasks, id }) => {
   return (
-    <Container className="column">
-      <Title style={{ backgroundColor: 'lightblue', position: 'sticky' }}>
-        {title}
-      </Title>
-
+    <div className="column w-80 h-[475px] bg-[#f4f5f7] rounded-sm border-[1px] border-gray-400">
+      <h3 className="sticky top-0 p-2 text-center bg-[#add8e6]">{title}</h3>
       <Droppable droppableId={id}>
-        {(provided, snapshot) => {
-          <TaskList
+        {(provided, snapshot) => (
+          <div
+            className={`p-1 min-h-[100px] flex flex-col gap-3 transition-all duration-1000 ${
+              snapshot.isDraggingOver ? 'bg-green-400' : 'bg-transparent'
+            }`}
             ref={provided.innerRef}
             {...provided.droppableProps}
-            isDraggingOver={snapshot.isDraggingOver}
           >
+            {tasks.map((task, index) => (
+              <Task key={index} index={index} task={task} />
+            ))}
             {provided.placeholder}
-          </TaskList>;
-        }}
+          </div>
+        )}
       </Droppable>
-    </Container>
+    </div>
   );
 };
 
 export default Column;
 ```
 
-- Di dalam komponen Column, kita mendefinisikan beberapa komponen styled-components seperti Container, Title, dan TaskList, yang akan menentukan tampilan CSS dari elemen-elemen di dalam komponen Column.
-- Pada baris `<Droppable droppableId={id}>`, Kita menggunakan komponen `<Droppable />` dari React Beautiful DND. Komponen ini bertindak sebagai zona yang dapat menerima elemen yang di-drop oleh user.
-- Di dalam komponen `<Droppable />`, Kita menggunakan render prop (fungsi sebagai child) untuk menentukan tindakan yang akan diambil oleh komponen <Droppable />. Fungsi ini menerima dua argumen, yaitu provided dan snapshot.
-- provided: Objek ini berisi properti dan fungsi yang harus diberikan ke elemen yang akan di-drop (biasanya `<div>`).
-- snapshot: Objek ini berisi informasi tentang keadaan saat ini dari zona drop, seperti apakah ada elemen yang sedang di-drag di atas zona ini atau tidak.
-- Di dalam fungsi render prop, Kita mendefinisikan komponen `<TaskList>` sebagai area yang menampilkan tugas-tugas (tasks) yang di-drop ke zona ini. Kita menggunakan provided.innerRef dan provided.droppableProps sebagai bagian dari atribut dari elemen `<TaskList>`. provided.innerRef akan mengatur ref untuk elemen yang harus didrop, sedangkan provided.droppableProps akan menambahkan atribut yang dibutuhkan untuk mengimplementasikan drag-and-drop ke elemen tersebut.
-- {provided.placeholder} adalah placeholder (penampung sementara) yang diberikan oleh komponen `<Droppable />`. Placeholder ini digunakan untuk mengatur tampilan saat tidak ada elemen yang di-drop ke zona ini.
+[Source code](https://github.com/argianardi/sinauReactBeautifulDND/blob/main/src/components/Column.jsx)
 
-Dengan menggunakan `<Droppable />` dan fungsi render prop, Kita membuat area (zona) di komponen Column yang dapat menerima elemen yang di-drop. Ketika ada elemen yang di-drag dan diarahkan ke zona ini, maka zona tersebut akan menampilkan elemen-elemen yang di-drop tersebut, serta menampilkan placeholder saat tidak ada elemen yang di-drop. Semua fitur ini diatur oleh React Beautiful DND melalui penggunaan komponen `<Droppable />` dan render prop pada komponen Column.
+##### droppableId
+
+- Pada baris `<Droppable droppableId={id}>`, Kita menggunakan tag `<Droppable />` dari react-beautiful-dnd.
+- Tag ini bertindak sebagai zona yang dapat menerima / tempat tujuan elemen yang di-drag oleh user.
+- Tag `<Droppable/>` ini memiliki properti `droppableId` yang sifatnya required/wajib.
+- Maksud dari `droppableId` digunakan untuk menandai area tujuan di mana elemen dapat diterima/di-drop saat sedang di-drag (drop area).
+- Di Contoh [ini](https://ninjaway.vercel.app) adalah di area column Todo, Done dan Backlog, Sehingga nantinya `droppableId` akan diisi dengan id ketiga area tersebut (Todo, Done dan Backlog).
+- droppableId harus bertipe string.
+
+##### Children function
+
+- Selanjutnya di dalam Tag `<Droppable />`, Kita menggunakan render prop (fungsi sebagai child) untuk menentukan tindakan yang akan diambil oleh Tag `<Droppable />`. Children function ini digunakan untuk mengatur tampilan dan logika pada area droppable.
+- Fungsi ini menerima dua argumen, yaitu provided dan snapshot.
+- provided <br/> Objek ini berisi properti dan fungsi yang harus diberikan ke elemen yang akan di-drop (biasanya `<div>`).
+- snapshot <br/> Objek ini berisi informasi tentang keadaan saat ini dari zona drop, seperti apakah ada elemen yang sedang di-drag di atas zona ini atau tidak.
+- Di dalam tag `<Droppable/>`, terdapat elemen `div` yang digunakan sebagai wadah untuk menampilkan tugas-tugas dalam kolom. Beberapa hal yang dilakukan oleh elemen `div` ini:
+
+  - Memiliki gaya tertentu dan dinamis berdasarkan `snapshot.isDraggingOver` (boolean).
+  - Jika isDraggingOver bernilai true, maka backgroundnya akan berubah menjadi `bg-green-400`, jika tidak backgroundnya menjadi `bg-transparent`.
+
+- ref={provided.innerRef} <br/> Properti ref ini diperlukan untuk memastikan elemen dalam Droppable (dalam hal ini, elemen div) dapat di-render dengan benar ketika item di-drag. provided.innerRef akan dihubungkan ke elemen tersebut sehingga react-beautiful-dnd dapat mengontrolnya dan menentukan lokasi di mana elemen dijalankan saat di-drag.
+
+- {...provided.droppableProps} <br/> Properti ini digunakan untuk memasukkan props yang diperlukan agar elemen berfungsi sebagai zona drop (droppable area). react-beautiful-dnd menyediakan props khusus yang perlu dioperasikan agar zona drop dapat berfungsi, dan ini mencakup props seperti onDragEnter, onDragLeave, onDrop, dan lain-lain. Dengan menggunakan {...provided.droppableProps}, kita meneruskan semua props ini ke elemen div, sehingga elemen tersebut akan berfungsi sebagai zona drop dengan benar.
+
+- {provided.placeholder} <br/> digunakan untuk membuat ruang di `<Droppable />` sesuai kebutuhan selama drag (melepaskan item yang sedang di-drag). Ketika kita men-drag item di atas zona droppable, provided.placeholder akan ditampilkan pada posisi di mana item akan di-drop saat kita menyelesaikan operasi drag.
+
+Dengan menggunakan `<Droppable />` dan fungsi render prop, Kita membuat area di komponen Column yang dapat menerima elemen yang di-drag. Ketika ada elemen yang di-drag dan diarahkan ke area ini, maka area tersebut akan dapat menerima elemen-elemen yang di-drag tersebut, serta menampilkan placeholder saat tidak ada elemen yang di-drop. Semua fitur ini diatur oleh React Beautiful DND melalui penggunaan komponen `<Droppable />` dan render prop pada komponen Column.
 
 Selanjutnya komponen Column ini di panggil di komponen KanbanBoard
+
+```
+import React, { useEffect, useState } from 'react';
+import { DragDropContext } from 'react-beautiful-dnd';
+import Column from './Column';
+
+const KanbanBoard = () => {
+  const [completed, setCompleted] = useState([]);
+  const [inCompleted, setInCompleted] = useState([]);
+
+  return (
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <h2 className="my-3 text-center">PROGRESS BOARDS</h2>
+      <div className="flex justify-center gap-8">
+      //----------------------------------------------------------------------------------
+        <Column title={'To do'} tasks={inCompleted} id={'1'} />
+        <Column title={'Done'} tasks={completed} id={'2'} />
+        <Column title={'BackLog'} tasks={[]} id={'3'} />
+      //----------------------------------------------------------------------------------
+      </div>
+    </DragDropContext>
+  );
+};
+
+export default KanbanBoard;
+```
+
+[source code](https://github.com/argianardi/sinauReactBeautifulDND/blob/main/src/components/KanbanBoard.jsx)
+
+#### Tag DragDropContext
+
+Di dalam aplikasi ini kita import dan gunakan tag DragDropContext di komponen KanbanBoard dan selanjutnya komponen KanbanBoard ini dipanggil di Komponen App.
 
 ```
 import React, { useState } from 'react';
@@ -4766,11 +4802,12 @@ import { DragDropContext } from 'react-beautiful-dnd';
 import Column from './Column';
 
 const KanbanBoard = () => {
-const [completed, setCompleted] = useState([]);
-const [inComplete, setInCompleted] = useState([]);
-return (
+  const [completed, setCompleted] = useState([]);
+  const [inComplete, setInCompleted] = useState([]);
+  return (
     <DragDropContext>
       <h2 style={{ textAlign: 'center' }}>PROGRESS BOARDS</h2>
+
       <div
         style={{
           display: 'flex',
@@ -4779,9 +4816,7 @@ return (
           flexDirection: 'row',
         }}
       >
-      //-------------------------------------------------------------------
         <Column title={'To do'} tasks={inComplete} id={'1'} />
-      //-------------------------------------------------------------------
       </div>
     </DragDropContext>
   );
@@ -4789,6 +4824,9 @@ return (
 
 export default KanbanBoard;
 ```
+
+- Kita menggunakan komponen `<DragDropContext>` dari React Beautiful DND. Komponen ini digunakan untuk mengindikasi bahwa bagian dalam konteks ini akan mendukung drag-and-drop. Komponen `<DragDropContext>` akan mengatur dan mengawasi seluruh proses drag-and-drop dalam konteks yang diberikan.
+- Selanjutnya kita memanggil komponen `<Column>` untuk menampilkan satu kolom kanban board. Kolom ini memiliki title "To do", tasklist inComplete, dan id '1'. Komponen ini bertanggung jawab untuk menampilkan kolom dalam kanban board dengan tugas-tugas yang sesuai.
 
 ## Smantic Commit Messages
 
