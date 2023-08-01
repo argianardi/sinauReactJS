@@ -4692,13 +4692,13 @@ Ada empat tag kunci yang digunakan dalam React Beautiful DND untuk mengatur inte
 
 ### Implementasi react-beautiful-dnd di Aplikasi Kanban Board
 
-Untuk mempelajari lebih lanjut tentang react-beautiful-dnd kita langsung praktekkan di aplikasi kanban board, menggunakan react js yang diintgrasi menggunakan [vite](https://vitejs.dev/guide/), stiling menggunakan tailwind css, dan tentu saja menggunakan [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd/tree/master). Untuk sorce code tersimpan [disini](https://github.com/argianardi/sinauReactBeautifulDND/tree/main) dan dmo apliksinya bisa dilihat [disini](https://ninjaway.vercel.app)
+Untuk mempelajari lebih lanjut tentang react-beautiful-dnd kita langsung praktekkan di aplikasi kanban board, menggunakan react js yang diintgrasi menggunakan [vite](https://vitejs.dev/guide/), stiling menggunakan tailwind css, dan tentu saja menggunakan [react-beautiful-dnd](https://github.com/atlassian/react-beautiful-dnd/tree/master). Untuk sorce code tersimpan [disini](https://github.com/argianardi/sinauReactBeautifulDND/tree/main) dan demo apliksinya bisa dilihat [disini](https://ninjaway.vercel.app)
 
 #### Buat Droppable Area
 
 Droppable Area adalah zona/area yang dapat menerima elemen atau item yang sedang di-drag oleh user atau bisa dibilang tempat/area tujuan untuk elemen yang didrag/dipindahkan oleh user. Area ini dibuat menggunakan tag Droppable (dibungkus menggunakan tag Droppable).
 
-Di dalam aplikasi ini kita import dan gunakan tag Droppable di komponen Column, yang selanjutnya komponen Column ini akan dipanggil di komponen KanbanBoard. Selanjutnya komponen KanbanBoard ini dipanggil di Komponen App.
+Di dalam aplikasi ini kita import dan gunakan tag Droppable di komponen Column, yang selanjutnya komponen Column ini akan dipanggil di komponen KanbanBoard. Selanjutnya komponen KanbanBoard ini dipanggil di Komponen App. Tag Droppable dibahas lebih detail [disini](https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/droppable.md)
 
 ```
 import React from 'react';
@@ -4791,6 +4791,83 @@ export default KanbanBoard;
 ```
 
 [source code](https://github.com/argianardi/sinauReactBeautifulDND/blob/main/src/components/KanbanBoard.jsx)
+
+#### Buat Draggable Area
+
+Draggable berfungsi untuk membungkus elemen yang ingin kita izinkan untuk di-drag, sehingga elemen tersebut akan menjadi elemen yang dapat di-drag oleh user. Di dalam aplikasi ini, kita import dan gunakan tag Dragable di komponen Task, yang selanjutnya komponen Task ini akan dipanggil di komponen Column (komponen droppable). Kemudian komponen Column ini dipanggil di komponen KanbanBoard. Terakhir komponen KanbanBoard ini dipanggil di Komponen App. Tag Draggable dibahas lebih detail [disini](https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/draggable.md)
+
+```
+import React from 'react';
+import { Draggable } from 'react-beautiful-dnd';
+
+const Task = ({ task, index }) => {
+  return (
+    <Draggable draggableId={`${task.id}`} key={task.id} index={index}>
+      {(provided, snapshot) => (
+        <div
+          {...provided.draggableProps}
+          {...provided.dragHandleProps}
+          ref={provided.innerRef}
+          isDragging={snapshot.isDragging}
+          className={`${
+            snapshot.isDragging ? 'bg-blue-400' : 'bg-transparent'
+          } rounded-md transition-all duration-1000`}
+        >
+          <div className="flex items-center justify-between gap-2 px-2 py-6 shadow-md border-[1px] border-gray-200">
+            <h3 className="w-4/5 text-xs text-start">
+              {task.id}. {task.title}
+            </h3>
+            <figure className="-mt-6 border-[1px] border-gray-600 w-6 h-6 overflow-hidden rounded-full">
+              <img
+                className="w-6 h-6"
+                src={'https://joesch.moe/api/v1/random?key=' + task.id}
+                onClick={() => console.log(task)}
+              />
+            </figure>
+          </div>
+
+          {provided.placeholder}
+        </div>
+      )}
+    </Draggable>
+  );
+};
+
+export default Task;
+```
+
+[Source Code](https://github.com/argianardi/sinauReactBeautifulDND/blob/main/src/components/Task.jsx)
+
+##### Required Prop
+
+Di dalam Tag `<Draggable>` terdapat beberapa prop yang sifatnya required/wajib, Di aplikasi [KanbanBoard](https://ninjaway.vercel.app/) kita menggunakannya di tag `<Draggable draggableId={${task.id}} key={task.id} index={index}>` berikut penjelasannya:
+
+- draggableId (string) <br/> Digunakan untuk memberikan ID unik pada elemen yang di-drag. Di dalamnya, kita menggunakan template literal `(${task.id})` untuk menggabungkan ID dari objek tugas (task) sehingga ID elemen menjadi unik dan dapat diidentifikasi dengan benar. draggableId digunakan untuk memberikan ID unik pada elemen yang akan di-drag (dalam hal ini, elemen div yang mewakili task). Penggunaan draggableId sangat penting dalam react-beautiful-dnd karena ini adalah cara untuk mengidentifikasi dengan tepat elemen mana yang sedang di-drag dan elemen mana yang sedang di-drop saat berinteraksi dengan sistem drag and drop. Berikut penjelasan lebih lanjutnya:
+
+  - Pengenal Elemen yang di-drag <br/>
+    react-beautiful-dnd menggunakan draggableId untuk mengidentifikasi elemen yang di-drag dengan tepat dan mengurus proses drag and drop
+  - Pengurutan Elemen Saat Drop <br/>
+    - Ketika kita meletakkan elemen di sebuah zona droppable, react-beautiful-dnd menggunakan draggableId untuk mengetahui elemen mana yang telah di-drop.
+    - Saat elemen di-drop, react-beautiful-dnd menyediakan informasi tentang posisi (indeks) elemen yang di-drop dalam list. Informasi ini berguna untuk mengatur/mengubah posisi elemen dalam list agar sesuai dengan posisi di mana elemen di-drop secara otomatis.
+    - Dengan menggunakan draggableId sebagai pengenal, react-beautiful-dnd ini dapat dengan tepat menemukan elemen yang di-drop dalam list dan menempatkannya pada posisi yang sesuai.
+  - Mencocokkan Data dengan Benar
+    - Saat elemen di-drop di zona droppable, react-beautiful-dnd akan memberikan informasi tentang elemen yang di-drop, yaitu draggableId, dan zona droppable tempat elemen di-drop, yaitu droppableId.
+    - Karena draggableId adalah unik untuk setiap elemen yang di-drag, maka library ini dapat dengan mudah mencocokkan data elemen yang di-drop dengan data yang seharusnya berada di zona droppable tersebut.
+  - Pergerakan Elemen <br/> Saat elemen sedang di-drag, react-beautiful-dnd akan menggunakan draggableId untuk mengikuti pergerakan elemen tersebut di layar. Ini memungkinkan elemen untuk mengikuti kursor pengguna saat di-drag.
+
+- key={task.id} <br/> Properti key digunakan untuk memberikan key unik untuk list elemen yang di-render oleh React. Ini diperlukan agar React dapat membedakan antara elemen yang berbeda dalam list.
+- index={index}
+  - Properti index digunakan untuk memberikan informasi tentang posisi tugas dalam list. Ini membantu react-beautiful-dnd mengatur ulang poisi task saat task di-drop ke posisi yang benar setelah di-drag.
+  - Mengatur Urutan Elemen Saat Di-Drag <br/> Dengan menggunakan properti index, react-beautiful-dnd dapat mengurutkan ulang elemen-elemen dalam daftar secara otomatis saat elemen sedang di-drag. Misalnya, ketika Anda men-drag elemen ke posisi lain dalam daftar, properti index ini memberitahu react-beautiful-dnd di mana elemen tersebut harus ditempatkan kembali setelah di-drop.
+  - Memastikan Posisi yang Tepat <br/> Saat elemen di-drop, index digunakan untuk menentukan posisi yang tepat di mana elemen tersebut harus ditempatkan kembali dalam daftar. Dengan menggunakan nilai index, react-beautiful-dnd memastikan bahwa elemen yang di-drop akan ditempatkan di posisi yang sesuai berdasarkan pergerakan drag and drop.
+
+##### Child Function
+
+Di dalam Tag Draggable, kita menggunakan child function untuk mengatur tampilan dan logika elemen yang di-drag. Fungsi anak ini menerima dua parameter, yaitu provided dan snapshot.
+
+- {...provided.draggableProps} <br/> Properti digunakan untuk memasukkan props yang diperlukan untuk menentukan perilaku drag dan drop elemen.
+- {...provided.dragHandleProps} <br/> Properti dragHandleProps digunakan untuk menentukan elemen mana yang digunakan sebagai handle untuk men-drag elemen ini. Ini berarti kita dapat menentukan area yang dapat digunakan oleh user untuk men-drag elemen tersebut, misalnya dengan menarik dari handle tertentu.
+- ref={provided.innerRef}<br/> Properti ref ini diperlukan untuk memastikan elemen yang di-drag dapat di-render dengan benar ketika item di-drag. provided.innerRef akan dihubungkan ke elemen tersebut sehingga react-beautiful-dnd dapat mengontrolnya dan menentukan lokasi di mana elemen dijalankan saat di-drag.
 
 #### Tag DragDropContext
 
