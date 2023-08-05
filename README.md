@@ -4869,31 +4869,79 @@ Di dalam Tag Draggable, kita menggunakan child function untuk mengatur tampilan 
 - {...provided.dragHandleProps} <br/> Properti dragHandleProps digunakan untuk menentukan elemen mana yang digunakan sebagai handle untuk men-drag elemen ini. Ini berarti kita dapat menentukan area yang dapat digunakan oleh user untuk men-drag elemen tersebut, misalnya dengan menarik dari handle tertentu.
 - ref={provided.innerRef}<br/> Properti ref ini diperlukan untuk memastikan elemen yang di-drag dapat di-render dengan benar ketika item di-drag. provided.innerRef akan dihubungkan ke elemen tersebut sehingga react-beautiful-dnd dapat mengontrolnya dan menentukan lokasi di mana elemen dijalankan saat di-drag.
 
-#### Tag DragDropContext
+#### Buat DragDropContext
 
-Di dalam aplikasi ini kita import dan gunakan tag DragDropContext di komponen KanbanBoard dan selanjutnya komponen KanbanBoard ini dipanggil di Komponen App.
+Berikut penjelasan tentang tag `<DragDropContext/>`
+
+- DragDropContext adalah komponen yang harus digunakan untuk membungkus seluruh bagian aplikasi yang ingin memiliki fungsi drag and drop.
+- Ketika kita menempatkan komponen DragDropContext pada tingkat paling atas dari aplikasi (misalnya di dalam App.js), maka seluruh komponen di bawahnya dapat memiliki fungsi drag and drop.
+- DragDropContext menyediakan konteks (context) khusus yang dibutuhkan oleh komponen-komponen Droppable dan Draggable di bawahnya untuk berkomunikasi dan berkoordinasi selama proses drag and drop.
+- Properti yang paling penting dari DragDropContext adalah onDragEnd. Properti ini harus diatur dengan fungsi yang akan dipanggil ketika drag and drop selesai. Fungsi ini akan menerima sebuah objek result yang berisi informasi tentang elemen yang di-drop, asal dan tujuan zona droppable, serta data lain yang relevan.
+- Saat drag and drop selesai, DragDropContext akan mengeksekusi fungsi onDragEnd dan meneruskan objek result sebagai argumen ke fungsi tersebut.
+- Dalam fungsi onDragEnd, kita dapat menentukan logika yang ingin dilakukan ketika elemen di-drop, seperti mengatur ulang urutan data, memperbarui status, atau melakukan perubahan lainnya sesuai kebutuhan aplikasi.
+- DragDropContext juga dapat mengatur animasi dan efek visual lainnya yang terjadi saat elemen di-drag dan di-drop untuk menciptakan pengalaman drag and drop yang lebih interaktif dan menarik.
+- Komponen-komponen Droppable dan Draggable yang berada di dalam DragDropContext akan berinteraksi dengan komponen lainnya yang terlibat dalam drag and drop secara otomatis. Ketika kita memindahkan elemen dari satu zona droppable ke zona droppable lainnya, DragDropContext akan memastikan perubahan data yang sesuai agar tercermin di tampilan aplikasi.
+
+Tag DragDropContext dibahas lebih detail [di sini](https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/drag-drop-context.md).
+
+Di dalam [aplikasi kita](https://ninjaway.vercel.app/) tag DragDropContext di-import dan digunakan di komponen KanbanBoard dan selanjutnya komponen KanbanBoard ini dipanggil di Komponen App.
 
 ```
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext } from 'react-beautiful-dnd';
 import Column from './Column';
 
 const KanbanBoard = () => {
   const [completed, setCompleted] = useState([]);
-  const [inComplete, setInCompleted] = useState([]);
-  return (
-    <DragDropContext>
-      <h2 style={{ textAlign: 'center' }}>PROGRESS BOARDS</h2>
+  const [inComplete, setInComplete] = useState([]);
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'row',
-        }}
-      >
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/todos')
+      .then((response) => response.json())
+      .then((json) => {
+        setCompleted(json.filter((task) => task.completed));
+        setInComplete(json.filter((task) => !task.completed));
+      });
+  }, []);
+
+  const handleDragEnd = (result) => {
+    const { destination, source, draggableId } = result;
+
+    if (source.droppableId == destination.droppableId) return;
+
+    // Remove From Source Array
+    if (source.droppableId == 2) {
+      setCompleted(removeItemById(draggableId, completed));
+    } else {
+      setInComplete(removeItemById(draggableId, inComplete));
+    }
+
+    // Get Item
+    const task = findItemById(draggableId, [...inComplete, ...completed]);
+
+    // Add Item
+    if (destination.droppableId == 2) {
+      setCompleted([{ ...task, completed: !task.completed }, ...completed]);
+    } else {
+      setInComplete([{ ...task, completed: !task.completed }, ...inComplete]);
+    }
+  };
+
+  function findItemById(id, array) {
+    return array.find((item) => item.id == id);
+  }
+
+  function removeItemById(id, array) {
+    return array.filter((item) => item.id != id);
+  }
+
+  return (
+    <DragDropContext onDragEnd={handleDragEnd}>
+      <h2 className="my-3 text-center">PROGRESS BOARDS</h2>
+      <div className="flex justify-center gap-8">
         <Column title={'To do'} tasks={inComplete} id={'1'} />
+        <Column title={'Done'} tasks={completed} id={'2'} />
+        <Column title={'BackLog'} tasks={[]} id={'3'} />
       </div>
     </DragDropContext>
   );
@@ -4902,8 +4950,75 @@ const KanbanBoard = () => {
 export default KanbanBoard;
 ```
 
-- Kita menggunakan komponen `<DragDropContext>` dari React Beautiful DND. Komponen ini digunakan untuk mengindikasi bahwa bagian dalam konteks ini akan mendukung drag-and-drop. Komponen `<DragDropContext>` akan mengatur dan mengawasi seluruh proses drag-and-drop dalam konteks yang diberikan.
-- Selanjutnya kita memanggil komponen `<Column>` untuk menampilkan satu kolom kanban board. Kolom ini memiliki title "To do", tasklist inComplete, dan id '1'. Komponen ini bertanggung jawab untuk menampilkan kolom dalam kanban board dengan tugas-tugas yang sesuai.
+[source code](https://github.com/argianardi/sinauReactBeautifulDND/blob/main/src/components/KanbanBoard.jsx)
+
+Dari code diatas kita akan lebih banyak bahas tentang function `handleDragEnd`, function tersebut akan dipanggil di prop `onDragEnd`. Funtion `handleDragEnd` ini akan dijalankan ketika proses drag and drop elemen selesai.
+
+- `handleDragEnd` adalah fungsi yang dipanggil oleh react-beautiful-dnd saat drag and drop selesai. Function ini akan dijalankan dengan argumen result, yang berisi informasi tentang elemen yang di-drop.
+- `const { destination, source, draggableId } = result` <br/> Code ini mengambil properti destination, source, dan draggableId dari result menggunakan destructuring assignment. Properti destination adalah zona droppable tempat/tujuan elemen di-drop, source adalah zona droppable asal dari elemen yang di-drop, dan draggableId adalah ID unik dari elemen yang di-drop.
+- `if (source.droppableId == destination.droppableId) return` <br/> Ini adalah kondisi untuk memastikan bahwa jika elemen di-drop di zona droppable yang sama (tidak pindah kolom), maka tidak perlu melakukan perubahan pada data dan langsung keluar dair function `handleDragEnd`.
+- Selanjutnya di code:
+
+  ```
+  // Remove From Source Array
+    if (source.droppableId == 2) {
+      setCompleted(removeItemById(draggableId, completed));
+    } else {
+      setInComplete(removeItemById(draggableId, inComplete));
+    }
+  ```
+
+  terdapat dua kondisi yang memeriksa zona droppable asal (source.droppableId) dari elemen yang di-drop. Jika source.droppableId adalah 2 (artinya dari kolom "Done"), maka task tersebut saat ini sudah selesai dan harus dihapus dari daftar completed. Function `removeItemById` digunakan untuk menghapus task tersebut dari daftar. <br/>
+  Jika `source.droppableId` bukan 2 (artinya dari kolom "To do"), maka task tersebut saat ini belum selesai dan harus dihapus dari daftar inCompleted. Function `removeItemById` juga digunakan untuk menghapus task tersebut dari daftar.
+
+- Setelah menghapus task dari daftar yang sesuai, code menggunakan function `findItemById` untuk mencari task berdasarkan draggableId dalam gabungan daftar completed dan inCompleted.
+
+  ```
+  // Get Item
+      const task = findItemById(draggableId, [...inComplete, ...completed]);
+  ```
+
+  code function `findItemById`:
+
+  ```
+  function findItemById(id, array) {
+      return array.find((item) => item.id == id);
+    }
+  ```
+
+  Function `findItemByID` melakukan pencarian task berdasarkan id (draggableId) dalam array gabungan `inComplete` dan `completed`
+    <details open>
+     <summary>Penjelasan lebih detail</summary>
+
+  - Di code `findItemById(draggableId, [...inComplete, ...completed])` Kita memanggil function `findItemById` dengan dua argumen. Argumen pertama (draggableId) adalah id dari task yang ingin dicari, dan argumen kedua adalah array gabungan dari dua array, yaitu `inComplete` dan `completed`.
+  - Dibagian `...inComplete` dan `...completed` merupakan spread Operator (...) digunakan untuk menyalin seluruh elemen dari array inComplete dan completed ke dalam array gabungan. Ini dilakukan agar kita tidak memodifikasi array asli inComplete dan completed saat mencari task.
+  - Operator spread (...) juga digunakan untuk menyalin seluruh elemen dari array completed ke dalam array gabungan.
+  - Setelah terbentuk daftar gabungan, fungsi findItemById akan mencari task dengan id yang sesuai di dalam array gabungan tersebut. Fungsi ini menggunakan metode find pada array untuk mencari elemen pertama yang memenuhi kondisi tertentu.
+  - Di dalam fungsi find, kita membandingkan id dari setiap elemen dengan id yang ingin kita cari. Jika elemen dengan id yang sesuai ditemukan, maka fungsi find akan mengembalikan elemen tersebut. Jika tidak ada elemen yang sesuai, maka fungsi find akan mengembalikan undefined.
+  - Hasil pencarian task dengan id yang sesuai akan disimpan dalam variabel task.
+  </details>
+
+- Setelah mendapatkan task - task tersebut, lanjut ke code Add Item:
+
+  ```
+  // Add Item
+      // Add Item
+      if (destination.droppableId == 2) {
+        setCompleted([{ ...task, completed: !task.completed }, ...completed]);
+      } else {
+        setInComplete([{ ...task, completed: !task.completed }, ...inComplete]);
+      }
+  ```
+
+  Code diatas memastikan untuk menetapkan status completed dari task tersebut sesuai dengan zona droppable tujuan (destination.droppableId).
+
+- Jika destination.droppableId adalah 2 (artinya ke kolom "Done"), maka task tersebut dianggap selesai dan properti completed dari task tersebut akan diubah menjadi nilai berlawanan dengan status sebelumnya (menggunakan !task.completed). task tersebut akan ditambahkan kembali ke daftar completed.
+
+- Jika destination.droppableId bukan 2 (artinya ke kolom "To do"), maka task tersebut dianggap belum selesai dan properti completed dari task tersebut akan diubah menjadi nilai berlawanan dengan status sebelumnya (menggunakan !task.completed). task tersebut akan ditambahkan kembali ke daftar inCompleted.
+
+- Setelah selesai, state completed dan inCompleted akan diperbarui dengan menggunakan fungsi setCompleted dan setInCompleted untuk mencerminkan perubahan yang telah dilakukan pada task-task tersebut.
+
+- Dengan implementasi ini, pustaka react-beautiful-dnd akan secara otomatis mengatur ulang tugas-tugas di dalam daftar berdasarkan drag and drop yang dilakukan oleh pengguna, dan perubahan ini akan tercermin pada tampilan papan kanban secara otomatis.
 
 ## Smantic Commit Messages
 
