@@ -4680,6 +4680,8 @@ React Beautiful DND adalah sebuah library yang dirancang untuk memudahkan implem
 
 ### Komponen Utama
 
+<image src="./src/images/komponen-react-beautiful-dnd.png"/>
+
 Ada empat tag kunci yang digunakan dalam React Beautiful DND untuk mengatur interaksi drag-and-drop:
 
 - `<DragDropContext />` <br/>
@@ -4740,7 +4742,7 @@ export default Column;
 - Tag ini bertindak sebagai zona yang dapat menerima / tempat tujuan elemen yang di-drag oleh user.
 - Tag `<Droppable/>` ini memiliki properti `droppableId` yang sifatnya required/wajib.
 - Maksud dari `droppableId` digunakan untuk menandai area tujuan di mana elemen dapat diterima/di-drop saat sedang di-drag (drop area).
-- Di Contoh [ini](https://ninjaway.vercel.app) adalah di area column Todo, Done dan Backlog, Sehingga nantinya `droppableId` akan diisi dengan id ketiga area tersebut (Todo, Done dan Backlog).
+- Droppable area Di Contoh [ini](https://ninjaway.vercel.app) adalah di area column Todo, Done dan Backlog, Sehingga nantinya `droppableId` akan diisi dengan id ketiga area tersebut (Todo, Done dan Backlog).
 - droppableId harus bertipe string.
 
 ##### Children function
@@ -4750,14 +4752,10 @@ export default Column;
 - provided <br/> Objek ini berisi properti dan fungsi yang harus diberikan ke elemen yang akan di-drop (biasanya `<div>`).
 - snapshot <br/> Objek ini berisi informasi tentang keadaan saat ini dari zona drop, seperti apakah ada elemen yang sedang di-drag di atas zona ini atau tidak.
 - Di dalam tag `<Droppable/>`, terdapat elemen `div` yang digunakan sebagai wadah untuk menampilkan tugas-tugas dalam kolom. Beberapa hal yang dilakukan oleh elemen `div` ini:
-
   - Memiliki gaya tertentu dan dinamis berdasarkan `snapshot.isDraggingOver` (boolean).
   - Jika isDraggingOver bernilai true, maka backgroundnya akan berubah menjadi `bg-green-400`, jika tidak backgroundnya menjadi `bg-transparent`.
-
 - ref={provided.innerRef} <br/> Properti ref ini diperlukan untuk memastikan elemen dalam Droppable (dalam hal ini, elemen div) dapat di-render dengan benar ketika item di-drag. provided.innerRef akan dihubungkan ke elemen tersebut sehingga react-beautiful-dnd dapat mengontrolnya dan menentukan lokasi di mana elemen dijalankan saat di-drag.
-
 - {...provided.droppableProps} <br/> Properti ini digunakan untuk memasukkan props yang diperlukan agar elemen berfungsi sebagai zona drop (droppable area). react-beautiful-dnd menyediakan props khusus yang perlu dioperasikan agar zona drop dapat berfungsi, dan ini mencakup props seperti onDragEnter, onDragLeave, onDrop, dan lain-lain. Dengan menggunakan {...provided.droppableProps}, kita meneruskan semua props ini ke elemen div, sehingga elemen tersebut akan berfungsi sebagai zona drop dengan benar.
-
 - {provided.placeholder} <br/> digunakan untuk membuat ruang di `<Droppable />` sesuai kebutuhan selama drag (melepaskan item yang sedang di-drag). Ketika kita men-drag item di atas zona droppable, provided.placeholder akan ditampilkan pada posisi di mana item akan di-drop saat kita menyelesaikan operasi drag.
 
 Dengan menggunakan `<Droppable />` dan fungsi render prop, Kita membuat area di komponen Column yang dapat menerima elemen yang di-drag. Ketika ada elemen yang di-drag dan diarahkan ke area ini, maka area tersebut akan dapat menerima elemen-elemen yang di-drag tersebut, serta menampilkan placeholder saat tidak ada elemen yang di-drop. Semua fitur ini diatur oleh React Beautiful DND melalui penggunaan komponen `<Droppable />` dan render prop pada komponen Column.
