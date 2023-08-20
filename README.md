@@ -150,7 +150,10 @@
       <summary><a href="#react-to-print">React To Print (print pdf)</a></summary>
       <ul>
         <li>
-         <a href="#"></a>
+         <a href="#penggunaan-react-to-print">Penggunaan React To Print</a>
+        </li>
+        <li>
+         <a href="#menghandle-style-untuk-hasil-komponen-setelah-di-print">Menghandle style Komponen yang Di-print</a>
         </li>
       </ul>
     </details>
@@ -5035,7 +5038,7 @@ Terlepas dari kemajuan teknologi digital, ada banyak situasi di mana pencetakan 
 
 React-to-Print memungkinkan Anda mendefinisikan komponen yang ingin Anda cetak dan menyediakan tombol atau trigger untuk memicu pencetakan. Ketika tombol cetak ditekan, React-to-Print akan menciptakan sebuah jendela sementara (pop-up) yang berisi konten yang ingin dicetak, kemudian menjalankan perintah cetak bawaan browser.
 
-### Penggunaan React To Print untuk case Print data Tabular
+### Penggunaan React To Print
 
 Untuk belajar kita langsung praktek ke case print data tabular, source code telah dipush [di sini](https://github.com/argianardi/print-pdf) dan demo aplikasinya bisa dilihat [di sini](https://printthejokes.vercel.app/)
 
@@ -5561,7 +5564,9 @@ Kit juga bisa menggunakan psudo class dari tailwind yaitu `print:`. Pseudo class
   </div>
 </div>
 ```
+
 Komponen article akan tampil dibrowser dan akan hilang saat di-print, sebaliknya komponen div dengan class `print:block` akan hilang saat di browser dan akan tampil saat di-print.
+
 ## Smantic Commit Messages
 
 Berikut adalah rekomendasi keterangan commit sesuai semantik beserta keywords yang sesuai [[10]](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716):
