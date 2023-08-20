@@ -1,4 +1,4 @@
-<!-- ## Key Word -->
+## Key Word
 
 - [Persiapan Project](#persiapan-project)
 - <details open>
@@ -131,27 +131,39 @@
          <a href="#fitur-copy-teks-ke-clipboard">Fitur Copy Teks Ke Clipboard</a>
         </li>
         <li>
+         <a href="#fitur-ganti-contenticon-button-dalam-beberapa-detik">Fitur auto ganti/update state, content, atau icon dalam beberapa detik</a>
+        </li>
+        <li>
          <a href="#fitur-active-link">Fitur Active Link</a>
         </li>
       </ul>
     </details>
-    - <details open>
-      <summary><a href="#react-beautiful-dnd">Kumpulan Fitur</a></summary>
+- <details open>
+      <summary><a href="#react-beautiful-dnd-fitur-drag-and-drop">React Beautiful DND</a></summary>
       <ul>
         <li>
-         <a href="#fitur-copy-teks-ke-clipboard">Fitur Copy Teks Ke Clipboard</a>
-        </li>
-        <li>
-         <a href="#fitur-active-link">Fitur Active Link</a>
+         <a href="#implementasi-react-beautiful-dnd-di-aplikasi-kanban-board">Implementasi React Beautiful DND di Aplikasi Kanban Board</a>
         </li>
       </ul>
     </details>
+- <details open>
+      <summary><a href="#react-to-print">React To Print (print pdf)</a></summary>
+      <ul>
+        <li>
+         <a href="#penggunaan-react-to-print">Penggunaan React To Print</a>
+        </li>
+        <li>
+         <a href="#menghandle-style-untuk-hasil-komponen-setelah-di-print">Menghandle style Komponen yang Di-print</a>
+        </li>
+      </ul>
+    </details>
+
 - [Semantic Commit Messages](#smantic-commit-messages)
 - [Referensi](#referensi)
 
 ## Roadmap
 
-Untuk alur belajar react kita bia mengikuti roadmap [ini](https://roadmap.sh/react).
+Untuk belajar react, kita bisa mengikuti roadmap [ini](https://roadmap.sh/react).
 
 ## Persiapan Project
 
@@ -5018,6 +5030,543 @@ Dari code diatas kita akan lebih banyak bahas tentang function `handleDragEnd`, 
 
 - Dengan implementasi ini, pustaka react-beautiful-dnd akan secara otomatis mengatur ulang tugas-tugas di dalam daftar berdasarkan drag and drop yang dilakukan oleh pengguna, dan perubahan ini akan tercermin pada tampilan papan kanban secara otomatis.
 
+## React-To-Print
+
+React-to-Print adalah sebuah library React yang memungkinkan user dengan mudah mencetak elemen atau komponen dalam aplikasi web. Ini adalah solusi untuk membuat user dapat mencetak konten dari aplikasi tanpa harus membuka dialog cetak bawaan browser.
+
+Terlepas dari kemajuan teknologi digital, ada banyak situasi di mana pencetakan masih diperlukan. Beberapa contoh laporan, tiket, atau konten yang lebih panjang. Dalam situasi seperti itu, React-to-Print hadir sebagai solusi untuk mencetak konten aplikasi dengan tampilan yang terkontrol. React to print dibahas lebih banyak [di sini](https://github.com/gregnb/react-to-print)
+
+React-to-Print memungkinkan Anda mendefinisikan komponen yang ingin Anda cetak dan menyediakan tombol atau trigger untuk memicu pencetakan. Ketika tombol cetak ditekan, React-to-Print akan menciptakan sebuah jendela sementara (pop-up) yang berisi konten yang ingin dicetak, kemudian menjalankan perintah cetak bawaan browser.
+
+### Penggunaan React To Print
+
+Untuk belajar kita langsung praktek ke case print data tabular, source code telah dipush [di sini](https://github.com/argianardi/print-pdf) dan demo aplikasinya bisa dilihat [di sini](https://printthejokes.vercel.app/)
+
+- Instalasi <br/>
+  Install `react-to-print` dengan command:
+  ```
+  npm install react-to-print
+  ```
+- Buat Komponen yang Akan Dicetak <br/>
+  Buat komponen yang akan di-print. Di case ini, kita akan mencetak komponen banner dan table yang berisi data tabular. Sehingga kita harus membuat komponen banner dan table, kemudian kita kumpulkan/import keduanya ke dalam satu file yaitu page tabular data. Berikut code di komponen banner:
+
+  ```
+  import React, { useRef } from 'react';
+
+  import plus from '../assets/icons/plus.svg';
+  import filter from '../assets/icons/filter.svg';
+  import printer from '../assets/icons/printer.svg';
+  import refresh from '../assets/icons/refresh.svg';
+  import search from '../assets/icons/search.svg';
+
+  const Banner = ({
+    title,
+    description,
+    image,
+    onOpenModal,
+    openModalButtonLabel,
+    showOpenModalButton,
+    searchPlaceholder,
+    showFilterButton,
+    showPrintButton,
+    showPrintButtonLabel,
+    shortPrintButtonLabel,
+    longPrintButtonLabel,
+    higher,
+    customePaddingTop,
+    handlePrint,
+  }) => {
+    return (
+      //----------------------------------------------------------------------------------------------------------------------------------------------------------
+      <div
+        className={`hidden print-component md:block sticky xl:static top-[105px] xl:top-28 bg-white z-20 ${customePaddingTop}`}
+      >
+      //----------------------------------------------------------------------------------------------------------------------------------------------------------
+        <div
+          className={`relative z-0 w-full overflow-hidden rounded-lg ${
+            higher ? 'h-[167px] xl:h-[215px]' : 'h-[167px]'
+          } bg-aurora-blue`}
+        >
+          <div className="absolute top-0 left-0 w-full h-full bg-dots-pattern" />
+          <img
+            src={image}
+            alt={title}
+            className="absolute -z-10 h-full -right-[340px] lg:-right-24 xl:-right-14 2xl:-right-3 2xl:w-[800px] w-[900px] xl:w-[700px] 3xl:right-0 lg:object-cover xl:object-fill"
+          />
+          <div className="absolute z-40 flex flex-col justify-between w-full h-[167px] p-3">
+            <div className="max-w-[345px] -mt-1">
+              <h2 className="text-xl font-bold text-white font-quicksand">
+                {title}
+              </h2>
+              <p className="mt-1 text-xs leading-6 font-inter text-forested-mind">
+                {description}
+              </p>
+            </div>
+            <div className="no-print">
+              <div className="flex items-center justify-between gap-4">
+                {showOpenModalButton && (
+                  <button
+                    type="button"
+                    className="flex items-center px-3 py-[13px] lg:py-3 rounded-lg blur-5 bg-white/20 hover:bg-white/40 bg-dots-pattern"
+                    onClick={onOpenModal}
+                  >
+                    <img src={plus} alt="plus icon" className="w-4 " />
+                    <span className="hidden ml-3 text-sm font-semibold text-white xs:ml-1 font-quicksand lg:block">
+                      {openModalButtonLabel}
+                    </span>
+                  </button>
+                )}
+                <div className="flex items-center flex-1 w-full py-1 pl-2 pr-1 bg-white rounded-lg sm:pl-4 bg-gradient-to-r from-white via-white-25 to-white-25">
+                  <div className="flex items-center w-full py-[3px] lg:py-0 text-gray-400">
+                    <img src={search} alt="search" />
+                    <input
+                      type="text"
+                      placeholder={searchPlaceholder}
+                      className="w-full px-2 py-1 text-sm font-medium bg-transparent focus:outline-none font-quicksand text-clinder placeholder:text-gray-x placeholder:font-quicksand placeholder:text-sm placeholder:font-medium"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="hidden p-2 text-sm font-bold text-white rounded-lg sm:px-4 bg-aurora-blue hover:bg-blue-700 font-quicksand lg:block"
+                  >
+                    Search
+                  </button>
+                </div>
+                {showFilterButton && (
+                  <button
+                    type="button"
+                    className="flex items-center px-4 py-3 rounded-lg blur-5 hover:bg-white/40 bg-white/20"
+                  >
+                    <img src={filter} alt="filter" />
+                    <span className="ml-3 text-sm font-semibold text-white font-quicksand">
+                      Filter
+                    </span>
+                  </button>
+                )}
+                <button className="flex items-center px-4 py-3 rounded-lg blur-5 hover:bg-white/40 bg-white/20 bg-dots-pattern">
+                  <img src={refresh} alt="refresh" />
+                  <span className="ml-3 text-sm font-semibold text-white font-quicksand">
+                    Refresh
+                  </span>
+                </button>
+                <div>
+                  {showPrintButton && (
+                    <button
+                      type="button"
+                      className="flex items-center px-4 py-3 rounded-lg blur-5 hover:bg-white/40 bg-white/20 bg-dots-pattern"
+                    //-------------------------- Jadikan method handlePrint sebagai trigger print----------------
+                      onClick={handlePrint}
+                    //--------------------------------------------------------------------------------------------------------
+                    >
+                      <img src={printer} alt="printer" />
+                      {showPrintButtonLabel && (
+                        <>
+                          <span className="block ml-3 text-sm font-semibold text-white font-quicksand xl:hidden">
+                            {shortPrintButtonLabel}
+                          </span>
+                          <span className="hidden ml-3 text-sm font-semibold text-white xl:block font-quicksand">
+                            {longPrintButtonLabel}
+                          </span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="absolute inset-0 z-30 flex flex-wrap w-full h-full opacity-10 bg-dots" />
+        </div>
+      </div>
+    );
+  };
+
+  Banner.defaultProps = {
+    openModalButtonLabel: true,
+    showOpenModalButton: true,
+    showFilterButton: true,
+    showPrintButton: true,
+    showPrintButtonLabel: true,
+    higher: false,
+    customePaddingTop: 'pt-4',
+  };
+
+  export default Banner;
+
+  ```
+
+  [Source Code](https://github.com/argianardi/print-pdf/blob/main/src/components/Banner.jsx)
+
+  Selanjutnya buat component Table, berikut codenya:
+
+  ```
+  import React from 'react';
+
+  import DoubleIndicatorDropdown from '../components/DoubleIndicatorDropdown';
+  import shieldSearch from '../assets/icons/shieldSearch.svg';
+  import edit from '../assets/icons/edit.svg';
+  import trashRed from '../assets/icons/trashRed.svg';
+
+  const Table = ({
+    nameSortOptions,
+    creatorSortOptions,
+    productSortOptions,
+    locationSortOptions,
+    categoryData,
+  }) => {
+    return (
+      //------------------------------------------------------------------------------------------
+      <div className="hidden overflow-x-auto print-component md:block">
+      //------------------------------------------------------------------------------------------
+        <div className="w-full">
+          <table className="w-full mt-3 border-collapse table-auto">
+            <thead className="bg-neutral-gray">
+              <tr>
+                <th
+                  className="w-[28.5%] lg:w-[29.7%] xl:w-[21.23%] 5xl:w-1/5 text-start"
+                  id="category-name"
+                >
+                  <DoubleIndicatorDropdown options={nameSortOptions} />
+                </th>
+                <th
+                  className="hidden w-[28.5%] lg:w-[29.7%] xl:w-full xl:block text-start"
+                  id="creator"
+                >
+                  <DoubleIndicatorDropdown options={creatorSortOptions} />
+                </th>
+                <th
+                  className="w-[28.5%] lg:w-[29.7%] xl:w-[15.10%] 5xl:w-1/5 text-start"
+                  id="product"
+                >
+                  <DoubleIndicatorDropdown options={productSortOptions} />
+                </th>
+                <th
+                  className="w-[28.5%] lg:w-[29.7%] xl:w-[21.23%] 5xl:w-1/5 text-start"
+                  id="location"
+                >
+                  <DoubleIndicatorDropdown options={locationSortOptions} />
+                </th>
+                <th
+                  className="w-[12.66%] lg:w-[9%] xl:w-[21.23%] 5xl:w-1/5 text-start no-print"
+                  id="action"
+                >
+                  <p className="p-[10px] text-sm font-medium hover:bg-gray-50 text-manatee font-quicksand">
+                    Action
+                  </p>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {categoryData.map((stock, index) => {
+                let locationBgColor;
+                let locationTextColor;
+                if (stock.location === 'kitchen') {
+                  locationTextColor = 'text-purpletty';
+                  locationBgColor = 'bg-coral';
+                } else if (stock.location === 'bar') {
+                  locationTextColor = 'text-greentty';
+                  locationBgColor = 'bg-pastel-green';
+                } else {
+                  locationTextColor = 'text-orangetty';
+                  locationBgColor = 'bg-linen';
+                }
+
+                return (
+                  <tr key={index}>
+                    <td
+                      className={`text-sm font-semibold leading-5 font-quicksand text-clinder px-[10px] ${
+                        index === 0 ? 'pt-8 pb-[14px]' : 'py-[14px]'
+                      }`}
+                      aria-labelledby="category-name"
+                    >
+                      {stock.categoryName}
+                    </td>
+                    <td
+                      className={`hidden xl:block px-[10px] text-sm font-semibold leading-5 font-quicksand text-clinder ${
+                        index === 0 ? 'pt-8 pb-[14px]' : 'py-[14px]'
+                      }`}
+                      aria-labelledby="creator"
+                    >
+                      <div className="flex items-center">
+                        <figure className="overflow-hidden rounded-full avatar w-9 h-9">
+                          <img
+                            src={stock.creator.creatorProfilePicture}
+                            alt="user profile"
+                          />
+                        </figure>
+                        <div>
+                          <div className="ml-3">
+                            <h3 className="text-sm font-semibold font-quicksand text-black-lighter leading-[150%]">
+                              {stock.creator.creatorName}
+                            </h3>
+                            <h5 className="text-xs font-normal font-satoshi text-manatee leading-[200%]">
+                              {stock.creator.creatorRole}
+                            </h5>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td
+                      className={`px-[10px] text-sm font-semibold font-quicksand text-clinder ${
+                        index === 0 ? 'pt-8 pb-[14px]' : 'py-[14px]'
+                      }`}
+                      aria-labelledby="product"
+                    >
+                      {stock.product} Menu
+                    </td>
+                    <td
+                      className={`${
+                        index === 0 ? 'pt-8 pb-[14px]' : 'py-[14px]'
+                      }`}
+                      aria-labelledby="location"
+                    >
+                      <div className={`inline px-4 py-[10px] ${locationBgColor}`}>
+                        <span
+                          className={`leading-5 text-sm font-semibold font-quicksand ${locationTextColor}`}
+                        >
+                          {stock.location}
+                        </span>
+                      </div>
+                    </td>
+                    <td
+                      aria-labelledby="action"
+                      className={`px-[10px] no-print ${
+                        index === 0 ? 'pt-8 pb-[14px]' : 'py-[14px]'
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className="block px-3 mx-auto xl:hidden"
+                      >
+                        <div className="w-[4px] h-[4px] bg-black rounded-full mx-auto" />
+                        <div className="w-[4px] h-[4px] bg-black rounded-full my-1 mx-auto" />
+                        <div className="w-[4px] h-[4px] bg-black rounded-full mx-auto" />
+                      </button>
+                      <div
+                        className={`hidden xl:flex items-center justify-center gap-1 mt-2 ${
+                          index === 0 ? 'mb-[3px] mt-4' : 'my-[3px]'
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          className="flex items-center justify-center flex-1 gap-2 px-3 py-1 duration-300 transform rounded bg-neutral-gray hover:bg-gray-200"
+                        >
+                          <img
+                            src={shieldSearch}
+                            alt="shield search"
+                            className="w-3 h-3"
+                          />
+                          <span className="text-sm font-semibold font-quicksand text-clinder">
+                            Detail
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          className="flex items-center justify-center flex-1 gap-2 px-3 py-1 duration-300 transform rounded-md bg-neutral-gray hover:bg-gray-200"
+                        >
+                          <img src={edit} alt="edit" className="w-3 h-3" />
+                          <span className="text-sm font-semibold font-quicksand text-clinder">
+                            Edit
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          className="px-3 py-[7px] duration-300 transform rounded-md bg-neutral-gray hover:bg-gray-200"
+                        >
+                          <img
+                            src={trashRed}
+                            alt="trash red"
+                            className="w-3 h-3"
+                          />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  };
+
+  export default Table;
+  ```
+
+  [Source Code](https://github.com/argianardi/print-pdf/blob/main/src/components/Table.jsx)
+
+- Terakhir kita buat element kumpulkan/import komponent banner dan Tabel ke dalam page tabular data, berikut codenya:
+
+  ```
+  import React, { useState, useRef } from 'react';
+
+  import stockCategoryBanner from '../assets/icons/stockBanner.png';
+  import Table from '../components/Table';
+  import Banner from '../components/Banner';
+  import { useReactToPrint } from 'react-to-print';
+
+  const TabularData = () => {
+    const [isNewCategoryModalOpen, setIsNewCategoryModalOpen] = useState(false);
+    //----------------------------------Buat referensi elemen DOM yang akan di-print----------------------
+    const refPrint = useRef();
+    //----------------------------------------------------------------------------------------------------------
+
+    // Fake Data
+    const nameSortOptions = [....];
+    const creatorSortOptions = [....];
+    const productSortOptions = [....];
+    const locationSortOptions = [....];
+    const categoryData = [....];
+
+    //------------------------Buat method handle print--------------------------------------------------------
+    const handlePrint = useReactToPrint({
+      content: () => refPrint.current,
+      documentTitle: 'category-data',
+    });
+    //------------------------------------------------------------------------------------------------------------------------
+
+    return (
+      <div className="flex flex-col min-h-screen border-2 border-blue-500 md:flex-row">
+      //---------------------------Letakkan Refs ke elemen yang akan di-print-----------------------------------------------------------
+        <main
+          className="flex flex-col justify-between flex-1 px-6"
+          ref={refPrint}
+        >
+      //------------------------------------------------------------------------------------------------------------------------
+          <div>
+            <Banner
+              title="Category"
+              description="On this menu you will be able to create, edit, and also delete the category of the food. Also you can manage it easily."
+              onOpenModal={() => setIsNewCategoryModalOpen(true)}
+              openModalButtonLabel="Create New Category"
+              searchPlaceholder={'Find your categories here'}
+              image={stockCategoryBanner}
+              showFilterButton={false}
+              shortPrintButtonLabel={'Print List'}
+              longPrintButtonLabel={'Print List of Category'}
+             //-------------------------------Jadikan method handlePrint sebagai trigger print------------------------------------------------------------------
+              handlePrint={handlePrint}
+              //------------------------------------------------------------------------------------------------------------------------
+            />
+
+            {/* Stock Category Table for Tablet & Desktop */}
+            <Table
+              nameSortOptions={nameSortOptions}
+              creatorSortOptions={creatorSortOptions}
+              productSortOptions={productSortOptions}
+              locationSortOptions={locationSortOptions}
+              categoryData={categoryData}
+            />
+          </div>
+        </main>
+      </div>
+    );
+  };
+
+  export default TabularData;
+  ```
+
+  [Source Code](https://github.com/argianardi/print-pdf/blob/main/src/pages/TabularData.jsx)
+
+- Gunakan React-to-Print <br/>
+  Dalam penggunaan `react-to-print` ada beberapa hal yang harus kita lakukan, diantaranya:
+
+  - Buat referensi elemen DOM yang akan di-print <br/>
+    pada code `const refPrint = useRef();` kita menggunakan Refs dalam React. Refs digunakan untuk mendapatkan referensi ke elemen dalam DOM atau ke komponen dalam React. Dalam kasus ini, Anda menggunakan ref untuk mendapatkan referensi ke elemen DOM yang ingin di-print.
+  - Letakkan Refs ke elemen yang akan di-print <br/>
+
+    ```
+    <main
+            className="flex flex-col justify-between flex-1 px-6"
+            ref={refPrint}
+          >
+          //Komponen child di tag main
+    </main>
+    ```
+
+    Di case yang ini kita meletakkan Refs yang kita buat tadi (`refPrint`) ke dalam tag `<main>`. Karena tag `<main>` ini membungkus komponen yang ingin di-print (komponen banner dan table)
+
+  - Buat method handle print
+    ```
+    const handlePrint = useReactToPrint({
+      content: () => refPrint.current,
+      documentTitle: 'category-data',
+    });
+    ```
+    kita menggunakan hook `useReactToPrint` dari library `react-to-print` untuk mengatur tindakan pencetakan halaman untuk mengatur action print. Properti content dari hook ini diberi fungsi yang mengambil nilai ref saat ini (refPrint.current) sebagai konten yang akan di-print.
+  - Jadikan method handlePrint sebagai trigger print <br/>
+    Disini kita buat komponen untuk menjalankan method `handlePrint` biasanya menggunakan event `onClick` di sebuah button. Di case ini kita akan menggunakan button `print` yang ada di komponen banner sebagai triggernya. Pertama kita lempar method dari page utama ke komponen banner lewat prop
+
+    ```
+    <Banner
+      title="Category"
+      description="On this menu you will be able to create, edit, and also delete the category of the food. Also you can manage it easily."
+      onOpenModal={() => setIsNewCategoryModalOpen(true)}
+      openModalButtonLabel="Create New Category"
+      searchPlaceholder={'Find your categories here'}
+      image={stockCategoryBanner}
+      showFilterButton={false}
+      shortPrintButtonLabel={'Print List'}
+      longPrintButtonLabel={'Print List of Category'}
+      //---------------------------------------------------------------
+      handlePrint={handlePrint}
+      //---------------------------------------------------------------
+    />
+    ```
+
+    Selanjutnya prop yang berisi `handlePrint` tadi ditangkap dan dijadikan method untuk event `onClick` di button print untuk menjalankan fitu print
+
+    ```
+    <button
+      type="button"
+      className="flex items-center px-4 py-3 rounded-lg blur-5 hover:bg-white/40 bg-white/20 bg-dots-pattern"
+      //-------------------------- Jadikan method handlePrint sebagai trigger print----------------
+      onClick={handlePrint}
+      //--------------------------------------------------------------------------------------------------------
+      >
+      ...content button
+    </button>
+    ```
+
+### Menghandle style Untuk Hasil Komponen Setelah Di-print
+
+#### Menggunakan CSS native
+
+Ketika menggunakan CSS Native, kita dapat menggunakan media query `@media print`, untuk memanipulasi style komponen hasil cetakan dalam React menggunakan `react-to-print`. Berikut contoh penggunaannya.
+
+- Buat kelas untuk memanipulasi style hasil komponen yang akan di-print
+  ```
+  @media print {
+    .no-print {
+      display: none;
+    }
+    .print-component {
+      display: block !important;
+    }
+  }
+  ```
+- Tambahkan class yang dibuat ke dalam komponen yang akan di-print dan dimanipulasi style-nya
+
+#### Menggunan Pseudo Class
+
+Kit juga bisa menggunakan psudo class dari tailwind yaitu `print:`. Pseudo class ini digunakan untuk memanipulasi style untuk komponen saat sedang diprint. Berikut contoh penggunaannya:
+
+```
+<div>
+  <article className="print:hidden">
+    <h1>My Secret Pizza Recipe</h1>
+    <p>This recipe is a secret, and must not be shared with anyone</p>
+    <!-- ... -->
+  </article>
+  <div className="hidden print:block">
+    Are you seriously trying to print this? It's secret!
+  </div>
+</div>
+```
+
+Komponen article akan tampil dibrowser dan akan hilang saat di-print, sebaliknya komponen div dengan class `print:block` akan hilang saat di browser dan akan tampil saat di-print.
+
 ## Smantic Commit Messages
 
 Berikut adalah rekomendasi keterangan commit sesuai semantik beserta keywords yang sesuai [[10]](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716):
@@ -5056,3 +5605,10 @@ Berikut adalah rekomendasi keterangan commit sesuai semantik beserta keywords ya
 - [[8] https://tailwindcss.com/](https://tailwindcss.com/)
 - [[9] yutube.com/@reactjsBD](https://www.youtube.com/@reactjsBD)
 - [[10] https://gist.github.com/joshbuchea/](https://gist.github.com/joshbuchea/6f47e86d2510bce28f8e7f42ae84c716)
+
+## Selected Tutor Links
+
+- [react beautiful-dnd by koding 101](https://www.youtube.com/watch?v=SJTazZUQVDE&list=PLjHnC-thKICcoh6IwXGrJMQy9O1-IJ-8c&index=9)
+- [react-beautiful-dnd by Laith Academy](https://www.youtube.com/watch?v=YJ5EMzyimfc&list=PLjHnC-thKICcoh6IwXGrJMQy9O1-IJ-8c&index=10)
+- [react-to-print by Code With YD](https://www.youtube.com/watch?v=Do7T8LDKy0Q&list=PLjHnC-thKICcoh6IwXGrJMQy9O1-IJ-8c&index=11)
+- [react-to-print by Easy Coding](https://www.youtube.com/watch?v=Do7T8LDKy0Q&list=PLjHnC-thKICcoh6IwXGrJMQy9O1-IJ-8c&index=12)
